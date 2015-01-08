@@ -1,5 +1,44 @@
 \chapter{Approach}
 
+\section{Constraint Programming}
+Constraint programing is a \emph{declarative} paradigm. This means that in contrast to \emph{imperative} paradigm languages, such as C or Java, the focus of solving problems using constraint programming is on specifying the solution and not the algorithm to solve it. This is done by specifying the solution using \emph{domain variables}, or simply variables, and \emph{constraints}. Variables have a domain of values, meaning they can represent each value in their domain. Variables can often be, depending on language and solver, either integers, floating-points, boolean or symbolic, symbolic being a text or label. For example a symbolic variable representing a week would have the domain\\
+$\{Monday,Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday\}$.
+
+\subsection{Constraints}
+Constraints are set up as relationships between the variables, and thereby limiting the domains of the variables. Integer domains are often used for variables, so for the rest of this section we will assume variables have integer domains. For this domain the following function symbols can be used: $+$, $\times$, $-$ and $\div$. The constraint relation symbols are $=$, $<$, $\leq$, $>$, $\geq$. Together with the function symbols and the constraint relation symbols, one can create simple constraint, called \emph{primitive constraints}. An example of a primitive constraint is $X < Y$, i.e.\ the values in $X$'s domain has to lower than in $Y$'s. Primitive constraints can be used to create more complex constraints using the conjunctive connective $\land$. An example of this is $X < Y \land Y < 10$, i.e.\ $Y$ has to be less than $10$ and $X$ has to be less than $Y$. Since all constraints has to hold when the model is evaluated, all constraints are joined in a conjunction.(\textbf{?}) The disjunctive connective $\lor$ is also available and can be used in the same way as $\land$. In some cases the logical implications; reverse implication ($\gets$), forward implication ($\to$) and bi-implication ($\leftrightarrow$) are also available. Here, for example, the implication works by taking two logical statement and if the first one evaluates to \emph{true} the other statement should hold as well. For example $X = 0 \to Y > 5$ says that if $X=0$ then $Y$ should be larger than $5$.
+
+\begin{framed}
+For example, we have a problem with the variables $x$ and $y$. $x = 4$ and $y = \{1..10\}$. Here the $x$ has the value $4$ and can thereby only assume the value $4$. $y$ on the other hand can assume the values $1$ to $10$. This means a solution to this problem can be $x = 4$ and $y = 1$ or likewise $x = 4$ and $y = 5$ , they are equally correct.\\
+On this problem we can impose a constraint, for example $y > x$. Now we have set the constraint that $y$ needs to be larger than $x$. And since $x$ has a fixed known value we can directly see that $y > 4$, since $x = 4$. Now with this constraint, we can get rid of the lower part of $y$'s domain and now $y = \{5..10\}$ instead. And now a viable solution can be $x = 4$ and $y = 7$, but not $x = 4$ and $y = 3$.
+\end{framed}
+
+\begin{figure}
+  \input{Figures/search_example}%     without .tex extension
+  % or use \input{mytikz}
+  \caption{The beginning of the search space for the variables $X$, $Y$, $Z$, where $X=\{1,3,6\}$ $Y=\{5,9,8\}$ $Z=\{6,3,5\}$}
+  \label{fig:search_space}
+\end{figure}
+
+\subsection{Global constraints}
+\subsubsection{AllDifferent}
+\subsubsection{Circuit}
+\subsubsection{Cumulative}
+\subsubsection{Global_Cardinality}
+
+
+
+\subsection{Solver}
+A constraint programming program is consisting of many of these constraints and variables. When the solution is specified in a model, a \emph{solver} runs the model. The goal of the solver is to satisfy all the constraints, i.e. set the domains of the variables so that the all follow the relationships of the constraints. This is called the \emph{constraint satisfaction problem}, and can  be defined as a triple $\langle Z,D,C \rangle$. $Z=\{x_1 \ldots x_n\}$ is a finite set of all the variables in the solution, $D(x_i), \; x_i \in Z$ is a set representing the domain of values the variable $x_i$ can assume, $C$ is the set of constraints imposed on the variables in $Z$. The solver accomplishes this by doing a \emph{search} on the space of possibilities, i.e.\ the \emph{search space}. The search space is in the form of a tree, where each branch is a selection of a variable where the variables domain is reduced into a smaller subset that conforms with the constraints. The solver traverses the tree in search for a solution. When all variables are set to conform with the constraints a solution is found. If the solver reaches a node where a variables domain becomes empty, it has to \emph{backtrack} to a previous node from which it can choose a new variable to set, i.e.\ traversing a new branch of that node.
+
+\cite{tsang_1993}
+\cite{marriott_1998}
+\cite{mz_manual}
+
+\subsection{Reified}
+
+\section{Job-shop scheduling problem}
+\subsection{Flexible job-shop scheduling problem}
+
 \section{MiniZinc}
 \section{Model}
 This model is based on/inspired by the model in [ejenstam]. That model is centered around work performed in fixtures. So tasks can easily be labeled \emph{tray} if it uses a tray, \emph{fixture} if it uses a fixture, etc. This is common robot cell assembly procedures; take a component from a tray, put it in a fixture, get another component, mount the component on the the component in the fixture. But YuMi can perform much more complex tasks than that. We want to be able to schedule mounting tasks that does not incorporate a fixture. We have used a similar way of generalizing tasks by labeling them with \emph{tray}, \emph{fixture}, etc. but extended it.

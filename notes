@@ -1,0 +1,39 @@
+Att inkludera:
+	* Markera ut om en arm inte kan ta sig till ett visst ställe -> kan förenkla datan, begränsa antalet lösningar och frammana en lösning snabbare. Har lagt in en parameter som talar om förmodellen ifall den ska börja söka igenom pred för take-tasks från slutet av domänen, alltså från start-tasks:en, eller från mitten av domänen. Detta prioriterar att take-tasks ska komma först i circuits:en. Detta kan påverka i vissa fall då man begränsar vilken maskin som kan göra vissa take tasks.
+	* Att en maskin kan ha flera tools samtidigt, nödvändigt för att lösa Ejenstams problem
+
+Med i rapporten:
+	* Hur man skapar data till modellen
+	* Jamförelse mellan solvers
+	* Om reified constraints och varför vi undvikit dem
+	* Beskriva lösarna
+		Gecode
+		JaCoP
+		OR-tools
+		Opturion CPX
+	* Jämföra resultaten från de olika lösarna
+		Hittar lösning inom rimlig tid?
+		Tid?
+		Antal genererade constraints. FlatZinc filens storlek
+	* Att ha begränsningar på var armarna kan röra sig vs inte ha det
+	* Diskutera valet av att definiera plats/tid för varje task istället för att definiera positioner i rummet och länka varje task till en position. Och på så sätt slippa definiera tider för varje task när de egentligen hänvisar till samma plats.
+	* Diskutera huruvida de constraints som begränsar moveDuration är nödvändiga då moveDuration väljs från en matris baserat på dess predecessor och dessa begränsningar bygger på matrisen
+	* Diskutera att timeMatrix3D kan vara rätt sparse. Vilket medför att en del filter, som involverar move time, inte påverkar något. Det uppstår nollor på en rad för de tasks som utförs på samma ställe, tex. de som involverar fixtures. Medan tasks som utförs på unika platser, tex. att ta upp en ring från ring-tray, inte borde få några nollor på sin rad.
+
+Begränsningar:
+	* Kollisions-avoidance både här och i Ejenstams modell garanterar inte att armarna i sig inte krockar, utan endast att grip-donen inte krockar vid trays, fixtuers, camera, mm.
+	* Modellen begränsar inte antalet tools som finns till hands. I stort sätt utgår den ifrån att det finns en uppsättning av alla sorters tools till alla maskiner.
+
+Allmänna funderingar:
+	* Att ha möjlighet att byta tool och kunna ha flera "tools" på ett tool kan ge en väldigt stor och komplex sökrymd. Möjligheten att optimera genom att byta "tool" finns på många ställen -> komplext problem
+	* Vår modell mer komplicerad genom att vi kan göra fler avancerade rörelser, t.ex. montera saker i luften mellan två armar. Alltså inte bara i fixturer.
+	  Ejenstams mer komplex genom större sökrymd som inte går att begränsa på ett vettigt sätt. De olika vägarna som kan tas genom att ta upp flera saker efter varandra gör att möjligheterna ökar drastiskt. Och att läga på vårt alternativ att byta verktyg ökar på denna komplexitet. Därav krävs det sökalgoritmer liknande de som används av Ejenstam.
+	  Analysera mindre fall matematiskt?
+	* Ejenstam gör det lätt för sig genom att säga att varje subassembyl måste utföras i sin helhet på en fixture och varje subassembly måste utföras på olika fixtures. Detta innebär att han inte behöver hålla reda på om det finns något i fixture:n eller inte, så länge fixture tasks inte överlappar.
+	  Detta är nog svårt att generalisera då det måste finnas lika många fixtures som subassemblies.
+	* Ejenstams tider bygger på riktig uppmätta tider. Dessa varierar dock även för samma tasks beroende på vilken arm som utför det. Detta kan te sig lite märkligt, då en task i sig borde ta lika lång tid oavsett vilken arm som gör det. De borde även kunna röra sig lika snabbt mellan tasks. Det enda som skiljer armar åt borde vara ifall armen kan utföra task:en eller inte, alltså om den kan nå punkten i rummet eller inte.
+	  Vi utgår ifrån att alla tasks och rörelser mellan tasks tar lika lång tid för alla armar.
+	* Anledningen till de stora filerna för G12 Lazy och Opturion CPX kan bero på att de använder sig av SAT. Båda är hybrider, Lazy SAT och FD [T.Feydy,P.J.Stuckey] och Opturion SAT och något odefinierat(Kolla upp!). Kolla mer i literatur
+
+Problem att modellera Ejenstams modell:
+	* Eftersom att det är tillåtet att plocka upp flera saker efter varandra i Ejenstams modell, så kan man inte ha constraint:et som kopplar ihop take och put av en komponent

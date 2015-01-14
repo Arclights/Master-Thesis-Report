@@ -1,0 +1,87 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{calc, shapes, backgrounds}
+\usepackage{standalone}
+\usepackage{amsmath, amssymb}
+\pagecolor{olive!50!yellow!50!white}
+\begin{document}
+\tikzset{
+  leaf/.style = {draw=none,label = center:\textsf{$\vdots$}},
+  labels/.style={midway, sloped, above, yshift=-10pt}
+}
+\begin{tikzpicture}
+[
+    scale = 0.75, transform shape, thick,
+    every node/.style = {draw, circle, minimum size = 5mm, line width = 1pt, align=center},
+    grow = down,  % alignment of characters
+    level 1/.style = {sibling distance=6cm},
+    level 2/.style = {sibling distance=2cm}, 
+    level 3/.style = {sibling distance=1cm}, 
+    level distance = 3 cm
+  ]
+  
+  \tikzset{VertexStyle/.style = {shape          = circle,
+                                   text           = black,
+                                   inner sep      = 2pt,
+                                   outer sep      = 5pt,
+                                   minimum size   = 20pt}}
+  \begin{scope}[node distance=20mm and 10mm]
+  \node[VertexStyle](11){1};
+  \node[VertexStyle, below of= 11](12){2};
+  \node[VertexStyle, below of= 12](13){3};
+
+  \node[VertexStyle, right= 2cm of 11](21){1};
+  \node[VertexStyle, below of= 21](22){2};
+  \node[VertexStyle, below of= 22](23){3};
+  \end{scope}
+  
+  \draw(11) to (21);
+  \draw(11) to (22);
+  \draw(11) to (23);
+  \draw(12) to (23);
+
+% \node (Start){}
+%   child {   node [] (A) {}
+%     child { node [] (D) {}
+%       child { node [leaf] (M) {}}
+%       child { node [leaf] (N) {}}
+%     }
+%     child { node [] (E) {}
+%       child { node [leaf] (O) {}}
+%       child { node [leaf] (P) {}}
+%     }
+%     child { node [] (F) {}
+%       child { node [leaf] (Q) {}}
+%       child { node [leaf] (R) {}}
+%     }
+%   }
+%   child {   node [] (B) {}
+%     child { node [] (G) {}
+%       child { node [leaf] (S) {}}
+%       child { node [leaf] (T) {}}
+%     }
+%     child { node [] (H) {}
+%       child { node [leaf] (U) {}}
+%       child { node [leaf] (V) {}}
+%     }
+%     child { node [] (I) {}
+%       child { node [leaf] (X) {}}
+%       child { node [leaf] (Y) {}}
+%     }
+%   }
+%   child{ node(C){}
+%     child { node [] (J) {}
+%       child { node [leaf] (Z) {}}
+%       child { node [leaf] (A1) {}}
+%     }
+%     child { node [] (K) {}
+%       child { node [leaf] (B1) {}}
+%       child { node [leaf] (C1) {}}
+%     }
+%     child { node [] (L) {}
+%       child { node [leaf] (D1) {}}
+%       child { node [leaf] (E1) {}}
+%     }
+%   };
+\end{tikzpicture}
+\end{document} 

@@ -1,1 +1,901 @@
  \chapter{Model}
+ 
+ Beskriv grunder i hur modellen fungerar
+ There are moves put inbetween each task
+ Model deosn't deal with coordinates only times for movement between tasks
+ The data used by the model can be generated using tools described in [appendix ??]
+ The move time depends on if there is a change between the tasks, if there is a task, the change will be longer than usual.
+ \\Terminology:\\
+ The goal for the assembly is to assemble components. This is components fed to the assembly from the outside, for example button components. The final assembly is the complete assembly of components that make the final product. All the smaller assemblies before that are called sub-assemblies. For reasons explained further down, we will in this thesis call components such as buttons for \emph{primitve} components instead of just components.
+ \subsection{Model varibles}
+ \subsection{Variables}
+ \subsubsection{Static variables}
+ Static variables are variables that have a fixed value, or is a set or list containing fixed values.
+ 
+ \begin{equation}\label{eq:1}
+ nbrTasks \in \{1 , \ldots , 2^{32}-1\}
+ \end{equation}
+ \begin{equation}\label{eq:10}
+ tasks = \{1 , \ldots , nbrTasks\}
+ \end{equation}
+ First we define the number of tasks to be scheduled. Each task is identified 
+ \\\\
+ As mentioned, this model is based on the technique of using predecessors to determine which task comes directly before another. This creates the need to have source and a sink node for each machine, we call them start tasks and goal tasks. As they are not provided as parameters, the model creates them and give them identifiers with numbers above the tasks to be scheduled. As seen later, this is a convenient way of numbering these tasks.
+ \begin{equation}\label{eq:19}
+ startTasks = \{nbrTasks+1 , \ldots , nbrTasks+nbrMachines\}
+ \end{equation}
+ As sources, the start tasks are the predecessors to the first tasks for each machine.
+ 
+ \begin{equation}\label{eq:20}
+ goalTasks = \{nbrTasks+nbrMachines+1 , \ldots , nbrTasks+nbrMachines \times 2\}\end{equation}
+ As sinks, the goal tasks has the last task as predecessor for each arm.
+ 
+ \begin{equation}\label{eq:21}
+ allTasks = tasks \cup startTasks \cup goalTasks
+ \end{equation}
+ We group together all tasks in one set in order for a more readable notation further down.
+ 
+ \begin{equation}\label{eq:2}
+ nbrMachines \in \{1 , \ldots , 2^{32}-1\}
+ \end{equation}
+ \begin{equation}\label{eq:11}
+ machines = \{1 , \ldots , nbrMachines\}
+ \end{equation}
+ Here we define the machines available for the assembly. A machine in this model is an arm.
+ 
+ \begin{equation}\label{eq:3}
+ nbrTools \in \{1 , \ldots , 2^{32}-1\}
+ \end{equation}
+ \begin{equation}\label{eq:12}
+ tools = \{1 , \ldots , nbrTools\}
+ \end{equation}
+ \begin{equation}\label{eq:33}
+ toolNeeded(t) \in tools, \; t \in tasks
+ \end{equation} 
+ These are the tools that can be fitted on an arm. The model assumes that there is a set of $nbrTools$ for each machine. I.e. if $nbrTools = 2$ and $nbrMachines = 2$, there is a set of tool $1$ and tool $2$ for machine $1$, and another set of tools $1$ and $2$ for machine $2$. There cannot be a combination of tools such as, for example, only tool $1$ for machine $1$ and a set of tools $1$ and $2$ for machine $2$.
+ 
+ $toolNeeded(t)$ defines the tool task $t$ needs.
+ 
+ \begin{equation}\label{eq:6}
+ nbrComponents \in \{1 , \ldots , 2^{32}-1\}
+ \end{equation}
+ \begin{equation}\label{eq:13}
+ components = \{1 , \ldots , nbrComponents\}
+ \end{equation}
+ \begin{equation}\label{eq:25}
+ componentsUsed(t) \subset components, \; t \in tasks
+ \end{equation}
+ $nbrComponents$ defines the number of components used. All components needs to be uniquely identified in the assembly, so even if we use 4 screws in an assembly, we need to define all 4 screws. As mentioned before we distinguish between components and \emph{primitve} components. The reason for that is that in the model we do not distinguish between a \emph{primitve} component and a sub-assembly, they are the same. And in the model we call them components. The reason for this is because we found it easier to only have one sort of object to deal with when it comes to what will be assembled, instead of two. This means that the final assembly is also a component, i.e. the product produced by the assembly is a component. In other words, in this thesis \emph{primitve} components and sub-assemblies are sub sets of components.
+ 
+ $componentsUsed(t)$ defines the set of components task $t$ uses. A task usually only uses one component at a time, but uses two in the case of mounting tasks, the mounted component and the component mounted on.
+ \\\\
+ Since components also can be sub-assemblies, it means a component can have subcomponents. These have been grouped in different groups to assist the constraints.
+ \begin{equation}\label{eq:53}
+ taskSubComponents(t) \subset components, \; t \in tasks\end{equation}
+ $taskSubComponents(t)$ is the set of components that make up the subcomponents for the components used in task $t$. One can think of the subcomponents as layers with the component on top, call it origin component, and the layer below are the components that make up that component, and so on. $taskSubComponents(t)$ contains the components one layer down, if the component itself is not a \emph{primitve} component. In that case, $taskSubComponents(t)$ contains that component instead.
+ 
+ \begin{equation}\label{eq:54}
+ taskCompleteSubComponents(t) \subset components, \; t \in tasks\end{equation}
+ To use the layer metaphor again, $taskCompleteSubComponents(t)$ contains all the layers below the origin component, for all the components in task $t$. Not including the origin components themselves. If the origin component is a \emph{primitve} component, the set is empty.
+ 
+ \begin{equation}\label{eq:55}
+ subComponents(c) \subset components, \; c \in components\end{equation}
+ $subComponents(c)$ contains only the the \emph{primitve} subcomponents for component $c$, one layer down. If $c$ is a \emph{primitve} component or is only made of sub-assemblies, the set is empty.
+ 
+ \begin{equation}\label{eq:4}
+ nbrTrays \in \{1 , \ldots , 2^{32}-1\}
+ \end{equation}
+ \begin{equation}\label{eq:14}
+ trays = \{1 , \ldots , nbrTrays\}
+ \end{equation}
+ \begin{equation}\label{eq:22}
+ tray(t) \in trays \cup \{0\}, \; t \in tasks
+ \end{equation}
+ The trays available in the assembly, $trays$. Trays are used to hold components until we need them in the assembly. This can be that the tray holds the components from the beginning, as with \emph{primitve} components fed to the assembly, or it can be a sub-assembly put there during the assembly to be picked up again later. Each \emph{primitve} component has its own tray, so we can have a button tray, a cover tray, etc.
+ 
+ $tray(t)$ is the tray task $t$ uses. If no tray is used by the task, $tray(t) = 0$.
+ 
+ 
+ \begin{equation}\label{eq:5}
+ nbrFixtures \in \{1 , \ldots , 2^{32}-1\}
+ \end{equation}
+ \begin{equation}\label{eq:15}
+ fixtures = \{1 , \ldots , nbrFixtures\}
+ \end{equation}
+ \begin{equation}\label{eq:24}
+ fixture(t) \in fixtures \cup \{0\}, \; t \in tasks
+ \end{equation}
+ $fixtures$ defines the fixtures available in the assembly. A fixture is primarily used to hold a component in order for another component to be mounted on that component. Although, as will be shown in the assembly example [section?], the fixture can be used for purposes than just holding components.
+ 
+ $fixture(t)$ is the fixture task $t$ uses. If no fixture is used by the task, $fixture(t) = 0$
+ 
+ \begin{equation}\label{eq:7}
+ nbrOutputs \in \{1 , \ldots , 2^{32}-1\}
+ \end{equation}
+ \begin{equation}\label{eq:16}
+ outputs = \{1 , \ldots , nbrOutputs\}
+ \end{equation}
+ \begin{equation}\label{eq:23}
+ output(t) \in outputs \cup \{0\}, \; t \in tasks
+ \end{equation}
+ $outputs$ defines the outputs available. An output is the final stage for a component in an assembly. After it is put here, it will not be removed. Although, there can still be other components mounted on the component put on the output. In that respect an output can be viewed as a fixture, only that the components put there can not be removed.
+ 
+ $output(t)$ is the output used by task $t$. If no output is used by the task, $output(t) = 0$.
+ 
+ 
+ \begin{equation}\label{eq:8}
+ nbrConcurrentGroups \in \{1 , \ldots , 2^{32}-1\}
+ \end{equation}
+ \begin{equation}\label{eq:17}
+ concurrentGroups = \{1 , \ldots , nbrConcurrentGroups\}
+ \end{equation}
+ \begin{equation}\label{eq:30}
+ concurrentTasks(k) \subset tasks, \; k \in concurrentGroups
+ \end{equation}
+ $concurrentTasks(k)$ is the $k$:th concurrent group among the concurrent groups defined. A concurrent group is a group of tasks that has to be performed at the same time. Hence, a concurrent group can not be larger than the amount of machines available, although, there is no check for it in the model. 
+ 
+ The $k$ set of tasks needing concurrent execution
+ $nbrConcurrentGroups$ defines the number of concurrent groups used. 
+ 
+ \begin{equation}\label{eq:9}
+ nbrOrderedGroups \in \{1 , \ldots , 2^{32}-1\}
+ \end{equation}
+ \begin{equation}\label{eq:9}
+ orderedGroups = \{1 , \ldots , nbrOrderedGroups\}
+ \end{equation}
+ \begin{equation}\label{eq:18}
+ orderedGroup(k) \subset tasks, \; k \in orderedGroups
+ \end{equation}
+ \begin{equation}\label{eq:32}
+ ordered(k,i) \in tasks, \; i \in \{1 , \ldots , |orderedGroup(k)|\}, \; k \in orderedGroups
+ \end{equation}
+ \begin{equation}\label{eq:39}
+ orderedSet = \bigcup_{\forall k \in orderedGroups}order(k), \; orderedSet \subset tasks\end{equation}
+ $orderedGroup(k)$ is the $k$:th ordered group specified, there are $nbrOrderedGroups$ ordered groups. An ordered group is an array of tasks that has to come in a very specific order. An example of this could be if an assembly has many move tasks that needs to be performed one after another in order to make an intricate movement. As will be showed in the constraints[section?], we can reason the relation between tasks if they use a certain component and are a certain kind of action. But we can not reason using two move tasks, there is no way to tell which should come before the other based on the component they use. 
+ 
+ $orderedGroup(k)$ is an array and the tasks in it will be scheduled in the order they com in the array. All the tasks in the group will be performed on the same machine, it can not order tasks on different machines.
+ 
+ If one wants to access a certain task in a group, one can use $ordered(k,i)$ to access the $i$:th element of the $k$:th group.
+ 
+ $orderedSet$ is the set of all tasks included in an ordered group.
+ \\\\
+ $tray(t)$, $output(t)$ and $fixture(t)$ can not be set at the same time for a task, since that would mean the task is performed at two locations at the same time, although this is not checked by the model. The only restriction for what kind of tasks can be performed using these are that output can not be used by a take task and tray can not be used by a mount task. If ones assembly contains these combinations, the output or tray should be changed to a fixture.
+ 
+ \begin{equation}\label{eq:26}
+ mounting \subset tasks
+ \end{equation}
+ \begin{equation}\label{eq:27}
+ taking \subset tasks
+ \end{equation}
+ \begin{equation}\label{eq:28}
+ moving \subset tasks
+ \end{equation}
+ \begin{equation}\label{eq:29}
+ putting \subset tasks
+ \end{equation}
+ Each task performed can be classified as either a mount task, a take task, a move task or a put task, but only one of them.
+ \begin{description}
+ \item[Taking] A task that picks up a component is a taking task. The location of the component is specified by either a tray or a fixture, but not an output since there is no reason to pick up something that has been placed on an output.
+ 
+ \item[Mounting] A task that mounts a component on another component is a mounting task. This assumes that the component to mount is picked up and in the hand. The location of the component to mount on is defined by either a fixture or an output.
+ 
+ \item[Putting] A task that puts a component somewhere is a putting task. Where a component is put is defined by either a fixture, a tray or an output.
+ 
+ \item[Moving] A task that moves a components from one place to another is a moving task. The model already puts in moves between tasks and if, for example, the first task is a take task and the second task is a put task, the move in between them is essentially a move that moves a component from one place to the another. Although, sometimes it can be handy to define a task that explicitly moves a component. An example of that can be if one wants to spin a component around. Then one can specify a take task in order to pick up the component, a move task to turn it, and a put task to put the component back. In this case there will be three moves of the component; one to move from the take task to the move task, the move task itself, and a move from the move task to the put task.
+ \end{description}
+ \begin{equation}\label{eq:35}
+ putting(c) \subset putting, \; c \in components
+ \end{equation}
+ \begin{equation}\label{eq:36}
+ mounting(c) \subset mounting, \; c \in components
+ \end{equation}
+ \begin{equation}\label{eq:37}
+ taking(c) \subset taking, \; c \in components
+ \end{equation}
+ \begin{equation}\label{eq:38}
+ moving(c) \subset moving, \; c \in components
+ \end{equation}
+ $putting(c)$, $mounting(c)$, $taking(c)$ and $moving(c)$ are subsets of respective set above based on the component involved.
+ 
+ \begin{equation}\label{eq:42}
+ duration(t) \in \{0 , \ldots , 2^{32}-1\}, \; t \in tasks\end{equation}
+ $duration(t)$ is simply the duration of task $t$.
+ \\\\
+ For the model to decide how long a move between two tasks should be and if there should be a change of tool in between, a matrix is used, $timeMatrix3D$.[picture?] This is a 3d matrix and on its y-axis it has the tasks to move from, on the x-axis the tasks to move to, and on the z-axis the different transitions between tools that can occur.
+ \begin{equation}\label{eq:43}
+ timeMatrixDepth = \frac{n^2 - n + 2}{2}, \; n = nbrTools\end{equation}
+ $timeMatrixDepth$ is the length of the z-axis, i.e. the depth of the matrix. It should be said that the reason for using the method described below is to reduce the size of the matrix and avoid too much redundancy.
+ 
+ What we mean with ''different transitions'' is easiest to show through an example. Lets say we have $3$ tools available for each machine. We consider each tool state as a node in a graph, see figure \ref{fig:tools_trans_bef}, with the old tool state to the left and the new tool state to the right. Between them we can draw the different ways we can change state. The we start to consider which ones we actually need. We can change from tool $1$ to tool $1$, which is not changing tool at all. The same can be done for tool $2$, but not changing tool here costs just as much time as with tool $1$. So the change from tool $1$ to itself covers not changing tool for this tool, as well as for all the other tools, thereby we only need to keep track of one of these changes. We can also change from tool $1$ to tool $2$. And we can change back from $2$ to $1$, although here in the model we assume the change from one tool to another takes the same time the other way around as well. Therefore, we consider the change from tool $1$ to tool $2$ the same as from tool $2$ to tool $1$, and only keep track of one of them. If we keep consider the rest of the transitions this way, we will end up with $4$ transitions, see figure \ref{fig:tools_trans_aft}
+ 
+ \begin{figure}
+ 	\centering
+ 	\input{Figures/tool_trans_bef}
+ 	% or use \input{mytikz}
+ 	\caption{All the transitions between the tool states}
+ 	\label{fig:tools_trans_bef}
+ \end{figure}
+ \begin{figure}
+ 	\centering
+  	\input{Figures/tool_trans_aft}
+  	% or use \input{mytikz}
+  	\caption{All the transitions between the tool states}
+  	\label{fig:tools_trans_aft}
+ \end{figure}
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:44}
+ timeMatrix3D(t(from),t(to),k) \in &\{0 , \ldots , 2^{32}-1\}, \; t(from) \in tasks \cup startTasks,  \\ 
+ &t(to) \in tasks, \; k \in \{0 , \ldots , timeMatrixDepth\}
+ \end{aligned}
+ \end{equation}
+ The time to move from task $t(from)$ to task $t(to)$ changing tool according to $k$
+ 
+ \begin{equation}\label{eq:56}
+ taskOutOfRange(m) \subset tasks, \; m \in machines\end{equation}
+ The tasks that cannot be reached by machine $m$
+ 
+ 
+ \subsubsection{Decision variables}
+ 
+ \begin{equation}\label{eq:40}
+ usingMachine(t) \in machines, \; t \in tasks\end{equation}
+ The machine task $t$ uses
+ 
+ \begin{equation}\label{eq:41}
+ pred(t) \in allTasks, \; t \in allTasks\end{equation}
+ The predecessor task of task $t$
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:45}
+ maxE = &(max(\{duration(t) : t \in tasks\}) +  \\ 
+ &max(\{timeMatrix3D(t_1,t_2,k) : \forall t_1 \in tasks \cup startTasks,  \\ 
+ &\forall t_2 \in tasks, \; \forall k \in \{0 , \ldots , timeMatrixDepth\}\}) \times nbrTasks
+ \end{aligned}
+ \end{equation}
+ Rough upper limit of the total schedule time. Assumes all move times take as long as the longest move time existing in the schedule. And likewise for the task durations.
+ 
+ \begin{equation}\label{eq:46}
+ start(t) \in \{0 , \ldots , maxE\}, \; t \in allTasks\end{equation}
+ The start time for task $t$
+ 
+ \begin{equation}\label{eq:47}
+ end(t) = start(t) + duration(t), \; t \in allTasks\end{equation}
+ The end time for task $t$
+ 
+ \begin{equation}\label{eq:48}
+ makespan \in \{0 , \ldots , maxE\}\end{equation}
+ The makespan for the whole schedule, the time to minimize
+ 
+ \begin{equation}\label{eq:49}
+ moveDuration(t) \in \{0 , \ldots , maxE\}, \; t \in allTasks\end{equation}
+ The duration of the move to task $t$ from its predecessor
+ 
+ \begin{equation}\label{eq:50}
+ moveStart(t) \in \{0 , \ldots , maxE\}, \; t \in allTasks\end{equation}
+ The start time for the move to task $t$ from its predecessor
+ 
+ \begin{equation}\label{eq:51}
+ moveEnd(t) = moveStart(t) + moveDuration(t), \; t \in allTasks\end{equation}
+ The end time for the move to task $t$ from its predecessor
+ 
+ \begin{equation}\label{eq:52}
+ toolUsed(t) \in tools, \; t \in allTasks\end{equation}
+ The tool used at task $t$
+ 
+ 
+ \section{Filter}
+ \subsection{Domain filter}
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:57}
+ &( \forall t \in tasks)\\
+ &\begin{aligned}
+ maxMoveDurs(t) = max(\{&timeMatrix3D(t,j,k) :\\
+ &\forall j \in tasks, \\
+ &\forall k \in \{1 , \ldots , timeMatrixDepth\},\\
+ &j \neq t\})
+ \end{aligned}
+ \end{aligned}
+ \end{equation}
+ The maximum duration for a move to task $t$
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:58}
+ &(\forall t \in tasks)\\
+ &\begin{aligned}
+ minMoveDurs(t) = min(\{&timeMatrix3D(t,j,k) :\\
+ &\forall j \in tasks, \\
+ &\forall k \in \{1 , \ldots , timeMatrixDepth\},\\
+ &j \neq t\})
+ \end{aligned}
+ %minMoveDurs(t) = min(\{timeMatrix3D(t,j,k) : \forall j \in tasks, \\
+ % \forall k \in \{1 , \ldots , timeMatrixDepth\}, \; j \neq t\}), \; \forall t \in tasks
+ \end{aligned}
+ \end{equation}
+ The minimum duration for a move to task $t$
+ 
+ \begin{equation}\label{eq:59}
+ maxEnd = \sum_{\forall t \in tasks} duration(t) + \sum_{\forall t \in tasks} maxMoveDurs(t)
+ \end{equation}
+ The upper limit of the schedule; all tasks is laid out after one after another and the duration between them is the maximum of the moves to them
+ 
+ \begin{equation}\label{eq:60}
+ minEnd = \frac{\left(\sum_{\forall t \in tasks} duration(t) + \sum_{\forall t \in tasks} minMoveDurs(t)\right)}{nbrMachines}
+ \end{equation}
+ The lower limit of the schedule; the total duration of each task is the duration of the task itself and the minimum duration of a move to the task, and the tasks are scheduled perfectly over all the machines
+ 
+ \begin{equation}\label{eq:61}
+ \begin{aligned}
+ &(\forall t \in allTasks)\\
+ &\begin{aligned}
+ start(t) &\le maxEnd-duration(t) \; \land\\
+ end(t) &\le maxEnd
+ \end{aligned}
+ \end{aligned}
+ \end{equation}
+ Sets the upper limit for the start of each task to be the maximum end minus the duration for the task. Sets the end for each task to be the maximum end
+ 
+ \begin{equation}\label{eq:62}
+ (\forall t \in tasks) \; end(t) \ge duration(t) + minMoveDurs(t)\end{equation}
+ A task can start at its earliest at the time directly after the move to a task, therefore the end of a task can earliest happen after the duration of the task plus the shortest move to it
+ 
+ \begin{equation}\label{eq:63}
+ (\forall t \in tasks) \; moveStart(t) \le maxEnd-(duration(t)+minMoveDurs(t)\end{equation}
+ A move to a task can start at the latest $maxEnd$ but before the duration of the task and before at least the minimum of the move times to the task
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:64}
+ &(\forall t \in tasks)\\
+ &\begin{aligned}
+ moveDuration(t) &\le maxMoveDurs(t) \; \land\\
+ moveDuration(t) &\ge minMoveDurs(t)
+ \end{aligned}
+ \end{aligned}
+ \end{equation}
+ The move duration for task $t$ is limited by $maxMoveDurs$ and $minMoveDurs$
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:65}
+ &(\forall t \in tasks)\\
+ &\begin{aligned}
+ moveEnd(t) &\le maxEnd - duration(t) \; \land\\
+ moveEnd(t) &\ge minMoveDurs(t)
+ \end{aligned}
+ \end{aligned}
+ \end{equation}
+ The end of a move to a task can at the latest come at $maxEnd$ minus the duration of the task. The move to a task can at the earliest happen at time 0, so the end can earliest happen at the shortest move time to the task
+ 
+ \begin{equation}\label{eq:66}
+ \begin{aligned}
+ makeSpan &\le maxEnd \land\\
+ makespan &\ge minEnd
+ \end{aligned}
+ \end{equation}
+ Limits the makespan
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:67}
+ &(\forall t \in tasks)\\
+ &\begin{aligned}
+ (\forall i \in \{0 , \ldots , maxMoveDurs(t)\} / \{&timeMatrix3D(task,j,k) :\\
+ &\forall j \in tasks,\\
+ &\begin{aligned}
+ &\forall k \in \{1 , \ldots , timeMatrixDepth\}\\
+ &t \neq j\})
+ \end{aligned}
+ \end{aligned}\\
+ &moveDuration(t) \neq i, \\
+ \end{aligned}
+ \end{equation}
+ Limits the $moveDuration$ domains to only the values specified in the $timeMatrix3D$
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:69}
+ &(\forall t \in tasks / taking) \\
+ &\begin{aligned}
+ moveStart(t) \ge min(\{&duration(tt) + minMoveDurs(tt) :\\
+ &\forall tt \in taking\})\\
+ \end{aligned}
+ \end{aligned}
+ \end{equation}
+ As the schedule has to start with a take task, the move to the other tasks can only start as early as after the shortest move to and execution of one of the take tasks
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:70}
+ &(\forall t \in tasks)\\
+ &\begin{aligned}
+ prevTasks = \{task : &\forall task \in tasks,\\
+ &componentCreated(task) \in componentsUsed(t)\},
+ \end{aligned}\\
+ &\begin{aligned}
+ nbrMachines &\ge |prevTasks|,\\
+ 0 &< |prevTasks|,
+ \end{aligned}\\
+ &start(t) \ge max(\{duration(pt) + minMoveDurs(pt) : \forall pt \in prevTasks\}) \\
+ \end{aligned}
+ \end{equation}
+ $prevTasks$ are the tasks for which the task $t$ uses the component created at task $task$, hence the tasks in $prevTasks$ precedes task $t$. If the number of machines are greater than or equal to the number of task preceding task t, then the best scheduling is to do all tasks in parallel. If so the earliest task $t$ can start is greater or equal to the maximum of the preceding tasks
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:71}
+ &(\forall t \in tasks) \\
+ &\begin{aligned}
+ prevTasks = \{task : &\forall task \in tasks,\\
+ &componentCreated(task) \in componentsUsed(t)\},
+ \end{aligned} \\
+ &nbrMachines < |prevTasks|,  \\
+ &start(t) \ge \frac{\left(\sum_{\forall pt \in prevTasks}duration(pt) + minMoveDurs(pt)\right)}{nbrMachines} \\
+ \end{aligned}
+ \end{equation}
+ $prevTasks$ are the tasks for which the task $t$ uses the component created at task $task$, hence the tasks in $prevTasks$ precedes task $t$. If the number of machines are less than the number of tasks preceding task t, then the best we can do is to divide the task times equally on all machines. If the tasks can be divided onto the machines so that the total length of the times on all machines are the same, that time will be equal to the sum$/nbrMachines$. If they don't match up the maximum of these times will be larger than the sum$/nbrMachines$.
+ 
+ \begin{equation}\label{eq:72}
+ \begin{aligned}
+ &(\forall t \in tasks) \\
+ &succTasks = \{task : \forall task \in tasks,\\
+ &componentsUsed(t) \subset taskCompleteSubComponent(task), \\
+ &componentsUsed(t) \cup taskCompleteSubComponents(task) \neq \emptyset\}, \\
+ &\begin{aligned}
+ nbrMachines &\ge |succTasks|,\\
+ 0 &< |succTasks|,
+ \end{aligned}\\
+ &\begin{aligned}
+ end(t) \le maxEnd - max(\{&duration(st) + minMoveDurs(st) :\\
+ &\forall st \in succTasks\})
+ \end{aligned}\\
+ \end{aligned}
+ \end{equation}
+ $succTasks$ are the tasks that has the components used in task $t$ as subcomponents, hence the tasks in $succTasks$ succeeds task $t$. If the number of machines are greater than or equal to the number of task preceding task t, then the best scheduling is to do all tasks in parallel. If so the latest task $t$ can end is less than or equal to the maximum end of the schedule minus the longest of the succeeding tasks
+ 
+ \begin{equation}\label{eq:73}
+ \begin{aligned}
+ &(\forall t \in tasks)\\
+ &succTasks = \{task : \forall task \in tasks, \\
+ &componentsUsed(t) \subset taskCompleteSubComponent(task), \\
+ &componentsUsed(t) \cup taskCompleteSubComponents(task) \neq \emptyset\}, \\
+ &nbrMachines \le |succTasks|, \\
+ &end(t) \le maxEnd - \frac{\left(\sum_{\forall st \in succTasks}duration(st) + minMoveDurs(st)\right)}{nbrMachines}
+ \end{aligned}
+ \end{equation}
+ $succTasks$ are the tasks that has the components used in task $t$ as subcomponents, hence the tasks in $succTasks$ succeeds task $t$. If the number of machines are less than the number of tasks preceding task t, then the best we can do is to divide the task times equally on all machines. If the tasks can be divided onto the machines so that the total length of the times on all machines are the same, that time will be equal to the sum$/nbrMachines$. If they don't match up the maximum of these times will be larger than the sum$/nbrMachines$.
+ 
+ 
+ \subsection{Predecessor filter}
+ \begin{equation}\label{eq:74}
+ alldifferent(\{pred(t) : \forall t \in tasks\})
+ \end{equation}
+ Helps ensure that no two tasks can have the same predecessor
+ 
+ \begin{equation}\label{eq:75}
+ (\forall t1, \forall t2 \in taking) \; pred(t1) \neq t2
+ \end{equation}
+ No two taking tasks can be the predecessor of each other
+ 
+ \begin{equation}\label{eq:76}
+ (\forall t1, \forall t2 \in taking) \; pred(t1) \neq t2
+ \end{equation}
+ No two putting tasks can be the predecessor of each other
+ 
+ \begin{equation}\label{eq:77}
+ ( \forall t1, \forall t2 \in mounting) \; pred(t1) \neq t2
+ \end{equation}
+ No two mounting tasks can be the predecessor of each other
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:78}
+ &(\forall t \in tasks)\\
+ &nonPredecessors = \{t_2 : \forall t_2 \in tasks, \\
+ &componentsUsed(t) \subset taskCompleteSubComponents(t_2) \; \lor \\
+ &componentsUsed(t) \subset subComponents(componentCreated(t_2))\} \\
+ &(\forall nonPred \in nonPredecessors) \\
+ &pred(t) \neq nonPred, \\
+ \end{aligned}
+ \end{equation}
+ A task $t$ cannot have task $t_2$ as predecessor if task $t_2$ uses a component, or creates a component, that the component task $t$ uses has as a subcomponent
+ 
+ \begin{equation}\label{eq:79}
+ \begin{aligned}
+ &(\forall startTask \in startTasks)\\
+ &(\forall putTask \in putting)\\
+ &pred(putTask) \neq startTask
+ \end{aligned}
+ \end{equation}
+ Since a component has to be taken before it can be put anywhere, put tasks cannot be first in the schedule
+ 
+ \begin{equation}\label{eq:80}
+ \begin{aligned}
+ &(\forall startTask \in startTasks)\\
+ &(\forall mountTask \in mounting)\\
+ &pred(putTask) \neq startTask 
+ \end{aligned}
+ \end{equation}
+ Since a component has to be taken before it can be mounted anywhere, mount tasks cannot be first in the schedule
+ 
+ \begin{equation}\label{eq:81}
+ \begin{aligned}
+ &(\forall goalTask \in goalTasks) \\
+ &(\forall takeTask \in taking) \\
+ &pred(goalTask) \neq takeTask
+ \end{aligned}
+ \end{equation}
+ Since a schedule has to end with an assembly on the output, a take task cannot be at the end of the assembly
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:82}
+ &\begin{aligned}
+ counts &= \{i : \forall task \in outputTasks, \; i \in \{0 , \ldots , 1\}\}, \\
+ outputTasks &= \{task : \forall task \in tasks, \; output(task) > 0\}, \\
+ goalPreds &= \{pred(task) : \forall task \in goalTasks\},
+ \end{aligned} \\
+ &global\_cardinality(goalPreds, \; outputTasks, \; counts) \; \land\\
+ &\sum counts > 0
+ \end{aligned}
+ \end{equation}
+ At least one of the output tasks has to be last on one of the circuits
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:83}
+ &\begin{aligned}
+ counts &= \{i : \forall task \in startTasks, \; i \in \{0 , \ldots , 1\}\}, \\
+ takePreds &= \{pred(task) : \forall task \in taking, \; output(task) = 0\}, 
+ \end{aligned}\\
+ &global\_cardinality(takePreds, \; startTasks, \; counts) \; \land\\
+ &\sum counts > 0
+ \end{aligned}
+ \end{equation}
+ At least one of the take tasks, thats not on an output, has to be first on one of the circuits
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:84}
+ (\forall comp &\in components) \\
+ (\forall mountTask &\in mounting(comp)) \\
+ (\forall putTask &\in putting(comp)) \\
+ pred(putTask) &\neq mountTask
+ \end{aligned}
+ \end{equation}
+ If a set of tasks on a component involves a mount task and a put task, the predecessor of the put task cannot be the mount task
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:85}
+ (\forall comp &\in components) \\
+ (\forall mountTask &\in mounting(comp)) \\
+ (\forall takeTask &\in taking(comp)) \\
+ pred(takeTask) &\neq mountTask
+ \end{aligned}
+ \end{equation}
+ If a set of tasks on a component involves a mount task and a take task, the predecessor of the take task cannot be the mount task.
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:86}
+ (\forall comp &\in components) \\
+ (\forall putTask &\in putting{comp}, \; tray(putTask) > 0) \\
+ (\forall takeTask &\in taking(comp), \; tray(putTask) = tray(takeTask)) \\
+ pred(putTask) &\le takeTask
+ \end{aligned}
+ \end{equation}
+ If a component has a put and take performed on it in a tray, the predecessor of the put task cannot be the take task.
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:87}
+ (\forall f &\in fixtures) \\
+ (\forall putTask &\in putting{comp}, \; fixture(putTask) = f) \\
+ (\forall takeTask &\in taking(comp), \; fixture(takeTask) = f,\\
+ &componentsUsed(putTask) \subset taskSubComponents(takeTask))\\
+ pred(putTask) &\le takeTask
+ \end{aligned}
+ \end{equation}
+ For every put action on a fixture, there is a take action. The predecessor of the put task cannot be the take task.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:88}
+ (\forall group &\in \{1 , \ldots , nbrConcurrentGroups\}) \\
+ (\forall t_1 &\in concurrentTasks(group)) \\
+ (\forall t_2 &\in concurrentTasks(group) / \{t_1\}) \\
+ pred(t_1) &\neq t_2 \land pred(t_2) \neq t_1
+ \end{aligned}
+ \end{equation}
+ Concurrent tasks cannot be predecessor to each other.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:89}
+ (\forall t_1 &\in tasks, \; componentCreated(t_1) > 0) \\
+ (\forall t_2 &\in tasks, \; componentCreated(t_1) \in compinentUsed(t_2)) \\
+ pred(t_1) &\neq t_2
+ \end{aligned}
+ \end{equation}
+ Components cannot be used before they are created.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:90}
+ &(\forall precTask \in tasks) \\
+ &(\forall t \in tasks, \; precTask \neq t,\\
+ &\begin{aligned}componentUsed(precTask) \cup taskCompleteSubComponent(t) \subset\\
+ taskCompleteSubComponents(t), \end{aligned}\\
+ &componentsUsed(precTask) \cup taskCompleteSubComponents(t) \neq \emptyset \\
+ &pred(precTask) \neq t
+ \end{aligned}
+ \end{equation}
+ Task using a component cannot execute before all the tasks having it as subcomponent.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:91}
+ (\forall concGroup &\in concurrentTasks, \; |concGroup| = nbrMachines) \\
+ concComps &= \bigcup_{\forall i \in concGroup}componentsUsed(i), \\
+ concSubComps &= \bigcup_{\forall i \in concGroup}taskCompleteSubComponents(i), \\
+ preTasks &= \{preTask : \forall preTask \in tasks,\\
+ &componentsUsed(preTask) \cap concSubComps \neq \emptyset\}, \\
+ (\forall postTask &\in postTasks) \\
+ (\forall predTask &\in preTasks) \\
+ pred(postTask) &\neq preTask
+ \end{aligned}
+ \end{equation}
+ If there is a set of concurrent tasks on a subset of tasks using as many machines as available, the tasks after the concurrent tasks cannot have the tasks before the concurrent tasks as predecessors.
+ 
+ 
+ \section{Constraints}
+ 
+ \begin{equation}\label{eq:92}
+ (\forall t \in tasks) \; end(t) \le makespan
+ \end{equation}
+ All ends has to be lesser than the total end
+ 
+ \begin{equation}\label{eq:93}
+ (\forall t \in startTasks \cup goalTasks) \; start(t) = 0
+ \end{equation}
+ Start and goal tasks are not temporal tasks, i.e. they are timeless. Therefore, their start time is set to 0
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:94}
+ &(\forall m \in machines) \\
+ &\begin{aligned}
+ usingMachine(nbrTasks + m) &= m \; \land\\
+ usingMachine(nbrTasks + nbrMachines + m) &= m
+ \end{aligned}
+ \end{aligned}
+ \end{equation}
+ The start tasks and goal tasks are assigned to machines, thereby there are start and goal tasks assigned to every machine. Because of the way start and goal tasks are created, the start tasks starts with number $nbrTasks + 1$, and the corresponding goal task for a start task can be accessed by $startTask + nbrMachines$.
+ 
+ \begin{equation}\label{eq:95}
+ \begin{aligned}
+ (\forall m &\in machines) \\
+ (\forall t &\in tasksOutOfRange(m)) \\
+ usingMachine(t) &\neq m
+ \end{aligned}
+ \end{equation}
+ Setting the tasks that are out of range for each machine
+ 
+ \subsection{Precedences}
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:96}
+ (\forall comp &\in components) \\
+ (\forall mountTask &\in mounting(comp)) \\
+ (\forall putTask &\in putting(comp)) \\
+ end(putTask) &\le moveStart(mountTask)
+ \end{aligned}
+ \end{equation}
+ If a set of tasks on a component involves a mount task and a put task, the put task has to come before the mount task
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:97}
+ \forall comp &\in components \\
+ \forall mountTask &\in mounting(comp), \\
+ \forall takeTask &\in taking(comp), \\
+ end(takeTask) &\le moveStart(mountTask)
+ \end{aligned}
+ \end{equation}
+ If a set of tasks on a component involves a mount task and a take task, the take task has to come before the mount task
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:98}
+ \forall comp &\in components \\
+ (\forall putTask &\in putting(comp), \; tray(putTask) > 0)\\
+ (\forall takeTask &\in taking(comp), tray(putTask) = tray(takeTask))\\
+ end(putTask) &\le moveStart(takeTask)
+ \end{aligned}
+ \end{equation}
+ If a component has a put and take performed on it in a tray, the put has to come before the take.
+ 
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:99}
+ (\forall f &\in fixtures) \\
+ (\forall putTask &\in putting(comp), \; fixture(putTask) = f)\\
+ (\forall takeTask &\in taking(comp), \; fixture(takeTask) = f \; \land \\
+ &componentsUsed(putTask) \subset taskSubComponents(takeTask)) \\
+ end(putTask) &\le moveStart(takeTask), \\
+ \end{aligned}
+ \end{equation}
+ For every put action on a fixture, there is a take action. The put action has to come before the take action.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:100}
+ &(\forall f \in fixtures) \\
+ &puts = [put : \forall put \in putting, \; fixture(put) = f], \\
+ &takesForEachPut = [\{take : \forall take \in taking, \; fixture(take) = f, \\
+ &componentsUsed(put) \subset taskCompleteSubComponent(take)\} : \forall put \in puts], \\
+ &\begin{aligned}
+ takes = [&\operatorname*{arg\,min}_{\forall take \in takesForEachPut(p)}{taskCompleteSubComponent(take)} : \\
+ &\forall p \in \{1 , \ldots , |puts|\}], 
+ \end{aligned}\\
+ &\begin{aligned}
+ cumulative(&[moveStart(task) : \forall task \in puts], \\ &[abs(end(takes(i))-moveStart(puts(i))) : \forall i \in \{1 , \ldots , |puts|\}], \\
+ &[1 : \forall i \in \{1 , \ldots , |puts|\}],\\
+ &1)
+ \end{aligned}\\
+ \end{aligned}
+ \end{equation}
+ The intervals between when components are put and then taken again cannot overlap on the same fixture.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:101}
+ (\forall group &\in \{1 , \ldots , nbrConcurrentGroups\}) \\
+ (\forall t_1 &\in concurrentTasks(group)) \\
+ (\forall t_2 &\in concurrentTasks(group) / \{t_1\}) \\
+ start(t_1) &= start(t_2) \; \land \\
+ usingMahine(t_1) &\neq usingMachine(t_2), \\
+ \end{aligned}
+ \end{equation}
+ Concurrent tasks has to happen at the same time.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:102}
+ (\forall t_1 &\in tasks, \; componentCreated(t1) > 0) \\
+ (\forall t_2 &\in tasks, \; componentCreated(t_1) \in compinentUsed(t_2)) \\
+ moveStart(t_2) &\geq end(t_1) \\
+ \end{aligned}
+ \end{equation}
+ Components cannot be used before they are created.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:103}
+ (\forall precTask &\in tasks) \\
+ (\forall t &\in tasks, \; precTask \neq t,\\
+ &componentUsed(precTask) \cup taskCompleteSubComponent(t) \subset\\
+ &taskCompleteSubComponents(t),\\
+ &componentsUsed(precTask) \cup taskCompleteSubComponents(t) \neq \emptyset)\\
+ end(precTask) &\leq moveStart(t), \\
+ \end{aligned}
+ \end{equation}
+ Task using a component cannot execute before all the tasks having it as subcomponent.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:104}
+ &\begin{aligned}
+ (\forall f &\in fixtures) \\
+ fixtureTasks &= [t : \forall t \in tasks, \; fixture(t) = f], 
+ \end{aligned}\\
+ &\begin{aligned}
+ cumulative(&[start(t) : \forall t \in fixtureTasks],\\
+ &[duration(t) : \forall t \in fixtureTasks],\\
+ &[1 : t \in fixtureTasks],\\
+ &1)
+ \end{aligned}\\
+ \end{aligned}
+ \end{equation}
+ Tasks on the same fixture cannot overlap.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:105}
+ &\begin{aligned}
+ (\forall tr &\in trays) \\
+ trayTasks &= [t : \forall t \in tasks, \; tray(t) = tr], 
+ \end{aligned}\\
+ &\begin{aligned}
+ cumulative(&[start(t) : \forall t \in trayTasks],\\
+ &[duration(t) : \forall t \in trayTasks],\\
+ &[1 : t \in trayTasks],\\
+ &1)
+ \end{aligned}\\
+ \end{aligned}
+ \end{equation}
+ Tasks on the same tray cannot overlap.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:106}
+ &\begin{aligned}
+ (\forall o &\in outputs) \\
+ outputTasks &= [t : \forall t \in tasks, \; output(t) = o], \\
+ \end{aligned}\\
+ &\begin{aligned}
+ cumulative(&[start(t) : \forall t \in outputTasks], \\
+ &[duration(t) : \forall t \in outputTasks], \\
+ &[1 : t \in outputTasks], \\
+ &1)
+ \end{aligned}\\
+ \end{aligned}
+ \end{equation}
+ Tasks on the same output cannot overlap.
+ 
+ \begin{equation}\label{eq:107}
+ (\forall t \in tasks) \; Start(t) \geq moveEnd(t)\end{equation}
+ A task can only start after the move to it.
+ 
+ \subsection{Predecessors}
+ 
+ \begin{equation}\label{eq:108}
+ (\forall t \in tasks) \; moveStart(t) \geq end(pred(t))\end{equation}
+ A task has to start after its predecessor.
+ 
+ \begin{equation}\label{eq:109}
+ \begin{aligned}
+ (\forall startTask &\in startTasks / \{nbrTasks + 1\}) \\
+ pred(startTask) &= startTask + nbrMachines - 1
+ \end{aligned}
+ \end{equation}
+ In order to create a circuit containing the sub circuits, for all start tasks, except the first one, the start tasks predecessor is the previous goal task.
+ 
+ \begin{equation}\label{eq:110}
+ pred(nbrTasks + 1) = nbrTasks + nbrMachines \times 2\end{equation}
+ To complete the circuit, the first start tasks predecessor is the last goal task.
+ 
+ \begin{equation}\label{eq:111}
+ circuit(\{pred(t) : \forall t \in tasks\})\end{equation}
+ The predecessors has to form a circuit.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:112}
+ (\forall c &\in components) \\
+ (\forall mountTask &\in mounting(c)) \\
+ puts &= \{p : \forall p \in putting(c),\\
+ &(fixture(p) > 0 \land fixture(p) = fixture(mountTask)) \; \lor  \\
+ &(output(p) > 0 \land output(p) = output(mountTask)) \; \lor  \\
+ &(tray(p) > 0 \land tray(p) = tray(mountTask))\}, \\
+ (\forall takeTask &\in taking(c), \; takeTask \notin orderedSet, \; puts = \emptyset) \\
+ pred(mountTask) &= takeTask \\
+ \end{aligned}
+ \end{equation}
+ If a set of tasks on a component involves a mount and a take task, but no move tasks or put task on the same fixture, tray or output as the mount, the take task is the predecessor of the mount task.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:113}
+ (\forall c &\in components, \; moving(c) = \emptyset)\\
+ (\forall putTask &\in putting(c), \; tray(putTask) = 0)\\
+ (\forall takeTask &\in taking(c))\\
+ pred(putTask) &= takeTask
+ \end{aligned}
+ \end{equation}
+ If a set of tasks on a component involves a put task not in a tray and a take task, and there is no moves involved, the take task has to be the predecessor of the put task.
+ 
+ \begin{equation}
+ \begin{aligned}\label{eq:114}
+ &\begin{aligned}
+ (\forall k &\in orderedGroups) \\
+ (\forall i &\in \{1 , \ldots , |orderedGroup(k)|-1\}) 
+ \end{aligned}\\
+ &pred(ordered(k, i + 1)) = ordered(k, i) \\
+ \end{aligned}
+ \end{equation}
+ Sets up the predecessors in accordance with the ordered groups.
+ 
+ \begin{equation}\label{eq:115}
+ \begin{aligned}
+ (\forall t &\in tasks \cup goalTasks) \\
+ usingMachine(t) &= usingMachine(pred(t)) 
+ \end{aligned}
+ \end{equation}
+ A task has to use the same machine as its predecessor.
+ 
+ \begin{equation}\label{eq:116}
+ \begin{aligned}
+ (\forall t &\in tasks) \\
+ k &= abs(toolUsed(t) - toolUsed(pred(t))) + 1, \\
+ moveDuration(t) &= timeMatrix3D(pred(t), \; t, \; k)
+ \end{aligned}
+ \end{equation}
+ Take tasks has to use the same tool as its predecessor or do a change first.
+ 
+ \begin{equation}\label{eq:117}
+ (\forall t \in tasks, \; toolNeeded(t) \neq 0) \; toolUsed(t) = toolNeeded(t)
+ \end{equation}
+ Set the tool used for each task in accordance with $toolNeeded$.

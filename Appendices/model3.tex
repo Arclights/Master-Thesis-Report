@@ -10,187 +10,170 @@
 \usepackage{caption}
 \begin{document}
 \section*{Model}
-\subsection*{Model parameters}
-\begin{itemize}
-\item $nbrTasks$
-\item $nbrMachines$
-\item $nbrTools$
-\item $nbrTrays$
-\item $nbrFixtures$
-\item $nbrComponents$
-\item $nbrOutputs$
-\item $nbrConcurrentGroups$
-\item $nbrOrderedGroups$
-\item $tray(t)$
-\item $output(t)$
-\item $fixture(t)$
-\item $componentsUsed(t)$
-\item $mounting$
-\item $taking$
-\item $moving$
-\item $putting$
-\item $concurrentTasks(k)$
-\item $order(k)$
-\item $toolNeeded(t)$
-\item $changeToolDuration(tool_1,tool_2)$
-\item $usingMachine(t)$
-\item $duration(t)$
-\item $taskSubComponents(t)$
-\item $taskCompleteSubComponents(t)$
-\item $timeMatrix3D(t1,t2)$
-\end{itemize}
-
-
+Beskriv grunder i hur modellen fungerar
+There are moves put inbetween each task
+Model deosn't deal with coordinates only times for movement between tasks
+\\Terminology:\\
+The goal for the assembly is to assemble components. This is components fed to the assembly from the outside, for example button components. The final assembly is the complete assembly of components that make the final product. All the smaller assemblies before that are called sub-assemblies. For reasons explained further down, we will in this thesis call components such as buttons for \emph{pure} components instead of just components.
 \subsection*{Variables}
 \subsection*{Static variables}
+Static variables are variables that have a fixed value, or is a set or list containing fixed values.
+
 \begin{equation}\label{eq:1}
 nbrTasks \in \{1 , \ldots , 2^{32}-1\}
 \end{equation}
-The number of tasks to schedule
-
-\begin{equation}\label{eq:2}
-nbrMachines \in \{1 , \ldots , 2^{32}-1\}
-\end{equation}
-The number of machines available. A machine in our case is an arm. The YuMi robot has two arms.
-
-\begin{equation}\label{eq:3}
-nbrTools \in \{1 , \ldots , 2^{32}-1\}
-\end{equation}
-The number of tools available. These are the number of tools that can be fitted on an arm. In our example we use two tools, one to grip the button, top and ring components. And one to grip the bottom and switch component. These are identified by numbers ranging from 1 and up.
-
-\begin{equation}\label{eq:4}
-nbrTrays \in \{1 , \ldots , 2^{32}-1\}
-\end{equation}
-The number of trays available
-
-\begin{equation}\label{eq:5}
-nbrFixtures \in \{1 , \ldots , 2^{32}-1\}
-\end{equation}
-The number of fixtures available
-
-\begin{equation}\label{eq:6}
-nbrComponents \in \{1 , \ldots , 2^{32}-1\}
-\end{equation}
-The number of components used
-
-\begin{equation}\label{eq:7}
-nbrOutputs \in \{1 , \ldots , 2^{32}-1\}
-\end{equation}
-The number of outputs available
-
-\begin{equation}\label{eq:8}
-nbrConcurrentGroups \in \{1 , \ldots , 2^{32}-1\}
-\end{equation}
-The number of concurrent groups used. A concurrent group is a group of tasks that has to be performed at the same time.
-
-\begin{equation}\label{eq:9}
-nbrOrderedGroups \in \{1 , \ldots , 2^{32}-1\}
-\end{equation}
-The number of ordered groups used.
-
 \begin{equation}\label{eq:10}
 tasks = \{1 , \ldots , nbrTasks\}\end{equation}
-The tasks to schedule.
-
-\begin{equation}\label{eq:11}
-machines = \{1 , \ldots , nbrMachines\}\end{equation}
-The machines.
-
-\begin{equation}\label{eq:12}
-tools = \{1 , \ldots , nbrTools\}\end{equation}
-The tools
-
-\begin{equation}\label{eq:13}
-components = \{1 , \ldots , nbrComponents\}\end{equation}
-The components.
-
-\begin{equation}\label{eq:14}
-trays = \{1 , \ldots , nbrTrays\}\end{equation}
-The trays.
-
-\begin{equation}\label{eq:15}
-fixtures = \{1 , \ldots , nbrFixtures\}\end{equation}
-The fixtures.
-
-\begin{equation}\label{eq:16}
-outputs = \{1 , \ldots , nbrOutputs\}\end{equation}
-The outputs.
-
-\begin{equation}\label{eq:17}
-concurrentGroups = \{1 , \ldots , nbrConcurrentGroups\}\end{equation}
-The concurrent groups.
-
-\begin{equation}\label{eq:18}
-orderedGroup(k) \subset tasks, \; k \in \{1 , \ldots , nbrOrderedGroups\}\end{equation}
-Ordered group number $k$. These tasks come in the order in which they should be scheduled. The first one is the predecessor of the second one, the second one is the predecessor of the third one, and so on.
-
+First we define the number of tasks to be scheduled. Each task is identified 
+\\\\
+As mentioned, this model is based on the technique of using predecessors to determine which task comes directly before another. This creates the need to have source and a sink node for each machine, we call them start tasks and goal tasks. As they are not provided as parameters, the model creates them and give them identifiers with numbers above the tasks to be scheduled. As seen later, this is a convenient way of numbering these tasks.
 \begin{equation}\label{eq:19}
 startTasks = \{nbrTasks+1 , \ldots , nbrTasks+nbrMachines\}\end{equation}
-The start tasks. These work as source tasks/nodes for the first tasks in the schedule, i.e. they are the predecessors to the first tasks for each arm.
+A sources, the start tasks are the predecessors to the first tasks for each machine.
 
 \begin{equation}\label{eq:20}
 goalTasks = \{nbrTasks+nbrMachines+1 , \ldots , nbrTasks+nbrMachines \times 2\}\end{equation}
-The goal tasks. Their predecessors are the last tasks for each arm.
+As sinks, the goal tasks has the last task as predecessor for each arm.
 
 \begin{equation}\label{eq:21}
 allTasks = tasks \cup startTasks \cup goalTasks\end{equation}
 All the tasks, including the start and goal tasks
 
-\begin{equation}\label{eq:22}
-tray(t) \in trays \cup \{0\}, \; t \in tasks\end{equation}
-The tray task $t$ uses. If none is used $tray(t) = 0$
-
-\begin{equation}\label{eq:23}
-output(t) \in outputs \cup \{0\}, \; t \in tasks\end{equation}
-The output task $t$ uses. If none is used $output(t) = 0$
-
-\begin{equation}\label{eq:24}
-fixture(t) \in fixtures \cup \{0\}, \; t \in tasks\end{equation}
-The fixture task $t$ uses. If none is used $fixture(t) = 0$
-
-\begin{equation}\label{eq:25}
-componentsUsed(t) \subset components, \; t \in tasks\end{equation}
-The components used at task $t$
-
-\begin{equation}\label{eq:26}
-mounting \subset tasks\end{equation}
-Set of tasks that mounts a component
-
-\begin{equation}\label{eq:27}
-taking \subset tasks\end{equation}
-Set of tasks that takes a component
-
-\begin{equation}\label{eq:28}
-moving \subset tasks\end{equation}
-Set of tasks that moves a component somewhere
-
-\begin{equation}\label{eq:29}
-putting \subset tasks\end{equation}
-Set of tasks that puts a component somewhere
-
-\begin{equation}\label{eq:30}
-concurrentTasks(k) \subset tasks, \; k \in concurrentGroups\end{equation}
-Set of tasks needing concurrent execution
-
-\begin{equation}\label{eq:31}
-order(k) \subset tasks, \; k \in orderedGroups
-\end{equation} 
-Array of tasks needed to be performed in a certain order on a single machine
-
-\begin{equation}\label{eq:32}
-order(k,i) \in tasks, \; i \in \{1 , \ldots , |orderedGroup(k)|\}, \; k \in orderedGroups
+\begin{equation}\label{eq:2}
+nbrMachines \in \{1 , \ldots , 2^{32}-1\}
 \end{equation}
-The $i$:th task to be performed i order according to the $k$:th $orderedGroup$
+Then the number of machines available for the assembly, $nbrMachines$. A machine in our case is an arm.
 
+\begin{equation}\label{eq:11}
+machines = \{1 , \ldots , nbrMachines\}\end{equation}
+The machines.
+
+\begin{equation}\label{eq:3}
+nbrTools \in \{1 , \ldots , 2^{32}-1\}
+\end{equation}
+The number of tools available, $nbrTools$. These are the number of tools that can be fitted on an arm. The model assumes that there is a set of $nbrTools$ for each machine. I.e. if $nbrTools = 2$ and $nbrMachines = 2$, there is a set of tool $1$ and tool $2$ for machine $1$, and another set of tools $1$ and $2$ for machine $2$. There cannot be a combination of tools such as, for example, only tool $1$ for machine $1$ and a set of tools $1$ and $2$ for machine $2$.
+\begin{equation}\label{eq:12}
+tools = \{1 , \ldots , nbrTools\}\end{equation}
+The tools
 \begin{equation}\label{eq:33}
 toolNeeded(t) \in tools, \; t \in tasks\end{equation} 
 The tool needed for task $t$
 
-\begin{equation}\label{eq:34}
-changeToolDuration(tool_1,tool_2) \in \{0 , \ldots , 2^{32}-1\}, \; tool_1,tool_2 \in tools
-\end{equation} 
-The duration of changing from $tool_1$ to $tool_2$
+\begin{equation}\label{eq:6}
+nbrComponents \in \{1 , \ldots , 2^{32}-1\}
+\end{equation}
+$nbrComponents$ defines the number of components used. All components needs to be uniquely identified in the assembly, so even if we use 4 screws in an assembly, we need to define all 4 screws. As mentioned before we distinguish between components and \emph{pure} components. The reason for that is that in the model we do not distinguish between a \emph{pure} component and a sub-assembly, they are the same. And in the model we call them components. The reason for this is because we found it easier to only have one sort of object to deal with when it comes to what will be assembled, instead of two. This means that the final assembly is also a component, i.e. the product produced by the assembly is a component. In other words, in this thesis \emph{pure} components and sub-assemblies are sub sets of components.
+\begin{equation}\label{eq:13}
+components = \{1 , \ldots , nbrComponents\}\end{equation}
+The components.
+\begin{equation}\label{eq:53}
+taskSubComponents(t) \subset components, \; t \in tasks\end{equation}
+The components that form the sub assemblies used in task $t$. The components can in them selves be sub assemblies
 
+\begin{equation}\label{eq:54}
+taskCompleteSubComponents(t) \subset components, \; t \in tasks\end{equation}
+The components that form the sub assemblies used in task $t$. This includes all sorts of components, being sub assemblies them selves or \emph{primitive} components.
+
+\begin{equation}\label{eq:55}
+subComponents(c) \subset components, \; c \in components\end{equation}
+The \emph{prmitive} components that form the component $c$. By being \emph{primitive}, the components in the set cannot be sub assemblies them selves.
+
+\begin{equation}\label{eq:4}
+nbrTrays \in \{1 , \ldots , 2^{32}-1\}
+\end{equation}
+The number of trays available in the assembly, $nbrTrays$. Trays are used to hold components until we need them in the assembly. This can be that the tray holds the components from the beginning, as with \emph{pure} components fed to the assembly, or it can be a sub-assembly put there during the assembly to be picked up again later. Each \emph{pure} component has its own tray, so we can have a button tray, a cover tray, etc.
+\begin{equation}\label{eq:22}
+tray(t) \in trays \cup \{0\}, \; t \in tasks
+\end{equation}
+$tray(t)$ is the tray task $t$ uses. If no tray is used by the task, $tray(t) = 0$. A tray can either hold a component from the beginning or have a component put in it during the assembly.
+\begin{equation}\label{eq:14}
+trays = \{1 , \ldots , nbrTrays\}\end{equation}
+The trays.
+
+\begin{equation}\label{eq:5}
+nbrFixtures \in \{1 , \ldots , 2^{32}-1\}
+\end{equation}
+$nbrFixtures$ defines the number of fixtures available in the assembly. A fixture is primarily used to hold a component in order for another component to be mounted on that component. Although, as will be shown in the assembly example [section?], the fixture can be used for purposes than just holding components.
+\begin{equation}\label{eq:24}
+fixture(t) \in fixtures \cup \{0\}, \; t \in tasks
+\end{equation}
+$fixture(t)$ is the fixture task $t$ uses. If no fixture is used by the task, $fixture(t) = 0$
+\begin{equation}\label{eq:15}
+fixtures = \{1 , \ldots , nbrFixtures\}\end{equation}
+The fixtures.
+
+\begin{equation}\label{eq:7}
+nbrOutputs \in \{1 , \ldots , 2^{32}-1\}
+\end{equation}
+$nbrOutputs$ defines the number of outputs available. An output is the final stage for a component in an assembly. After it is put here, it will not be removed. Although, there can still be other components mounted on the component put on the output. In that respect an output can be viewed as a fixture, only that the components put there can not be removed.
+\begin{equation}\label{eq:23}
+output(t) \in outputs \cup \{0\}, \; t \in tasks
+\end{equation}
+$output(t)$ is the output used by task $t$. If no output is used by the task, $output(t) = 0$.
+\begin{equation}\label{eq:16}
+outputs = \{1 , \ldots , nbrOutputs\}\end{equation}
+The outputs.
+
+\begin{equation}\label{eq:8}
+nbrConcurrentGroups \in \{1 , \ldots , 2^{32}-1\}
+\end{equation}
+$nbrConcurrentGroups$ defines the number of concurrent groups used. A concurrent group is a group of tasks that has to be performed at the same time. Hence, a concurrent group can not be larger than the amount of machines available, although, there is no check for it in the model. 
+\begin{equation}\label{eq:17}
+concurrentGroups = \{1 , \ldots , nbrConcurrentGroups\}\end{equation}
+The concurrent groups.
+
+\begin{equation}\label{eq:9}
+nbrOrderedGroups \in \{1 , \ldots , 2^{32}-1\}
+\end{equation}
+The number of ordered groups used. An ordered group is an array of tasks that has to come in a very specific order. An example of this could be if an assembly has many move tasks that needs to be performed one after another in order to make an intricate movement. As will be showed in the constraints[section?], we can reason the relation between tasks if they use a certain component and are a certain kind of action. But we can not reason using two move tasks, there is no way to tell which should come before the other based on the component they use.
+\begin{equation}\label{eq:18}
+orderedGroup(k) \subset tasks, \; k \in \{1 , \ldots , nbrOrderedGroups\}\end{equation}
+Ordered group number $k$. These tasks come in the order in which they should be scheduled. The first one is the predecessor of the second one, the second one is the predecessor of the third one, and so on.
+\begin{equation}\label{eq:31}
+order(k) \subset tasks, \; k \in orderedGroups
+\end{equation} 
+Array of tasks needed to be performed in a certain order on a single machine
+\begin{equation}\label{eq:32}
+order(k,i) \in tasks, \; i \in \{1 , \ldots , |orderedGroup(k)|\}, \; k \in orderedGroups
+\end{equation}
+The $i$:th task to be performed i order according to the $k$:th $orderedGroup$
+\begin{equation}\label{eq:39}
+orderedSet = \bigcup_{\forall k \in orderedGroups}order(k), \; orderedSet \subset tasks\end{equation}
+The set of tasks member of ordered groups
+\\\\
+All the variables described that starts with $nbr$ describes an amount of something, for example $nbrTasks$ describes the number of tasks to schedule. In \emph{Calculated Static Variables} one can see that these values help define sets of numbers. These sets represents the set of those things, for example a set of tasks. So in the case of tasks, each task is represented by a number from $1$ to $nbrTasks$. The numbers in one of those sets represents one of the items in the set.
+
+These sets are used to define the following variables, but they are not present in the parameters to the model. They are therefore not included here, but first in \emph{Calculated Static Variables}.
+\\\\
+$tray(t)$, $output(t)$ and $fixture(t)$ can not be set at the same time for a task, since that would mean the task is performed at two locations at the same time, although this is not checked by the model. The only restriction for what kind of tasks can be performed using these are that output can not be used by a take task and tray can not be used by a mount task. If ones assembly contains these combinations, the output or tray should be changed to a fixture.
+
+\begin{equation}\label{eq:25}
+componentsUsed(t) \subset components, \; t \in tasks
+\end{equation}
+$componentsUsed(t)$ defines the set of components task $t$ uses. A task usually only uses one component at a time, but uses two in the case of mounting tasks, the mounted component and the component mounted on.
+
+\begin{equation}\label{eq:26}
+mounting \subset tasks
+\end{equation}
+\begin{equation}\label{eq:27}
+taking \subset tasks
+\end{equation}
+\begin{equation}\label{eq:28}
+moving \subset tasks
+\end{equation}
+\begin{equation}\label{eq:29}
+putting \subset tasks
+\end{equation}
+Each task performed can be classified as either a mount task, a take task, a move task or a put task, but only one of them.
+\begin{description}
+\item[Taking] A task that picks up a component is a taking task. The location of the component is specified by either a tray or a fixture, but not an output since there is no reason to pick up something that has been placed on an output.
+
+\item[Mounting] A task that mounts a component on another component is a mounting task. This assumes that the component to mount is picked up and in the hand. The location of the component to mount on is defined by either a fixture or an output.
+
+\item[Putting] A task that puts a component somewhere is a putting task. Where a component is put is defined by either a fixture, a tray or an output.
+
+\item[Moving] A task that moves a components from one place to another is a moving task. The model already puts in moves between tasks and if, for example, the first task is a take task and the second task is a put task, the move in between them is essentially a move that moves a component from one place to the another. Although, sometimes it can be handy to define a task that explicitly moves a component. An example of that can be if one wants to spin a component around. Then one can specify a take task in order to pick up the component, a move task to turn it, and a put task to put the component back. In this case there will be three moves of the component; one to move from the take task to the move task, the move task itself, and a move from the move task to the put task.
+\end{description}
 \begin{equation}\label{eq:35}
 putting(c) \subset putting, \; c \in components\end{equation}
 Set of tasks that puts component $c$ somewhere
@@ -207,9 +190,14 @@ Set of tasks that takes component $c$
 moving(c) \subset moving, \; c \in components\end{equation}
 Set of tasks that moves component $c$ somewhere
 
-\begin{equation}\label{eq:39}
-orderedSet = \bigcup_{\forall k \in orderedGroups}order(k), \; orderedSet \subset tasks\end{equation}
-The set of tasks member of ordered groups
+\begin{equation}\label{eq:30}
+concurrentTasks(k) \subset tasks, \; k \in concurrentGroups\end{equation}
+The $k$ set of tasks needing concurrent execution
+
+\begin{equation}\label{eq:34}
+changeToolDuration(tool_1,tool_2) \in \{0 , \ldots , 2^{32}-1\}, \; tool_1,tool_2 \in tools
+\end{equation} 
+The duration of changing from $tool_1$ to $tool_2$
 
 \begin{equation}\label{eq:42}
 duration(t) \in \{0 , \ldots , 2^{32}-1\}, \; t \in tasks\end{equation}
@@ -226,18 +214,6 @@ timeMatrix3D(t(from),t(to),k) \in &\{0 , \ldots , 2^{32}-1\}, \; t(from) \in tas
 \end{aligned}
 \end{equation}
 The time to move from task $t(from)$ to task $t(to)$ changing tool according to $k$
-
-\begin{equation}\label{eq:53}
-taskSubComponents(t) \subset components, \; t \in tasks\end{equation}
-The components that form the sub assemblies used in task $t$. The components can in them selves be sub assemblies
-
-\begin{equation}\label{eq:54}
-taskCompleteSubComponents(t) \subset components, \; t \in tasks\end{equation}
-The components that form the sub assemblies used in task $t$. This includes all sorts of components, being sub assemblies them selves or \emph{primitive} components.
-
-\begin{equation}\label{eq:55}
-subComponents(c) \subset components, \; c \in components\end{equation}
-The \emph{prmitive} components that form the component $c$. By being \emph{primitive}, the components in the set cannot be sub assemblies them selves.
 
 \begin{equation}\label{eq:56}
 taskOutOfRange(m) \subset tasks, \; m \in machines\end{equation}

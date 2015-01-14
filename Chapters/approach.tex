@@ -40,23 +40,6 @@ A constraint programming program is consisting of many of these constraints and 
 \subsection{Flexible job-shop scheduling problem}
 
 \section{MiniZinc}
-\section{Model}
-This model is based on/inspired by the model in [ejenstam]. That model is centered around work performed in fixtures. So tasks can easily be labeled \emph{tray} if it uses a tray, \emph{fixture} if it uses a fixture, etc. This is common robot cell assembly procedures; take a component from a tray, put it in a fixture, get another component, mount the component on the the component in the fixture. But YuMi can perform much more complex tasks than that. We want to be able to schedule mounting tasks that does not incorporate a fixture. We have used a similar way of generalizing tasks by labeling them with \emph{tray}, \emph{fixture}, etc. but extended it.
-\subsection{Input data}
-The solver takes a description of the robot cell in the form of a MiniZink data file. The file describes; the number of arms available, the tools available, the trays available, the fixtures available, etc. Here on after called \emph{Cell Variables}. It also sets up a number of \emph{Decision Varibles} which contains a set of values from which each \emph{Decision Variable} can take.
-\subsubsection{Cell Variables}
-
-
-\subsubsection{Decision Variables}
-
-
-\subsection{Constraints}
-In this section some of the most important constraints for the model will be described. For a full list of used constraints see \emph{Appendix A}, for the MiniZink code see \emph{Appendix B}.
-
-
-\subsection{Filter}
-\subsubsection{Domain Filter}
-\subsubsection{Predecessor Filter}
 
 \section{Solvers}
 \subsection{G12}

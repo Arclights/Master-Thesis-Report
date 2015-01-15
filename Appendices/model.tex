@@ -65,9 +65,14 @@
  \begin{equation}\label{eq:25}
  componentsUsed(t) \subset components, \; t \in tasks
  \end{equation}
+ \begin{equation}\label{eq:componentCreated}
+ componentCreated(t) \in components \cup \{0\}, \; t \in tasks
+ \end{equation}
  $nbrComponents$ defines the number of components used. All components needs to be uniquely identified in the assembly, so even if we use 4 screws in an assembly, we need to define all 4 screws. As mentioned before we distinguish between components and \emph{primitve} components. The reason for that is that in the model we do not distinguish between a \emph{primitve} component and a sub-assembly, they are the same. And in the model we call them components. The reason for this is because we found it easier to only have one sort of object to deal with when it comes to what will be assembled, instead of two. This means that the final assembly is also a component, i.e. the product produced by the assembly is a component. In other words, in this thesis \emph{primitve} components and sub-assemblies are sub sets of components.
  
  $componentsUsed(t)$ defines the set of components task $t$ uses. A task usually only uses one component at a time, but uses two in the case of mounting tasks, the mounted component and the component mounted on.
+ 
+ To know when a sub-assembly is created we set is as $compoentCreated$ for the task where it is created. This cannot happen anywhere else other than at a mount task, although there is no check in the model for it. If there is not component created at a task, $componentCreated=0$
  \\\\
  Since components also can be sub-assemblies, it means a component can have subcomponents. These have been grouped in different groups to assist the constraints.
  \begin{equation}\label{eq:53}
@@ -198,15 +203,33 @@
  $putting(c)$, $mounting(c)$, $taking(c)$ and $moving(c)$ are subsets of respective set above based on the component involved.
  
  \begin{equation}\label{eq:42}
- duration(t) \in \{0 , \ldots , 2^{32}-1\}, \; t \in tasks\end{equation}
+ duration(t) \in \{0 , \ldots , 2^{32}-1\}, \; t \in tasks
+ \end{equation}
  $duration(t)$ is simply the duration of task $t$.
  \\\\
- For the model to decide how long a move between two tasks should be and if there should be a change of tool in between, a matrix is used, $timeMatrix3D$.[picture?] This is a 3d matrix and on its y-axis it has the tasks to move from, on the x-axis the tasks to move to, and on the z-axis the different transitions between tools that can occur.
- \begin{equation}\label{eq:43}
- timeMatrixDepth = \frac{n^2 - n + 2}{2}, \; n = nbrTools\end{equation}
+   \begin{figure}
+   	\centering
+    	\input{Figures/3d_matrix}
+    	% or use \input{mytikz}
+    	\caption{The timeMatrix3D}
+    	\label{fig:3d_matrix}
+   \end{figure}
+ For the model to decide how long a move between two tasks should be and if there should be a change of tool in between, a matrix is used, $timeMatrix3D$, see figure \ref{fig:3d_matrix}. This is a 3-dimensional matrix and contains the times for moving between all the tasks depending on what tool change occurs. On its y-axis it has the tasks to move from, on the x-axis the tasks to move to, and on the z-axis the different transitions between tools that can occur.
+ \begin{equation}\label{eq:timeMatrixDepth}
+ timeMatrixDepth = \frac{n^2 - n + 2}{2}, \; n = nbrTools
+ \end{equation}
+  \begin{equation}
+  \begin{aligned}\label{eq:44}
+  timeMatrix3D(t(from),t(to),k) &\in \{0 , \ldots , 2^{32}-1\},\\
+  t(from) &\in tasks \cup startTasks,  \\ 
+  t(to) &\in tasks, \; k \in \{0 , \ldots , timeMatrixDepth\}
+  \end{aligned}
+  \end{equation}
  $timeMatrixDepth$ is the length of the z-axis, i.e. the depth of the matrix. It should be said that the reason for using the method described below is to reduce the size of the matrix and avoid too much redundancy.
  
- What we mean with ''different transitions'' is easiest to show through an example. Lets say we have $3$ tools available for each machine. We consider each tool state as a node in a graph, see figure \ref{fig:tools_trans_bef}, with the old tool state to the left and the new tool state to the right. Between them we can draw the different ways we can change state. The we start to consider which ones we actually need. We can change from tool $1$ to tool $1$, which is not changing tool at all. The same can be done for tool $2$, but not changing tool here costs just as much time as with tool $1$. So the change from tool $1$ to itself covers not changing tool for this tool, as well as for all the other tools, thereby we only need to keep track of one of these changes. We can also change from tool $1$ to tool $2$. And we can change back from $2$ to $1$, although here in the model we assume the change from one tool to another takes the same time the other way around as well. Therefore, we consider the change from tool $1$ to tool $2$ the same as from tool $2$ to tool $1$, and only keep track of one of them. If we keep consider the rest of the transitions this way, we will end up with $4$ transitions, see figure \ref{fig:tools_trans_aft}
+ What we mean with ''different transitions'' is easiest to show through an example. Lets say we have $3$ tools available for each machine. We consider each tool state as a node in a graph, see figure \ref{fig:tools_trans_bef}, with the old tool state to the left and the new tool state to the right. Between them we can draw the different ways we can change state. The we start to consider which ones we actually need. We can change from tool $1$ to tool $1$, which is not changing tool at all. The same can be done for tool $2$, but not changing tool here costs just as much time as with tool $1$. So the change from tool $1$ to itself covers not changing tool for this tool, as well as for all the other tools, thereby we only need to keep track of one of these changes. We can also change from tool $1$ to tool $2$. And we can change back from $2$ to $1$, although here in the model we assume the change from one tool to another takes the same time the other way around as well. Therefore, we consider the change from tool $1$ to tool $2$ the same as from tool $2$ to tool $1$, and only keep track of one of them. If we keep consider the rest of the transitions this way, we will end up with a reduced number of transitions, in our case $4$, see figure \ref{fig:tools_trans_aft}
+ 
+ It has been observed that using the reasoning above, $timeMatrixDepth$ follows the function \ref{eq:timeMatrixDepth}.
  
  \begin{figure}
  	\centering
@@ -215,77 +238,81 @@
  	\caption{All the transitions between the tool states}
  	\label{fig:tools_trans_bef}
  \end{figure}
+ 
  \begin{figure}
  	\centering
   	\input{Figures/tool_trans_aft}
   	% or use \input{mytikz}
-  	\caption{All the transitions between the tool states}
+  	\caption{The reduced number of transitions between the tool states}
   	\label{fig:tools_trans_aft}
  \end{figure}
  
- \begin{equation}
- \begin{aligned}\label{eq:44}
- timeMatrix3D(t(from),t(to),k) \in &\{0 , \ldots , 2^{32}-1\}, \; t(from) \in tasks \cup startTasks,  \\ 
- &t(to) \in tasks, \; k \in \{0 , \ldots , timeMatrixDepth\}
- \end{aligned}
- \end{equation}
- The time to move from task $t(from)$ to task $t(to)$ changing tool according to $k$
- 
  \begin{equation}\label{eq:56}
- taskOutOfRange(m) \subset tasks, \; m \in machines\end{equation}
- The tasks that cannot be reached by machine $m$
+ taskOutOfRange(m) \subset tasks, \; m \in machines
+ \end{equation}
+Depending on the physical layout of the assembly, sometimes not all tasks can be done with all machines. It could be that the machines would collide or simply that the spatial location is out of reach for the machine. In those cases we can specify tasks are out of hand for a specific machine. This is the only time when we distinguish between the two machines and connect the machine in the model model with the machine in the real world. In all other aspects other than this the machines in the model are identical and has the potential perform the same work.
  
  
  \subsubsection{Decision variables}
+ Decision variables are variables that can take on many values. It is these values that the solver set out to determine in order to solve the problem.
  
  \begin{equation}\label{eq:40}
- usingMachine(t) \in machines, \; t \in tasks\end{equation}
- The machine task $t$ uses
+ usingMachine(t) \in machines, \; t \in tasks
+ \end{equation}
+ The model has to decide which task uses which machine.
  
  \begin{equation}\label{eq:41}
- pred(t) \in allTasks, \; t \in allTasks\end{equation}
- The predecessor task of task $t$
+ pred(t) \in allTasks, \; t \in allTasks
+ \end{equation}
+Each task has a predecessor that tells the model what other task comes right before the task in question on the same machine.
  
  \begin{equation}
- \begin{aligned}\label{eq:45}
- maxE = &(max(\{duration(t) : t \in tasks\}) +  \\ 
- &max(\{timeMatrix3D(t_1,t_2,k) : \forall t_1 \in tasks \cup startTasks,  \\ 
- &\forall t_2 \in tasks, \; \forall k \in \{0 , \ldots , timeMatrixDepth\}\}) \times nbrTasks
+ \begin{aligned}\label{eq:maxE}
+ maxE = &(max(\{duration(t) : t \in tasks\}) \; +  \\ 
+ &\begin{aligned}
+ max(\{&timeMatrix3D(t_1,t_2,k) : \\
+ &\forall t_1 \in tasks \cup startTasks,  \\ 
+ &\forall t_2 \in tasks,\\
+ &\forall k \in \{0 , \ldots , timeMatrixDepth\}\}) \times nbrTasks
+  \end{aligned}
  \end{aligned}
  \end{equation}
- Rough upper limit of the total schedule time. Assumes all move times take as long as the longest move time existing in the schedule. And likewise for the task durations.
+ In order to create an upper limit for variables dealing with time, we create a rough upper limit of the complete assembly. It simply takes the longest duration for a task and the longest duration for a move between tasks and assert it for all the tasks.
  
  \begin{equation}\label{eq:46}
- start(t) \in \{0 , \ldots , maxE\}, \; t \in allTasks\end{equation}
- The start time for task $t$
- 
+ start(t) \in \{0 , \ldots , maxE\}, \; t \in allTasks
+ \end{equation} 
  \begin{equation}\label{eq:47}
- end(t) = start(t) + duration(t), \; t \in allTasks\end{equation}
- The end time for task $t$
+ end(t) = start(t) + duration(t), \; t \in allTasks
+ \end{equation}
+Each task has to start have a start time. We set it to be anywhere between time $0$ and the maximum possible end calculated before.
+
+To simplify notation we also introduce one more variable called $end(t)$. It is the time when task $t$ ends and is simply the sum of the start and the duration of the task.
+
+ \begin{equation}\label{eq:49}
+ moveDuration(t) \in \{0 , \ldots , maxE\}, \; t \in allTasks
+ \end{equation}
+ \begin{equation}\label{eq:50}
+ moveStart(t) \in \{0 , \ldots , maxE\}, \; t \in allTasks
+ \end{equation}
+ \begin{equation}\label{eq:51}
+ moveEnd(t) = moveStart(t) + moveDuration(t), \; t \in allTasks
+ \end{equation}
+As mentioned before, each task has a move time connected to it since it takes a certain amount of time to move from one task to another. Since this time depends on both what task comes before it and what tools is needed for both of the tasks, the duration for the move is a decision variable as opposed to the duration for the task itself.
  
  \begin{equation}\label{eq:48}
  makespan \in \{0 , \ldots , maxE\}\end{equation}
- The makespan for the whole schedule, the time to minimize
- 
- \begin{equation}\label{eq:49}
- moveDuration(t) \in \{0 , \ldots , maxE\}, \; t \in allTasks\end{equation}
- The duration of the move to task $t$ from its predecessor
- 
- \begin{equation}\label{eq:50}
- moveStart(t) \in \{0 , \ldots , maxE\}, \; t \in allTasks\end{equation}
- The start time for the move to task $t$ from its predecessor
- 
- \begin{equation}\label{eq:51}
- moveEnd(t) = moveStart(t) + moveDuration(t), \; t \in allTasks\end{equation}
- The end time for the move to task $t$ from its predecessor
+Since the goal of the assembly is to complete the assembly in as little time as possible, we set up a variable for it, $makespan$. It is this variable the solver will try to minimize.
  
  \begin{equation}\label{eq:52}
  toolUsed(t) \in tools, \; t \in allTasks\end{equation}
- The tool used at task $t$
+The last variable is for determine what tool should be used for a task. With $toolNeeded$ we specify what tool is needed for the specific task. But we do not need to specify a tool if the task does not need any specific tool. That is why we need to determine what tool should be used for those tasks. Leaving the option open by not specifying any particular tool opens up for optimisations since it could mean we can avoid costly tool changes.
  
  
  \section{Filter}
- \subsection{Domain filter}
+ In \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} \cite{VilimBartak2002Sequence} Vilím shows that filtering the domains of variables when, as in our case, using sequence dependent setup times can have a great effect on the runtime. Here we present a set of filters in order to minimize the domains of the variables.
+ \subsection{Temporal filter}
+ The largest domains in the model are the domains for the variables dealing with time, i.e. the temporal variables. Reducing those has the potential to cut much of the processing time.
  
  \begin{equation}
  \begin{aligned}\label{eq:57}
@@ -298,74 +325,63 @@
  \end{aligned}
  \end{aligned}
  \end{equation}
- The maximum duration for a move to task $t$
- 
- 
- \begin{equation}
- \begin{aligned}\label{eq:58}
- &(\forall t \in tasks)\\
- &\begin{aligned}
- minMoveDurs(t) = min(\{&timeMatrix3D(t,j,k) :\\
- &\forall j \in tasks, \\
- &\forall k \in \{1 , \ldots , timeMatrixDepth\},\\
- &j \neq t\})
- \end{aligned}
- %minMoveDurs(t) = min(\{timeMatrix3D(t,j,k) : \forall j \in tasks, \\
- % \forall k \in \{1 , \ldots , timeMatrixDepth\}, \; j \neq t\}), \; \forall t \in tasks
- \end{aligned}
- \end{equation}
- The minimum duration for a move to task $t$
+  \begin{equation}
+  \begin{aligned}\label{eq:58}
+  &(\forall t \in tasks)\\
+  &\begin{aligned}
+  minMoveDurs(t) = min(\{&timeMatrix3D(t,j,k) :\\
+  &\forall j \in tasks, \\
+  &\forall k \in \{1 , \ldots , timeMatrixDepth\},\\
+  &j \neq t\})
+  \end{aligned}
+  \end{aligned}
+  \end{equation}
+We start with defining two variables, $maxMoveDurs(t)$ and $minMoveDurs(t)$. These contain the maximum duration and the minimum duration respectively for each task taken from the time matrix.
  
  \begin{equation}\label{eq:59}
- maxEnd = \sum_{\forall t \in tasks} duration(t) + \sum_{\forall t \in tasks} maxMoveDurs(t)
+	maxEnd = \sum_{\forall t \in tasks} duration(t) + maxMoveDurs(t)
  \end{equation}
- The upper limit of the schedule; all tasks is laid out after one after another and the duration between them is the maximum of the moves to them
- 
- \begin{equation}\label{eq:60}
- minEnd = \frac{\left(\sum_{\forall t \in tasks} duration(t) + \sum_{\forall t \in tasks} minMoveDurs(t)\right)}{nbrMachines}
+ \begin{equation}\label{eq:minEnd}
+ 	minEnd = \frac{\sum_{\forall t \in tasks} duration(t) + minMoveDurs(t)}{nbrMachines}
  \end{equation}
- The lower limit of the schedule; the total duration of each task is the duration of the task itself and the minimum duration of a move to the task, and the tasks are scheduled perfectly over all the machines
- 
+By using the newly created variables we candefine yet another two. These define a new maximum for the total time of the assembly, $maxEnd$. It is similar to $maxE$ in equation \ref{eq:maxE}, although much more thorough in the filtering. These variables also define a new minimum for the total time of the assembly, it was earlier ju set to 0.
+
+To calculate the maximum end we look at the worst case scenario for the assembly. The worst case would be if all the tasks had to be done one after the other, one at a time, on the same machine and they would take the longest time, according to the time matrix, to move between them. See figure \ref{fig:worst_case}. This can simply be defined by summing the durations and maximum move durations for all the tasks.
+
+To calculate the minimum end we look at the best case scenario. The best case scenario is if all the tasks can be evenly scheduled over all machines, taking the shortest, according to the time matrix, time to move between them. See figure \ref{fig:best_case}. We can define this by summing up the durations and minimum move durations for all the task end divide the sum with the number of machines available. If the tasks can be perfectly evenly scheduled across all the machines, the total assembly time will be equal to $minEnd$, if they cannot $menEnd$ will always be smaller than the total assembly time.
+
+ \begin{figure}
+ 	\centering
+ 	\input{Figures/worst_case}
+ 	% or use \input{mytikz}
+ 	\caption{The worst case assembly}
+ 	\label{fig:worst_case}
+ \end{figure}
+  \begin{figure}
+  	\centering
+  	\input{Figures/best_case}
+  	% or use \input{mytikz}
+  	\caption{The best case assembly}
+  	\label{fig:best_case}
+  \end{figure}
+\newpage
+We can now start using $maxEnd$ and $minEnd$ to filter variables
  \begin{equation}\label{eq:61}
  \begin{aligned}
- &(\forall t \in allTasks)\\
- &\begin{aligned}
- start(t) &\le maxEnd-duration(t) \; \land\\
- end(t) &\le maxEnd
- \end{aligned}
+&(\forall t \in allTasks)\\
+&\begin{aligned}
+start(t) &\le maxEnd-duration(t) \; \land\\
+start(t) &\ge minMoveDurs(t)
+\end{aligned}
  \end{aligned}
  \end{equation}
- Sets the upper limit for the start of each task to be the maximum end minus the duration for the task. Sets the end for each task to be the maximum end
- 
- \begin{equation}\label{eq:62}
- (\forall t \in tasks) \; end(t) \ge duration(t) + minMoveDurs(t)\end{equation}
- A task can start at its earliest at the time directly after the move to a task, therefore the end of a task can earliest happen after the duration of the task plus the shortest move to it
- 
+We set and upper bound for the start of a task by setting it to happen at latest the duration of the task time units before the $maxEnd$, since the task has to have time to execute before the end.
+
+To set a lower bound for the start of a task, we simply reason that the move to the task can start at its earliest at time 0. Therefore, we limit the task to start earliest direct after the minimum move duration to it.
+
  \begin{equation}\label{eq:63}
  (\forall t \in tasks) \; moveStart(t) \le maxEnd-(duration(t)+minMoveDurs(t)\end{equation}
- A move to a task can start at the latest $maxEnd$ but before the duration of the task and before at least the minimum of the move times to the task
- 
- \begin{equation}
- \begin{aligned}\label{eq:64}
- &(\forall t \in tasks)\\
- &\begin{aligned}
- moveDuration(t) &\le maxMoveDurs(t) \; \land\\
- moveDuration(t) &\ge minMoveDurs(t)
- \end{aligned}
- \end{aligned}
- \end{equation}
- The move duration for task $t$ is limited by $maxMoveDurs$ and $minMoveDurs$
- 
- \begin{equation}
- \begin{aligned}\label{eq:65}
- &(\forall t \in tasks)\\
- &\begin{aligned}
- moveEnd(t) &\le maxEnd - duration(t) \; \land\\
- moveEnd(t) &\ge minMoveDurs(t)
- \end{aligned}
- \end{aligned}
- \end{equation}
- The end of a move to a task can at the latest come at $maxEnd$ minus the duration of the task. The move to a task can at the earliest happen at time 0, so the end can earliest happen at the shortest move time to the task
+ In order to limit the move start to a task we use the same reasoning as with start. But now we have to account for that there comes a task after the move and a duration of the move itself. So we have to subtract the duration of the task and the duration of the move. Since we do not know the exact length of the move, we have to use the value we know the duration can not be lower than, which is $minMoveDuration$.
  
  \begin{equation}\label{eq:66}
  \begin{aligned}
@@ -373,7 +389,7 @@
  makespan &\ge minEnd
  \end{aligned}
  \end{equation}
- Limits the makespan
+ We have already calculated the limits for the whole assembly, $maxEnd$ and $minEnd$. Now we just enforce them on the makespan.
  
  \begin{equation}
  \begin{aligned}\label{eq:67}
@@ -386,21 +402,18 @@
  &t \neq j\})
  \end{aligned}
  \end{aligned}\\
- &moveDuration(t) \neq i, \\
+ &moveDuration(t) \neq i \\
  \end{aligned}
  \end{equation}
- Limits the $moveDuration$ domains to only the values specified in the $timeMatrix3D$
+We know that the value for move duration will be one of the values in the time matrix, hence we can restrict the duration to only those values. We do that by coming up with the values that the duration cannot assume, and limits the duration to not have those values in its domain.
  
  \begin{equation}
  \begin{aligned}\label{eq:69}
  &(\forall t \in tasks / taking) \\
- &\begin{aligned}
- moveStart(t) \ge min(\{&duration(tt) + minMoveDurs(tt) :\\
- &\forall tt \in taking\})\\
- \end{aligned}
+ &moveStart(t) \ge min(\{duration(tt) + minMoveDurs(tt) : \forall tt \in taking\})
  \end{aligned}
  \end{equation}
- As the schedule has to start with a take task, the move to the other tasks can only start as early as after the shortest move to and execution of one of the take tasks
+ The first thing that has to happen to a component in the assembly is that is has to be picked up. So since the assembly starts out with empty machines the first thing that has to happen, with the exception of a tool change, is a take task. Therefore, we can limit that start of the tasks not being take tasks to happen at earliest after the take task with the smallest sum of duration and minimum move duration.
  
  \begin{equation}
  \begin{aligned}\label{eq:70}
@@ -416,7 +429,9 @@
  &start(t) \ge max(\{duration(pt) + minMoveDurs(pt) : \forall pt \in prevTasks\}) \\
  \end{aligned}
  \end{equation}
- $prevTasks$ are the tasks for which the task $t$ uses the component created at task $task$, hence the tasks in $prevTasks$ precedes task $t$. If the number of machines are greater than or equal to the number of task preceding task t, then the best scheduling is to do all tasks in parallel. If so the earliest task $t$ can start is greater or equal to the maximum of the preceding tasks
+ The start of a task can be even further limited by analysing the components used by the task and how that relates to what components are created by other tasks.
+ 
+ Lets take task $t$ as an example. We start by getting all tasks that creates the components that is used in task $t$, $prevTasks$. These tasks has to come before task $t$ since the component that they create cannot be used before they are created. If the number of machines are greater than or equal to the number of task preceding task t, then the best scheduling that can be done is to do all tasks in parallel. That means that task $t$ can start at earliest after the one of the proceeding tasks taking the longest to complete.
  
  \begin{equation}
  \begin{aligned}\label{eq:71}
@@ -426,10 +441,10 @@
  &componentCreated(task) \in componentsUsed(t)\},
  \end{aligned} \\
  &nbrMachines < |prevTasks|,  \\
- &start(t) \ge \frac{\left(\sum_{\forall pt \in prevTasks}duration(pt) + minMoveDurs(pt)\right)}{nbrMachines} \\
+ &start(t) \ge \frac{\left(\sum_{\forall pt \in prevTasks}duration(pt) + minMoveDurs(pt)\right)}{nbrMachines}
  \end{aligned}
  \end{equation}
- $prevTasks$ are the tasks for which the task $t$ uses the component created at task $task$, hence the tasks in $prevTasks$ precedes task $t$. If the number of machines are less than the number of tasks preceding task t, then the best we can do is to divide the task times equally on all machines. If the tasks can be divided onto the machines so that the total length of the times on all machines are the same, that time will be equal to the sum$/nbrMachines$. If they don't match up the maximum of these times will be larger than the sum$/nbrMachines$.
+ But if the number of machines is fewer than the number of preceding tasks, the best we can do is divide them as equally as possible over the machines. This is the same reasoning as when we calculated $minEnd$ in equation \ref{eq:minEnd}.
  
  \begin{equation}\label{eq:72}
  \begin{aligned}
@@ -442,8 +457,8 @@
  0 &< |succTasks|,
  \end{aligned}\\
  &\begin{aligned}
- end(t) \le maxEnd - max(\{&duration(st) + minMoveDurs(st) :\\
- &\forall st \in succTasks\})
+ start(t) \le maxEnd - max(\{&duration(st) + minMoveDurs(st) :\\
+ &\forall st \in succTasks\}) - duration(t)
  \end{aligned}\\
  \end{aligned}
  \end{equation}
@@ -456,7 +471,10 @@
  &componentsUsed(t) \subset taskCompleteSubComponent(task), \\
  &componentsUsed(t) \cup taskCompleteSubComponents(task) \neq \emptyset\}, \\
  &nbrMachines \le |succTasks|, \\
- &end(t) \le maxEnd - \frac{\left(\sum_{\forall st \in succTasks}duration(st) + minMoveDurs(st)\right)}{nbrMachines}
+ &\begin{aligned}
+ start(t) \; \le \; &maxEnd - \frac{\left(\sum_{\forall st \in succTasks}duration(st) + minMoveDurs(st)\right)}{nbrMachines}\\
+ &- duration(t)
+ \end{aligned}
  \end{aligned}
  \end{equation}
  $succTasks$ are the tasks that has the components used in task $t$ as subcomponents, hence the tasks in $succTasks$ succeeds task $t$. If the number of machines are less than the number of tasks preceding task t, then the best we can do is to divide the task times equally on all machines. If the tasks can be divided onto the machines so that the total length of the times on all machines are the same, that time will be equal to the sum$/nbrMachines$. If they don't match up the maximum of these times will be larger than the sum$/nbrMachines$.

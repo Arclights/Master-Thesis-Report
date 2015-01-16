@@ -307,358 +307,7 @@ Since the goal of the assembly is to complete the assembly in as little time as 
  \begin{equation}\label{eq:52}
  toolUsed(t) \in tools, \; t \in allTasks\end{equation}
 The last variable is for determine what tool should be used for a task. With $toolNeeded$ we specify what tool is needed for the specific task. But we do not need to specify a tool if the task does not need any specific tool. That is why we need to determine what tool should be used for those tasks. Leaving the option open by not specifying any particular tool opens up for optimisations since it could mean we can avoid costly tool changes.
- 
- 
- \section{Filter}
- In \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} \cite{VilimBartak2002Sequence} Vilím shows that filtering the domains of variables when, as in our case, using sequence dependent setup times can have a great effect on the runtime. Here we present a set of filters in order to minimize the domains of the variables.
- \subsection{Temporal filter}
- The largest domains in the model are the domains for the variables dealing with time, i.e. the temporal variables. Reducing those has the potential to cut much of the processing time.
- 
- \begin{equation}
- \begin{aligned}\label{eq:57}
- &( \forall t \in tasks)\\
- &\begin{aligned}
- maxMoveDurs(t) = max(\{&timeMatrix3D(t,j,k) :\\
- &\forall j \in tasks, \\
- &\forall k \in \{1 , \ldots , timeMatrixDepth\},\\
- &j \neq t\})
- \end{aligned}
- \end{aligned}
- \end{equation}
-  \begin{equation}
-  \begin{aligned}\label{eq:58}
-  &(\forall t \in tasks)\\
-  &\begin{aligned}
-  minMoveDurs(t) = min(\{&timeMatrix3D(t,j,k) :\\
-  &\forall j \in tasks, \\
-  &\forall k \in \{1 , \ldots , timeMatrixDepth\},\\
-  &j \neq t\})
-  \end{aligned}
-  \end{aligned}
-  \end{equation}
-We start with defining two variables, $maxMoveDurs(t)$ and $minMoveDurs(t)$. These contain the maximum duration and the minimum duration respectively for each task taken from the time matrix.
- 
- \begin{equation}\label{eq:59}
-	maxEnd = \sum_{\forall t \in tasks} duration(t) + maxMoveDurs(t)
- \end{equation}
- \begin{equation}\label{eq:minEnd}
- 	minEnd = \frac{\sum_{\forall t \in tasks} duration(t) + minMoveDurs(t)}{nbrMachines}
- \end{equation}
-By using the newly created variables we candefine yet another two. These define a new maximum for the total time of the assembly, $maxEnd$. It is similar to $maxE$ in equation \ref{eq:maxE}, although much more thorough in the filtering. These variables also define a new minimum for the total time of the assembly, it was earlier ju set to 0.
-
-To calculate the maximum end we look at the worst case scenario for the assembly. The worst case would be if all the tasks had to be done one after the other, one at a time, on the same machine and they would take the longest time, according to the time matrix, to move between them. See figure \ref{fig:worst_case}. This can simply be defined by summing the durations and maximum move durations for all the tasks.
-
-To calculate the minimum end we look at the best case scenario. The best case scenario is if all the tasks can be evenly scheduled over all machines, taking the shortest, according to the time matrix, time to move between them. See figure \ref{fig:best_case}. We can define this by summing up the durations and minimum move durations for all the task end divide the sum with the number of machines available. If the tasks can be perfectly evenly scheduled across all the machines, the total assembly time will be equal to $minEnd$, if they cannot $minEnd$ will always be smaller than the total assembly time.
-
- \begin{figure}
- 	\centering
- 	\input{Figures/worst_case}
- 	% or use \input{mytikz}
- 	\caption{The worst case assembly}
- 	\label{fig:worst_case}
- \end{figure}
-  \begin{figure}
-  	\centering
-  	\input{Figures/best_case}
-  	% or use \input{mytikz}
-  	\caption{The best case assembly}
-  	\label{fig:best_case}
-  \end{figure}
-\newpage
-We can now start using $maxEnd$ and $minEnd$ to filter variables
- \begin{equation}\label{eq:lim_start_over}
- \begin{aligned}
-&(\forall t \in allTasks)\\
-&start(t) \le maxEnd-duration(t)
- \end{aligned}
- \end{equation}
-  \begin{equation}\label{eq:lim_start_under}
- \begin{aligned}
-&(\forall t \in Tasks)\\
-&start(t) \ge minMoveDurs(t)
- \end{aligned}
- \end{equation}
-We set and upper bound for the start of a task by setting it to happen at latest the duration of the task time units before the $maxEnd$, since the task has to have time to execute before the end.
-
-To set a lower bound for the start of a task, we simply reason that the move to the task can start at its earliest at time 0. Therefore, we limit the task to start earliest direct after the minimum move duration to it.
-
-The difference between \ref{eq:lim_start_over} and \ref{eq:lim_start_under} is that the upper limit can be set for all sorts of tasks, even the start and goal tasks, but the lower limit cannot be set for start and goal tasks. This is simply because the start and goal tasks do not have any move times to them since they are source and sink nodes.
-
- \begin{equation}\label{eq:63}
- (\forall t \in tasks) \; moveStart(t) \le maxEnd-(duration(t)+minMoveDurs(t))
- \end{equation}
- In order to limit the move start to a task we use the same reasoning as with start. But now we have to account for that there comes a task after the move and a duration of the move itself. So we have to subtract the duration of the task and the duration of the move. Since we do not know the exact length of the move, we have to use the value we know the duration can not be lower than, which is $minMoveDuration$.
- 
- \begin{equation}\label{eq:66}
- \begin{aligned}
- makeSpan &\le maxEnd \land\\
- makespan &\ge minEnd
- \end{aligned}
- \end{equation}
- We have already calculated the limits for the whole assembly, $maxEnd$ and $minEnd$. Now we just enforce them on the makespan.
- 
- \begin{equation}
- \begin{aligned}\label{eq:67}
- &(\forall t \in tasks)\\
- &\begin{aligned}
- (\forall i \in \{0 , \ldots , maxMoveDurs(t)\} / \{&timeMatrix3D(task,j,k) :\\
- &\forall j \in tasks,\\
- &\begin{aligned}
- &\forall k \in \{1 , \ldots , timeMatrixDepth\}\\
- &t \neq j\})
- \end{aligned}
- \end{aligned}\\
- &moveDuration(t) \neq i
- \end{aligned}
- \end{equation}
-We know that the value for move duration will be one of the values in the time matrix, hence we can restrict the duration to only those values. We do that by coming up with the values that the duration cannot assume, and limits the duration to not have those values in its domain.
- 
- \begin{equation}
- \begin{aligned}\label{eq:69}
- &(\forall t \in tasks / taking) \\
- &moveStart(t) \ge min(\{duration(tt) + minMoveDurs(tt) : \forall tt \in taking\})
- \end{aligned}
- \end{equation}
- The first thing that has to happen to a component in the assembly is that is has to be picked up. So since the assembly starts out with empty machines the first thing that has to happen, with the exception of a tool change, is a take task. Therefore, we can limit that start of the tasks not being take tasks to happen at earliest after the task with the smallest sum of duration and minimum move duration.
- 
- \begin{equation}
- \begin{aligned}\label{eq:70}
- &(\forall t \in tasks)\\
- &\begin{aligned}
- prevTasks = \{task : &\forall task \in tasks,\\
- &componentCreated(task) \in componentsUsed(t)\},
- \end{aligned}\\
- &\begin{aligned}
- nbrMachines &\ge |prevTasks|,\\
- 0 &< |prevTasks|,
- \end{aligned}\\
- &start(t) \ge max(\{duration(pt) + minMoveDurs(pt) : \forall pt \in prevTasks\}) \\
- \end{aligned}
- \end{equation}
- The start of a task can be even further limited by analysing the components used by the task and how that relates to what components are created by other tasks.
- 
- Lets take task $t$ as an example. We start by getting all tasks that creates the components that is used in task $t$, $prevTasks$. These tasks has to come before task $t$ since the component that they create cannot be used before they are created. If the number of machines are greater than or equal to the number of task preceding task t, then the best scheduling that can be done is to do all tasks in parallel. That means that task $t$ can start at earliest after the one of the proceeding tasks taking the longest to complete.
- 
- \begin{equation}
- \begin{aligned}\label{eq:71}
- &(\forall t \in tasks) \\
- &\begin{aligned}
- prevTasks = \{task : &\forall task \in tasks,\\
- &componentCreated(task) \in componentsUsed(t)\},
- \end{aligned} \\
- &nbrMachines < |prevTasks|,  \\
- &start(t) \ge \frac{\left(\sum_{\forall pt \in prevTasks}duration(pt) + minMoveDurs(pt)\right)}{nbrMachines}
- \end{aligned}
- \end{equation}
- But if the number of machines is fewer than the number of preceding tasks, the best we can do is divide them as equally as possible over the machines. This is the same reasoning as when we calculated $minEnd$ in equation \ref{eq:minEnd}.
- 
- \begin{equation}\label{eq:72}
- \begin{aligned}
- &(\forall t \in tasks) \\
- &succTasks = \{task : \forall task \in tasks,\\
- &componentsUsed(t) \subset taskCompleteSubComponent(task), \\
- &componentsUsed(t) \cup taskCompleteSubComponents(task) \neq \emptyset\}, \\
- &\begin{aligned}
- nbrMachines &\ge |succTasks|,\\
- 0 &< |succTasks|,
- \end{aligned}\\
- &\begin{aligned}
- start(t) \le maxEnd - max(\{&duration(st) + minMoveDurs(st) :\\
- &\forall st \in succTasks\}) - duration(t)
- \end{aligned}\\
- \end{aligned}
- \end{equation}
- To set the upper limit for the start of tasks we use a little bit different strategy.
- 
- We know that if a component $c$ has been mounted on another component, $c$ cannot be used again on its own. Therefore, a task that uses component $c$ has to come before the tasks that uses a component in which $c$ is a part of.
- 
- We use the same strategy as in \ref{eq:70} and look at the best case scenario where the tasks are performed concurrently on all machines. The difference here from \ref{eq:70} is that here we have to look at the maximum end of the assembly and subtract the successor task which takes the longest to perform and the duration of the task in question.
- 
- \begin{equation}\label{eq:73}
- \begin{aligned}
- &(\forall t \in tasks)\\
- &succTasks = \{task : \forall task \in tasks, \\
- &componentsUsed(t) \subset taskCompleteSubComponent(task), \\
- &componentsUsed(t) \cup taskCompleteSubComponents(task) \neq \emptyset\}, \\
- &nbrMachines \le |succTasks|, \\
- &\begin{aligned}
- start(t) \; \le \; &maxEnd - \frac{\left(\sum_{\forall st \in succTasks}duration(st) + minMoveDurs(st)\right)}{nbrMachines}\\
- &- duration(t)
- \end{aligned}
- \end{aligned}
- \end{equation}
- As with \ref{eq:71} we look at the worst case scenario.
- 
- 
- \subsection{Predecessor filter}
- Since the predecessors are searched by the solver before searching the start variables, reducing their domains has potential to help reduce the total runtime considerably.
- 
- \begin{equation}\label{eq:74}
- alldifferent(\{pred(t) : \forall t \in tasks\})
- \end{equation}
-The \texttt{circuit} constraint already sees to it that the predecessors of the tasks forms a circuit. This means that all the predecessors will take on different values. However, we apply this \texttt{alldifferent} constraint in order to help the \texttt{circuit} make the predecessor variables take on different values.
- 
- \begin{equation}\label{eq:75}
- (\forall t1, \forall t2 \in taking) \; pred(t1) \neq t2
- \end{equation}
- \begin{equation}\label{eq:76}
- (\forall t1, \forall t2 \in putting \cup mounting) \; pred(t1) \neq t2
- \end{equation}
-In our model the tools can only pick up one component at a time. This also means that if a task puts down a component or mounts one, there cannot be a mount or put task directly afterwards.
- 
- \begin{equation}
- \begin{aligned}\label{eq:78}
- &(\forall t \in tasks)\\
- &nonPredecessors = \{t_2 : \forall t_2 \in tasks, \\
- &componentsUsed(t) \subset taskCompleteSubComponents(t_2) \; \lor \\
- &componentsUsed(t) \subset subComponents(componentCreated(t_2))\} \\
- &(\forall nonPred \in nonPredecessors) \\
- &pred(t) \neq nonPred, \\
- \end{aligned}
- \end{equation}
- Using a similar reasoning as in \ref{eq:72} and \ref{eq:73}, we can find the tasks that cannot be the predecessor of task $t$. We look at what tasks uses the components that has the components used in $t$ as sub-components. This means that those components cannot come before task $t$, and therefore cannot be predecessors of $t$.
- 
- \begin{equation}\label{eq:79}
- \begin{aligned}
- &(\forall startTask \in startTasks)\\
- &(\forall putTask \in putting)\\
- &pred(putTask) \neq startTask
- \end{aligned}
- \end{equation}
- \begin{equation}\label{eq:80}
-  \begin{aligned}
-  &(\forall startTask \in startTasks)\\
-  &(\forall mountTask \in mounting)\\
-  &pred(mountTask) \neq startTask 
-  \end{aligned}
- \end{equation}
- As mentioned before, a component has to be picked up first before it can be manipulate in any way and the assembly has to start with a take task. Therefore, we can say that an assembly cannot start with neither a put task nor a mount task.
- 
- The same could be said for move tasks, but since they need to be in an ordered group, a constraint like these would no make any difference.
- 
- \begin{equation}\label{eq:81}
- \begin{aligned}
- &(\forall goalTask \in goalTasks) \\
- &(\forall takeTask \in taking) \\
- &pred(goalTask) \neq takeTask
- \end{aligned}
- \end{equation}
- The same way we can observe that an assemble needs to start with a take task, we can observe that an assembly cannot end with a take task. There is no component in the assembly that does not end up in the finished assembly, therefore the assembly cannot end with a machine holding a component, since it needs to be on the output in some way. 
- 
- \begin{equation}
- \begin{aligned}\label{eq:82}
- &\begin{aligned}
- counts &= \{i : \forall task \in outputTasks, \; i \in \{0 , \ldots , 1\}\}, \\
- outputTasks &= \{task : \forall task \in tasks, \; output(task) > 0\}, \\
- goalPreds &= \{pred(task) : \forall task \in goalTasks\},
- \end{aligned} \\
- &global\_cardinality(goalPreds, \; outputTasks, \; counts) \; \land\\
- &\sum counts > 0
- \end{aligned}
- \end{equation}
- At least one of the output tasks has to be last on one of the circuits
- 
- 
- \begin{equation}
- \begin{aligned}\label{eq:83}
- &\begin{aligned}
- counts &= \{i : \forall task \in startTasks, \; i \in \{0 , \ldots , 1\}\}, \\
- takePreds &= \{pred(task) : \forall task \in taking, \; output(task) = 0\}, 
- \end{aligned}\\
- &global\_cardinality(takePreds, \; startTasks, \; counts) \; \land\\
- &\sum counts > 0
- \end{aligned}
- \end{equation}
- At least one of the take tasks, thats not on an output, has to be first on one of the circuits
- 
-  \begin{equation}
- \begin{aligned}\label{eq:84}
- (\forall comp &\in components) \\
- (\forall mountTask &\in mounting(comp)) \\
- (\forall putTask &\in putting(comp)) \\
- pred(putTask) &\neq mountTask
- \end{aligned}
- \end{equation}
- If a set of tasks on a component involves a mount task and a put task, the predecessor of the put task cannot be the mount task
- 
-  \begin{equation}
- \begin{aligned}\label{eq:85}
- (\forall comp &\in components) \\
- (\forall mountTask &\in mounting(comp)) \\
- (\forall takeTask &\in taking(comp)) \\
- pred(takeTask) &\neq mountTask
- \end{aligned}
- \end{equation}
- If a set of tasks on a component involves a mount task and a take task, the predecessor of the take task cannot be the mount task.
- 
- 
- \begin{equation}
- \begin{aligned}\label{eq:86}
- (\forall comp &\in components) \\
- (\forall putTask &\in putting{comp}, \; tray(putTask) > 0) \\
- (\forall takeTask &\in taking(comp), \; tray(putTask) = tray(takeTask)) \\
- pred(putTask) &\le takeTask
- \end{aligned}
- \end{equation}
- If a component has a put and take performed on it in a tray, the predecessor of the put task cannot be the take task.
- 
- 
- \begin{equation}
- \begin{aligned}\label{eq:87}
- (\forall f &\in fixtures) \\
- (\forall putTask &\in putting{comp}, \; fixture(putTask) = f) \\
- (\forall takeTask &\in taking(comp), \; fixture(takeTask) = f,\\
- &componentsUsed(putTask) \subset taskSubComponents(takeTask))\\
- pred(putTask) &\le takeTask
- \end{aligned}
- \end{equation}
- For every put action on a fixture, there is a take action. The predecessor of the put task cannot be the take task.
- 
- \begin{equation}
- \begin{aligned}\label{eq:88}
- (\forall group &\in \{1 , \ldots , nbrConcurrentGroups\}) \\
- (\forall t_1 &\in concurrentTasks(group)) \\
- (\forall t_2 &\in concurrentTasks(group) / \{t_1\}) \\
- pred(t_1) &\neq t_2 \land pred(t_2) \neq t_1
- \end{aligned}
- \end{equation}
- Concurrent tasks cannot be predecessor to each other.
- 
- \begin{equation}
- \begin{aligned}\label{eq:89}
- (\forall t_1 &\in tasks, \; componentCreated(t_1) > 0) \\
- (\forall t_2 &\in tasks, \; componentCreated(t_1) \in compinentUsed(t_2)) \\
- pred(t_1) &\neq t_2
- \end{aligned}
- \end{equation}
- Components cannot be used before they are created.
- 
- \begin{equation}
- \begin{aligned}\label{eq:90}
- &(\forall precTask \in tasks) \\
- &(\forall t \in tasks, \; precTask \neq t,\\
- &\begin{aligned}componentUsed(precTask) \cup taskCompleteSubComponent(t) \subset\\
- taskCompleteSubComponents(t), \end{aligned}\\
- &componentsUsed(precTask) \cup taskCompleteSubComponents(t) \neq \emptyset \\
- &pred(precTask) \neq t
- \end{aligned}
- \end{equation}
- Task using a component cannot execute before all the tasks having it as subcomponent.
- 
- \begin{equation}
- \begin{aligned}\label{eq:91}
- (\forall concGroup &\in concurrentTasks, \; |concGroup| = nbrMachines) \\
- concComps &= \bigcup_{\forall i \in concGroup}componentsUsed(i), \\
- concSubComps &= \bigcup_{\forall i \in concGroup}taskCompleteSubComponents(i), \\
- preTasks &= \{preTask : \forall preTask \in tasks,\\
- &componentsUsed(preTask) \cap concSubComps \neq \emptyset\}, \\
- (\forall postTask &\in postTasks) \\
- (\forall predTask &\in preTasks) \\
- pred(postTask) &\neq preTask
- \end{aligned}
- \end{equation}
- If there is a set of concurrent tasks on a subset of tasks using as many machines as available, the tasks after the concurrent tasks cannot have the tasks before the concurrent tasks as predecessors.
- 
+  
  
  \section{Constraints}
  
@@ -920,3 +569,343 @@ In our model the tools can only pick up one component at a time. This also means
  (\forall t \in tasks, \; toolNeeded(t) \neq 0) \; toolUsed(t) = toolNeeded(t)
  \end{equation}
  Set the tool used for each task in accordance with $toolNeeded$.
+ 
+ 
+ \section{Filter}
+  In \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} \cite{VilimBartak2002Sequence} Vilím shows that filtering the domains of variables when, as in our case, using sequence dependent setup times can have a great effect on the runtime. Here we present a set of filters in order to minimize the domains of the variables.
+  \subsection{Temporal filter}
+  The largest domains in the model are the domains for the variables dealing with time, i.e. the temporal variables. Reducing those has the potential to cut much of the processing time.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:57}
+  &( \forall t \in tasks)\\
+  &\begin{aligned}
+  maxMoveDurs(t) = max(\{&timeMatrix3D(t,j,k) :\\
+  &\forall j \in tasks, \\
+  &\forall k \in \{1 , \ldots , timeMatrixDepth\},\\
+  &j \neq t\})
+  \end{aligned}
+  \end{aligned}
+  \end{equation}
+   \begin{equation}
+   \begin{aligned}\label{eq:58}
+   &(\forall t \in tasks)\\
+   &\begin{aligned}
+   minMoveDurs(t) = min(\{&timeMatrix3D(t,j,k) :\\
+   &\forall j \in tasks, \\
+   &\forall k \in \{1 , \ldots , timeMatrixDepth\},\\
+   &j \neq t\})
+   \end{aligned}
+   \end{aligned}
+   \end{equation}
+ We start with defining two variables, $maxMoveDurs(t)$ and $minMoveDurs(t)$. These contain the maximum duration and the minimum duration respectively for each task taken from the time matrix.
+  
+  \begin{equation}\label{eq:59}
+ 	maxEnd = \sum_{\forall t \in tasks} duration(t) + maxMoveDurs(t)
+  \end{equation}
+  \begin{equation}\label{eq:minEnd}
+  	minEnd = \frac{\sum_{\forall t \in tasks} duration(t) + minMoveDurs(t)}{nbrMachines}
+  \end{equation}
+ By using the newly created variables we candefine yet another two. These define a new maximum for the total time of the assembly, $maxEnd$. It is similar to $maxE$ in equation \ref{eq:maxE}, although much more thorough in the filtering. These variables also define a new minimum for the total time of the assembly, it was earlier ju set to 0.
+ 
+ To calculate the maximum end we look at the worst case scenario for the assembly. The worst case would be if all the tasks had to be done one after the other, one at a time, on the same machine and they would take the longest time, according to the time matrix, to move between them. See figure \ref{fig:worst_case}. This can simply be defined by summing the durations and maximum move durations for all the tasks.
+ 
+ To calculate the minimum end we look at the best case scenario. The best case scenario is if all the tasks can be evenly scheduled over all machines, taking the shortest, according to the time matrix, time to move between them. See figure \ref{fig:best_case}. We can define this by summing up the durations and minimum move durations for all the task end divide the sum with the number of machines available. If the tasks can be perfectly evenly scheduled across all the machines, the total assembly time will be equal to $minEnd$, if they cannot $minEnd$ will always be smaller than the total assembly time.
+ 
+  \begin{figure}
+  	\centering
+  	\input{Figures/worst_case}
+  	% or use \input{mytikz}
+  	\caption{The worst case assembly}
+  	\label{fig:worst_case}
+  \end{figure}
+   \begin{figure}
+   	\centering
+   	\input{Figures/best_case}
+   	% or use \input{mytikz}
+   	\caption{The best case assembly}
+   	\label{fig:best_case}
+   \end{figure}
+ \newpage
+ We can now start using $maxEnd$ and $minEnd$ to filter variables
+  \begin{equation}\label{eq:lim_start_over}
+  \begin{aligned}
+ &(\forall t \in allTasks)\\
+ &start(t) \le maxEnd-duration(t)
+  \end{aligned}
+  \end{equation}
+   \begin{equation}\label{eq:lim_start_under}
+  \begin{aligned}
+ &(\forall t \in Tasks)\\
+ &start(t) \ge minMoveDurs(t)
+  \end{aligned}
+  \end{equation}
+ We set and upper bound for the start of a task by setting it to happen at latest the duration of the task time units before the $maxEnd$, since the task has to have time to execute before the end.
+ 
+ To set a lower bound for the start of a task, we simply reason that the move to the task can start at its earliest at time 0. Therefore, we limit the task to start earliest direct after the minimum move duration to it.
+ 
+ The difference between \ref{eq:lim_start_over} and \ref{eq:lim_start_under} is that the upper limit can be set for all sorts of tasks, even the start and goal tasks, but the lower limit cannot be set for start and goal tasks. This is simply because the start and goal tasks do not have any move times to them since they are source and sink nodes.
+ 
+  \begin{equation}\label{eq:63}
+  (\forall t \in tasks) \; moveStart(t) \le maxEnd-(duration(t)+minMoveDurs(t))
+  \end{equation}
+  In order to limit the move start to a task we use the same reasoning as with start. But now we have to account for that there comes a task after the move and a duration of the move itself. So we have to subtract the duration of the task and the duration of the move. Since we do not know the exact length of the move, we have to use the value we know the duration can not be lower than, which is $minMoveDuration$.
+  
+  \begin{equation}\label{eq:66}
+  \begin{aligned}
+  makeSpan &\le maxEnd \land\\
+  makespan &\ge minEnd
+  \end{aligned}
+  \end{equation}
+  We have already calculated the limits for the whole assembly, $maxEnd$ and $minEnd$. Now we just enforce them on the makespan.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:67}
+  &(\forall t \in tasks)\\
+  &\begin{aligned}
+  (\forall i \in \{0 , \ldots , maxMoveDurs(t)\} / \{&timeMatrix3D(task,j,k) :\\
+  &\forall j \in tasks,\\
+  &\begin{aligned}
+  &\forall k \in \{1 , \ldots , timeMatrixDepth\}\\
+  &t \neq j\})
+  \end{aligned}
+  \end{aligned}\\
+  &moveDuration(t) \neq i
+  \end{aligned}
+  \end{equation}
+ We know that the value for move duration will be one of the values in the time matrix, hence we can restrict the duration to only those values. We do that by coming up with the values that the duration cannot assume, and limits the duration to not have those values in its domain.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:69}
+  &(\forall t \in tasks / taking) \\
+  &moveStart(t) \ge min(\{duration(tt) + minMoveDurs(tt) : \forall tt \in taking\})
+  \end{aligned}
+  \end{equation}
+  The first thing that has to happen to a component in the assembly is that is has to be picked up. So since the assembly starts out with empty machines the first thing that has to happen, with the exception of a tool change, is a take task. Therefore, we can limit that start of the tasks not being take tasks to happen at earliest after the task with the smallest sum of duration and minimum move duration.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:70}
+  &(\forall t \in tasks)\\
+  &\begin{aligned}
+  prevTasks = \{task : &\forall task \in tasks,\\
+  &componentCreated(task) \in componentsUsed(t)\},
+  \end{aligned}\\
+  &\begin{aligned}
+  nbrMachines &\ge |prevTasks|,\\
+  0 &< |prevTasks|,
+  \end{aligned}\\
+  &start(t) \ge max(\{duration(pt) + minMoveDurs(pt) : \forall pt \in prevTasks\}) \\
+  \end{aligned}
+  \end{equation}
+  The start of a task can be even further limited by analysing the components used by the task and how that relates to what components are created by other tasks.
+  
+  Lets take task $t$ as an example. We start by getting all tasks that creates the components that is used in task $t$, $prevTasks$. These tasks has to come before task $t$ since the component that they create cannot be used before they are created. If the number of machines are greater than or equal to the number of task preceding task t, then the best scheduling that can be done is to do all tasks in parallel. That means that task $t$ can start at earliest after the one of the proceeding tasks taking the longest to complete.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:71}
+  &(\forall t \in tasks) \\
+  &\begin{aligned}
+  prevTasks = \{task : &\forall task \in tasks,\\
+  &componentCreated(task) \in componentsUsed(t)\},
+  \end{aligned} \\
+  &nbrMachines < |prevTasks|,  \\
+  &start(t) \ge \frac{\left(\sum_{\forall pt \in prevTasks}duration(pt) + minMoveDurs(pt)\right)}{nbrMachines}
+  \end{aligned}
+  \end{equation}
+  But if the number of machines is fewer than the number of preceding tasks, the best we can do is divide them as equally as possible over the machines. This is the same reasoning as when we calculated $minEnd$ in equation \ref{eq:minEnd}.
+  
+  \begin{equation}\label{eq:72}
+  \begin{aligned}
+  &(\forall t \in tasks) \\
+  &succTasks = \{task : \forall task \in tasks,\\
+  &componentsUsed(t) \subset taskCompleteSubComponent(task), \\
+  &componentsUsed(t) \cup taskCompleteSubComponents(task) \neq \emptyset\}, \\
+  &\begin{aligned}
+  nbrMachines &\ge |succTasks|,\\
+  0 &< |succTasks|,
+  \end{aligned}\\
+  &\begin{aligned}
+  start(t) \le maxEnd - max(\{&duration(st) + minMoveDurs(st) :\\
+  &\forall st \in succTasks\}) - duration(t)
+  \end{aligned}\\
+  \end{aligned}
+  \end{equation}
+  To set the upper limit for the start of tasks we use a little bit different strategy.
+  
+  We know that if a component $c$ has been mounted on another component, $c$ cannot be used again on its own. Therefore, a task that uses component $c$ has to come before the tasks that uses a component in which $c$ is a part of.
+  
+  We use the same strategy as in \ref{eq:70} and look at the best case scenario where the tasks are performed concurrently on all machines. The difference here from \ref{eq:70} is that here we have to look at the maximum end of the assembly and subtract the successor task which takes the longest to perform and the duration of the task in question.
+  
+  \begin{equation}\label{eq:73}
+  \begin{aligned}
+  &(\forall t \in tasks)\\
+  &succTasks = \{task : \forall task \in tasks, \\
+  &componentsUsed(t) \subset taskCompleteSubComponent(task), \\
+  &componentsUsed(t) \cup taskCompleteSubComponents(task) \neq \emptyset\}, \\
+  &nbrMachines \le |succTasks|, \\
+  &\begin{aligned}
+  start(t) \; \le \; &maxEnd - \frac{\left(\sum_{\forall st \in succTasks}duration(st) + minMoveDurs(st)\right)}{nbrMachines}\\
+  &- duration(t)
+  \end{aligned}
+  \end{aligned}
+  \end{equation}
+  As with \ref{eq:71} we look at the worst case scenario.
+  
+  
+  \subsection{Predecessor filter}
+  Since the predecessors are searched by the solver before searching the start variables, reducing their domains has potential to help reduce the total runtime considerably.
+  
+  \begin{equation}\label{eq:74}
+  alldifferent(\{pred(t) : \forall t \in tasks\})
+  \end{equation}
+ The \texttt{circuit} constraint already sees to it that the predecessors of the tasks forms a circuit. This means that all the predecessors will take on different values. However, we apply this \texttt{alldifferent} constraint in order to help the \texttt{circuit} make the predecessor variables take on different values.
+  
+  \begin{equation}\label{eq:75}
+  (\forall t1, \forall t2 \in taking) \; pred(t1) \neq t2
+  \end{equation}
+  \begin{equation}\label{eq:76}
+  (\forall t1, \forall t2 \in putting \cup mounting) \; pred(t1) \neq t2
+  \end{equation}
+ In our model the tools can only pick up one component at a time. This also means that if a task puts down a component or mounts one, there cannot be a mount or put task directly afterwards.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:78}
+  &(\forall t \in tasks)\\
+  &nonPredecessors = \{t_2 : \forall t_2 \in tasks, \\
+  &componentsUsed(t) \subset taskCompleteSubComponents(t_2) \; \lor \\
+  &componentsUsed(t) \subset subComponents(componentCreated(t_2))\} \\
+  &(\forall nonPred \in nonPredecessors) \\
+  &pred(t) \neq nonPred, \\
+  \end{aligned}
+  \end{equation}
+  Using a similar reasoning as in \ref{eq:72} and \ref{eq:73}, we can find the tasks that cannot be the predecessor of task $t$. We look at what tasks uses the components that has the components used in $t$ as sub-components. This means that those components cannot come before task $t$, and therefore cannot be predecessors of $t$.
+  
+  \begin{equation}\label{eq:79}
+  \begin{aligned}
+  &(\forall startTask \in startTasks)\\
+  &(\forall putTask \in putting)\\
+  &pred(putTask) \neq startTask
+  \end{aligned}
+  \end{equation}
+  \begin{equation}\label{eq:80}
+   \begin{aligned}
+   &(\forall startTask \in startTasks)\\
+   &(\forall mountTask \in mounting)\\
+   &pred(mountTask) \neq startTask 
+   \end{aligned}
+  \end{equation}
+  As mentioned before, a component has to be picked up first before it can be manipulate in any way and the assembly has to start with a take task. Therefore, we can say that an assembly cannot start with neither a put task nor a mount task.
+  
+  The same could be said for move tasks, but since they need to be in an ordered group, a constraint like these would no make any difference.
+  
+  \begin{equation}\label{eq:81}
+  \begin{aligned}
+  &(\forall goalTask \in goalTasks) \\
+  &(\forall takeTask \in taking) \\
+  &pred(goalTask) \neq takeTask
+  \end{aligned}
+  \end{equation}
+  The same way we can observe that an assemble needs to start with a take task, we can observe that an assembly cannot end with a take task. There is no component in the assembly that does not end up in the finished assembly, therefore the assembly cannot end with a machine holding a component, since it needs to be on the output in some way. 
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:82}
+  &\begin{aligned}
+  counts &= \{i : \forall task \in outputTasks, \; i \in \{0 , \ldots , 1\}\}, \\
+  outputTasks &= \{task : \forall task \in tasks, \; output(task) > 0\}, \\
+  goalPreds &= \{pred(task) : \forall task \in goalTasks\},
+  \end{aligned} \\
+  &global\_cardinality(goalPreds, \; outputTasks, \; counts) \; \land\\
+  &\sum counts > 0
+  \end{aligned}
+  \end{equation}
+   \begin{equation}
+   \begin{aligned}\label{eq:83}
+   &\begin{aligned}
+   counts &= \{i : \forall task \in startTasks, \; i \in \{0 , \ldots , 1\}\}, \\
+   takePreds &= \{pred(task) : \forall task \in taking\}, 
+   \end{aligned}\\
+   &global\_cardinality(takePreds, \; startTasks, \; counts) \; \land\\
+   &\sum counts > 0
+   \end{aligned}
+   \end{equation}
+ Continuing the reasoning around what tasks can come first and not we can expand with which tasks has to come last. We cannot limit the last task on each arm to be on an output, because it does not necessarily need to be that. Although, among the last tasks in the assembly there needs to be a task on an output. We can easily check that by placing a constraint over the $pred$ variables for the goal tasks. This is what \ref{eq:82} says.
+ 
+ We can do the same reasoning with what needs to come first in the assembly. As we stated before, a take task has to be the first task in the assembly. And as with the last tasks in the assembly, the first task of a machine does not have to be a take task, but there needs to be at least one take task among the first tasks. We ensure this in \ref{eq:83} by placing a constraint over the $pred$ variables for the take tasks.
+  
+   \begin{equation}
+  \begin{aligned}\label{eq:85}
+  (\forall comp &\in components) \\
+  (\forall mountTask &\in mounting(comp)) \\
+  (\forall takeTask &\in taking(comp)) \\
+  pred(takeTask) &\neq mountTask
+  \end{aligned}
+  \end{equation}
+  For all the tasks that operate on the same component we can restrict so the mount task of the component cannot be the predecessor of the take task. 
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:86}
+  (\forall comp &\in components) \\
+  (\forall putTask &\in putting{comp}, \; tray(putTask) > 0) \\
+  (\forall takeTask &\in taking(comp), \; tray(putTask) = tray(takeTask)) \\
+  pred(putTask) &\neq takeTask
+  \end{aligned}
+  \end{equation}
+  We can also restrict the predecessor of a put task for a component to not be the take task for that component, if the two tasks are performed on the same tray. This can help in a situation when we want the assembly to put down a part for a moment and pick it up later, because if the part does not come in the tray from the beginning, i.e. it is not the component tray, we first need to put it in the tray before we are able to take it. 
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:87}
+  (\forall f &\in fixtures) \\
+  (\forall putTask &\in putting{comp}, \; fixture(putTask) = f) \\
+  (\forall takeTask &\in taking(comp), \; fixture(takeTask) = f,\\
+  &componentsUsed(putTask) \subset taskSubComponents(takeTask))\\
+  pred(putTask) &\neq takeTask
+  \end{aligned}
+  \end{equation}
+  For every put action on a fixture, there is a take action. The predecessor of the put task cannot be the take task.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:88}
+  (\forall group &\in \{1 , \ldots , nbrConcurrentGroups\}) \\
+  (\forall t_1 &\in concurrentTasks(group)) \\
+  (\forall t_2 &\in concurrentTasks(group) / \{t_1\}) \\
+  pred(t_1) &\neq t_2 \land pred(t_2) \neq t_1
+  \end{aligned}
+  \end{equation}
+  Since concurrent tasks need to happen simultaneously on different machines, they cannot be the predecessor to each other.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:89}
+  (\forall t_1 &\in tasks, \; componentCreated(t_1) > 0) \\
+  (\forall t_2 &\in tasks, \; componentCreated(t_1) \in componentUsed(t_2)) \\
+  pred(t_1) &\neq t_2
+  \end{aligned}
+  \end{equation}
+ Sub-assembly components can only be used after they are created. Therefore, we can say that a task that uses a component created at task $t$ cannot be the predecessor of task $t$.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:90}
+  &(\forall precTask \in tasks) \\
+  &(\forall t \in tasks, \; precTask \neq t,\\
+  &\begin{aligned}componentUsed(precTask) \cup taskCompleteSubComponent(t) \subset\\
+  taskCompleteSubComponents(t), \end{aligned}\\
+  &componentsUsed(precTask) \cup taskCompleteSubComponents(t) \neq \emptyset \\
+  &pred(precTask) \neq t
+  \end{aligned}
+  \end{equation}
+ Referera \ref{eq:103}
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:91}
+  (\forall concGroup &\in concurrentTasks, \; |concGroup| = nbrMachines) \\
+  concComps &= \bigcup_{\forall i \in concGroup}componentsUsed(i), \\
+  concSubComps &= \bigcup_{\forall i \in concGroup}taskCompleteSubComponents(i), \\
+  postTasks &= \{postTask : \forall postTask \in tasks,\\
+  &concComps \cap taskCompleteSubComponents(postTask) \neq \emptyset\}\\
+  preTasks &= \{preTask : \forall preTask \in tasks,\\
+  &componentsUsed(preTask) \cap concSubComps \neq \emptyset\}, \\
+  (\forall postTask &\in postTasks) \\
+  (\forall predTask &\in preTasks) \\
+  pred(postTask) &\neq preTask
+  \end{aligned}
+  \end{equation}
+  If there is a group of concurrently executing tasks that take up all machines available they will act as a wall between the tasks before and after the group. It is guaranteed that the tasks after the group cannot have the tasks before the group as predecessors. We can extract the tasks before and after the concurrent tasks by analysing the components used, since the components used in the concurrent tasks will have the components used before as sub-components.

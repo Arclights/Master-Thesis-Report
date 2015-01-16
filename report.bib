@@ -1,4 +1,4 @@
-% This file was created with JabRef 2.10.
+% This file was created with JabRef 2.10b2.
 % Encoding: UTF-8
 
 
@@ -59,6 +59,13 @@
   Url                      = {http://ludwig.lub.lu.se/login?url=http://search.ebscohost.com/login.aspx?direct=true&db=cat01310a&AN=lovisa.001414308&site=eds-live&scope=site}
 }
 
+@TechReport{or_manual,
+  Title                    = {or-tools user’s manual},
+  Author                   = {Nikolaj van Omme and Laurent Perron and Vincent Furnon},
+  Institution              = {Google},
+  Year                     = {2014}
+}
+
 @Article{sadykov_integer_2006,
   Title                    = {Integer Programming and Constraint Programming in Solving a Multimachine Assignment Scheduling Problem with Deadlines and Release Dates},
   Author                   = {Sadykov, Ruslan and Wolsey, Laurence A.},
@@ -74,6 +81,16 @@
   Langid                   = {english},
   Url                      = {http://pubsonline.informs.org/doi/abs/10.1287/ijoc.1040.0110},
   Urldate                  = {2014-10-29}
+}
+
+@Manual{gecode,
+  Title                    = {Modeling and Programming with Gecode},
+  Author                   = {Christian Schulte and Guido Tack and Mikael Z. Lagerkvist},
+  Note                     = {Corresponds to Gecode 4.3.2},
+  Year                     = {2014},
+
+  Booktitle                = {Modeling and Programming with Gecode},
+  Editor                   = {Christian Schulte and Guido Tack and Mikael Z. Lagerkvist}
 }
 
 @Article{sethi_scheduling_2001,
@@ -92,18 +109,36 @@
   Urldate                  = {2014-10-29}
 }
 
+@Misc{jacop_overview,
+  Title                    = {{JaCoP Overview}},
+
+  Author                   = {Radoslaw Szymanek},
+  HowPublished             = {\url{http://jacop.osolpro.com/index.php?option=com_content&view=article&id=19&Itemid=27}},
+  Note                     = {Accessed: 2015-01-16},
+  Year                     = {2010}
+}
+
 @Manual{mz_manual,
-  Title                    = {Specification of Zinc and MiniZinc v.1.6},
+  Title                    = {Specification of Zinc and MiniZinc v.1.0},
 
   Address                  = {Melbourne, Australia},
   Author                   = {The G12 Team},
   Month                    = {August},
   Organization             = {NICTA, Victoria Research Lab},
-  Year                     = {2011},
+  Year                     = {2014},
 
   Owner                    = {tommy},
-  Timestamp                = {2014.10.31},
-  Url                      = {https://www.minizinc.org/downloads/doc-1.6/zinc-spec.pdf}
+  Timestamp                = {2015.1.16},
+  Url                      = {http://www.minizinc.org/2.0/doc-lib/minizinc-spec.pdf}
+}
+
+@manual{choco,
+  author        = {Charles Prud'homme, Jean-Guillaume Fages, Xavier Lorca},
+  title         = {Choco3 Documentation},
+  year          = {2014},
+  organization  = {TASC, INRIA Rennes, LINA CNRS UMR 6241, COSLING S.A.S.},
+  timestamp     = {Thu, 02 Oct 2014},
+  url           = {http://www.choco-solver.org },
 }
 
 @Conference{Thornblad_2013,
@@ -126,6 +161,43 @@
   Date                     = {1993},
   ISBN                     = {0127016104 9780127016108},
   Location                 = {London; San Diego}
+}
+
+@InProceedings{Vilim2002Precedence,
+  Title                    = {Batch Processing with Sequence Dependent Setup Times: New Results},
+  Author                   = {Petr Vil{\'i}m},
+  Booktitle                = {Proceedings of the 4th Workshop of Constraint Programming for Decision and Control, CPDC'02},
+  Year                     = {2002},
+
+  Address                  = {Gliwice, Poland},
+
+  Url                      = {http://vilim.eu/petr/cpdc2002.pdf}
+}
+
+@InProceedings{VilimBartak2002Batch,
+  Title                    = {Filtering Algorithms for Batch Processing with Sequence Dependent Setup Times},
+  Author                   = {Petr Vil{\'i}m and Roman Bart{\'a}k},
+  Booktitle                = {Proceedings of the 6th International Conference on AI Planning and Scheduling, {AIPS}'02},
+  Year                     = {2002},
+  Editor                   = {Malik Ghallab and Joachim Hertzberg and Paolo Traverso},
+  Pages                    = {312-321},
+  Publisher                = {The AAAI Press},
+
+  ISBN                     = {1-57735-142-8},
+  Url                      = {http://vilim.eu/petr/aips2002.pdf}
+}
+
+@TechReport{VilimBartak2002Sequence,
+  Title                    = {A Filtering Algorithm Sequence Composition for Batch Processing with Sequence Dependent Setup Times},
+  Author                   = {Petr Vil{\'i}m and Roman Bart{\'a}k},
+  Institution              = {Charles University, Faculty of Mathematics and Physics},
+  Year                     = {2002},
+
+  Address                  = {KTIML MFF UK, Malostransk\'e n\'am\v{e}st\'\i\ 2/25, 118 00 Praha 1, Czech Republic},
+  Month                    = {May},
+  Number                   = {KTIML 2002/1},
+
+  Url                      = {http://vilim.eu/petr/sequence.pdf}
 }
 
 @Article{yuan_2013,
@@ -165,40 +237,12 @@
   Urldate                  = {2014-10-29}
 }
 
-@INPROCEEDINGS{VilimBartak2002Batch,
-  author = {Petr Vil{\'i}m and Roman Bart{\'a}k},
-  title = {Filtering Algorithms for Batch Processing with Sequence Dependent
-	Setup Times},
-  booktitle = {Proceedings of the 6th International Conference on AI Planning and
-	Scheduling, {AIPS}'02},
-  year = {2002},
-  editor = {Malik Ghallab and Joachim Hertzberg and Paolo Traverso},
-  pages = {312-321},
-  publisher = {The AAAI Press},
-  isbn = {1-57735-142-8},
-  url = {http://vilim.eu/petr/aips2002.pdf}
-}
+@Manual{cpx,
+  Title                    = {Opturion CPX User's Guide: Version 1.0.2},
+  Organization             = {Opturion Pty Ltd},
+  Year                     = {2013},
 
-@INPROCEEDINGS{Vilim2002Precedence,
-  author = {Petr Vil{\'i}m},
-  title = {Batch Processing with Sequence Dependent Setup Times: New Results},
-  booktitle = {Proceedings of the 4th Workshop of Constraint Programming for Decision
-	and Control, CPDC'02},
-  year = {2002},
-  address = {Gliwice, Poland},
-  url = {http://vilim.eu/petr/cpdc2002.pdf}
-}
-
-@TECHREPORT{VilimBartak2002Sequence,
-  author = {Petr Vil{\'i}m and Roman Bart{\'a}k},
-  title = {A Filtering Algorithm Sequence Composition for Batch Processing with
-	Sequence Dependent Setup Times},
-  institution = {Charles University, Faculty of Mathematics and Physics},
-  year = {2002},
-  number = {KTIML 2002/1},
-  address = {KTIML MFF UK, Malostransk\'e n\'am\v{e}st\'\i\ 2/25, 118 00 Praha
-	1, Czech Republic},
-  month = {May},
-  url = {http://vilim.eu/petr/sequence.pdf}
+  Owner                    = {tommy},
+  Timestamp                = {2015.01.16}
 }
 

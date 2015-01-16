@@ -7,3 +7,5 @@
 *.toc
 *.gz
 *.bbl
+*.bcf
+*.run.xml

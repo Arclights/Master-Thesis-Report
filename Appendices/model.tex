@@ -348,7 +348,7 @@ By using the newly created variables we candefine yet another two. These define 
 
 To calculate the maximum end we look at the worst case scenario for the assembly. The worst case would be if all the tasks had to be done one after the other, one at a time, on the same machine and they would take the longest time, according to the time matrix, to move between them. See figure \ref{fig:worst_case}. This can simply be defined by summing the durations and maximum move durations for all the tasks.
 
-To calculate the minimum end we look at the best case scenario. The best case scenario is if all the tasks can be evenly scheduled over all machines, taking the shortest, according to the time matrix, time to move between them. See figure \ref{fig:best_case}. We can define this by summing up the durations and minimum move durations for all the task end divide the sum with the number of machines available. If the tasks can be perfectly evenly scheduled across all the machines, the total assembly time will be equal to $minEnd$, if they cannot $menEnd$ will always be smaller than the total assembly time.
+To calculate the minimum end we look at the best case scenario. The best case scenario is if all the tasks can be evenly scheduled over all machines, taking the shortest, according to the time matrix, time to move between them. See figure \ref{fig:best_case}. We can define this by summing up the durations and minimum move durations for all the task end divide the sum with the number of machines available. If the tasks can be perfectly evenly scheduled across all the machines, the total assembly time will be equal to $minEnd$, if they cannot $minEnd$ will always be smaller than the total assembly time.
 
  \begin{figure}
  	\centering
@@ -366,21 +366,27 @@ To calculate the minimum end we look at the best case scenario. The best case sc
   \end{figure}
 \newpage
 We can now start using $maxEnd$ and $minEnd$ to filter variables
- \begin{equation}\label{eq:61}
+ \begin{equation}\label{eq:lim_start_over}
  \begin{aligned}
 &(\forall t \in allTasks)\\
-&\begin{aligned}
-start(t) &\le maxEnd-duration(t) \; \land\\
-start(t) &\ge minMoveDurs(t)
-\end{aligned}
+&start(t) \le maxEnd-duration(t)
+ \end{aligned}
+ \end{equation}
+  \begin{equation}\label{eq:lim_start_under}
+ \begin{aligned}
+&(\forall t \in Tasks)\\
+&start(t) \ge minMoveDurs(t)
  \end{aligned}
  \end{equation}
 We set and upper bound for the start of a task by setting it to happen at latest the duration of the task time units before the $maxEnd$, since the task has to have time to execute before the end.
 
 To set a lower bound for the start of a task, we simply reason that the move to the task can start at its earliest at time 0. Therefore, we limit the task to start earliest direct after the minimum move duration to it.
 
+The difference between \ref{eq:lim_start_over} and \ref{eq:lim_start_under} is that the upper limit can be set for all sorts of tasks, even the start and goal tasks, but the lower limit cannot be set for start and goal tasks. This is simply because the start and goal tasks do not have any move times to them since they are source and sink nodes.
+
  \begin{equation}\label{eq:63}
- (\forall t \in tasks) \; moveStart(t) \le maxEnd-(duration(t)+minMoveDurs(t)\end{equation}
+ (\forall t \in tasks) \; moveStart(t) \le maxEnd-(duration(t)+minMoveDurs(t))
+ \end{equation}
  In order to limit the move start to a task we use the same reasoning as with start. But now we have to account for that there comes a task after the move and a duration of the move itself. So we have to subtract the duration of the task and the duration of the move. Since we do not know the exact length of the move, we have to use the value we know the duration can not be lower than, which is $minMoveDuration$.
  
  \begin{equation}\label{eq:66}
@@ -402,7 +408,7 @@ To set a lower bound for the start of a task, we simply reason that the move to 
  &t \neq j\})
  \end{aligned}
  \end{aligned}\\
- &moveDuration(t) \neq i \\
+ &moveDuration(t) \neq i
  \end{aligned}
  \end{equation}
 We know that the value for move duration will be one of the values in the time matrix, hence we can restrict the duration to only those values. We do that by coming up with the values that the duration cannot assume, and limits the duration to not have those values in its domain.
@@ -413,7 +419,7 @@ We know that the value for move duration will be one of the values in the time m
  &moveStart(t) \ge min(\{duration(tt) + minMoveDurs(tt) : \forall tt \in taking\})
  \end{aligned}
  \end{equation}
- The first thing that has to happen to a component in the assembly is that is has to be picked up. So since the assembly starts out with empty machines the first thing that has to happen, with the exception of a tool change, is a take task. Therefore, we can limit that start of the tasks not being take tasks to happen at earliest after the take task with the smallest sum of duration and minimum move duration.
+ The first thing that has to happen to a component in the assembly is that is has to be picked up. So since the assembly starts out with empty machines the first thing that has to happen, with the exception of a tool change, is a take task. Therefore, we can limit that start of the tasks not being take tasks to happen at earliest after the task with the smallest sum of duration and minimum move duration.
  
  \begin{equation}
  \begin{aligned}\label{eq:70}
@@ -462,7 +468,11 @@ We know that the value for move duration will be one of the values in the time m
  \end{aligned}\\
  \end{aligned}
  \end{equation}
- $succTasks$ are the tasks that has the components used in task $t$ as subcomponents, hence the tasks in $succTasks$ succeeds task $t$. If the number of machines are greater than or equal to the number of task preceding task t, then the best scheduling is to do all tasks in parallel. If so the latest task $t$ can end is less than or equal to the maximum end of the schedule minus the longest of the succeeding tasks
+ To set the upper limit for the start of tasks we use a little bit different strategy.
+ 
+ We know that if a component $c$ has been mounted on another component, $c$ cannot be used again on its own. Therefore, a task that uses component $c$ has to come before the tasks that uses a component in which $c$ is a part of.
+ 
+ We use the same strategy as in \ref{eq:70} and look at the best case scenario where the tasks are performed concurrently on all machines. The difference here from \ref{eq:70} is that here we have to look at the maximum end of the assembly and subtract the successor task which takes the longest to perform and the duration of the task in question.
  
  \begin{equation}\label{eq:73}
  \begin{aligned}
@@ -477,29 +487,24 @@ We know that the value for move duration will be one of the values in the time m
  \end{aligned}
  \end{aligned}
  \end{equation}
- $succTasks$ are the tasks that has the components used in task $t$ as subcomponents, hence the tasks in $succTasks$ succeeds task $t$. If the number of machines are less than the number of tasks preceding task t, then the best we can do is to divide the task times equally on all machines. If the tasks can be divided onto the machines so that the total length of the times on all machines are the same, that time will be equal to the sum$/nbrMachines$. If they don't match up the maximum of these times will be larger than the sum$/nbrMachines$.
+ As with \ref{eq:71} we look at the worst case scenario.
  
  
  \subsection{Predecessor filter}
+ Since the predecessors are searched by the solver before searching the start variables, reducing their domains has potential to help reduce the total runtime considerably.
+ 
  \begin{equation}\label{eq:74}
  alldifferent(\{pred(t) : \forall t \in tasks\})
  \end{equation}
- Helps ensure that no two tasks can have the same predecessor
+The \texttt{circuit} constraint already sees to it that the predecessors of the tasks forms a circuit. This means that all the predecessors will take on different values. However, we apply this \texttt{alldifferent} constraint in order to help the \texttt{circuit} make the predecessor variables take on different values.
  
  \begin{equation}\label{eq:75}
  (\forall t1, \forall t2 \in taking) \; pred(t1) \neq t2
  \end{equation}
- No two taking tasks can be the predecessor of each other
- 
  \begin{equation}\label{eq:76}
- (\forall t1, \forall t2 \in taking) \; pred(t1) \neq t2
+ (\forall t1, \forall t2 \in putting \cup mounting) \; pred(t1) \neq t2
  \end{equation}
- No two putting tasks can be the predecessor of each other
- 
- \begin{equation}\label{eq:77}
- ( \forall t1, \forall t2 \in mounting) \; pred(t1) \neq t2
- \end{equation}
- No two mounting tasks can be the predecessor of each other
+In our model the tools can only pick up one component at a time. This also means that if a task puts down a component or mounts one, there cannot be a mount or put task directly afterwards.
  
  \begin{equation}
  \begin{aligned}\label{eq:78}
@@ -511,7 +516,7 @@ We know that the value for move duration will be one of the values in the time m
  &pred(t) \neq nonPred, \\
  \end{aligned}
  \end{equation}
- A task $t$ cannot have task $t_2$ as predecessor if task $t_2$ uses a component, or creates a component, that the component task $t$ uses has as a subcomponent
+ Using a similar reasoning as in \ref{eq:72} and \ref{eq:73}, we can find the tasks that cannot be the predecessor of task $t$. We look at what tasks uses the components that has the components used in $t$ as sub-components. This means that those components cannot come before task $t$, and therefore cannot be predecessors of $t$.
  
  \begin{equation}\label{eq:79}
  \begin{aligned}
@@ -520,16 +525,16 @@ We know that the value for move duration will be one of the values in the time m
  &pred(putTask) \neq startTask
  \end{aligned}
  \end{equation}
- Since a component has to be taken before it can be put anywhere, put tasks cannot be first in the schedule
- 
  \begin{equation}\label{eq:80}
- \begin{aligned}
- &(\forall startTask \in startTasks)\\
- &(\forall mountTask \in mounting)\\
- &pred(putTask) \neq startTask 
- \end{aligned}
+  \begin{aligned}
+  &(\forall startTask \in startTasks)\\
+  &(\forall mountTask \in mounting)\\
+  &pred(mountTask) \neq startTask 
+  \end{aligned}
  \end{equation}
- Since a component has to be taken before it can be mounted anywhere, mount tasks cannot be first in the schedule
+ As mentioned before, a component has to be picked up first before it can be manipulate in any way and the assembly has to start with a take task. Therefore, we can say that an assembly cannot start with neither a put task nor a mount task.
+ 
+ The same could be said for move tasks, but since they need to be in an ordered group, a constraint like these would no make any difference.
  
  \begin{equation}\label{eq:81}
  \begin{aligned}
@@ -538,7 +543,7 @@ We know that the value for move duration will be one of the values in the time m
  &pred(goalTask) \neq takeTask
  \end{aligned}
  \end{equation}
- Since a schedule has to end with an assembly on the output, a take task cannot be at the end of the assembly
+ The same way we can observe that an assemble needs to start with a take task, we can observe that an assembly cannot end with a take task. There is no component in the assembly that does not end up in the finished assembly, therefore the assembly cannot end with a machine holding a component, since it needs to be on the output in some way. 
  
  \begin{equation}
  \begin{aligned}\label{eq:82}
@@ -566,8 +571,7 @@ We know that the value for move duration will be one of the values in the time m
  \end{equation}
  At least one of the take tasks, thats not on an output, has to be first on one of the circuits
  
- 
- \begin{equation}
+  \begin{equation}
  \begin{aligned}\label{eq:84}
  (\forall comp &\in components) \\
  (\forall mountTask &\in mounting(comp)) \\
@@ -577,8 +581,7 @@ We know that the value for move duration will be one of the values in the time m
  \end{equation}
  If a set of tasks on a component involves a mount task and a put task, the predecessor of the put task cannot be the mount task
  
- 
- \begin{equation}
+  \begin{equation}
  \begin{aligned}\label{eq:85}
  (\forall comp &\in components) \\
  (\forall mountTask &\in mounting(comp)) \\

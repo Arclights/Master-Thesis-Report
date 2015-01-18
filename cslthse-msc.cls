@@ -71,10 +71,12 @@
     % custom commands
 	\newcommand{\company}[1]{\def \@company {#1}}
 	\newcommand{\supervisor}[1]{\def \@supervisor {#1}}
+	\newcommand{\assSupervisor}[1]{\def \@assSupervisor {#1}}
 	\newcommand{\examiner}[1]{\def \@examiner {#1}}
 	\newcommand{\subtitle}[1]{\def \@subtitle {#1}}
 	\company{}
 	\supervisor{}
+	\assSupervisor{}
 	\examiner{}
 	\subtitle{}
 	
@@ -90,7 +92,10 @@
 		\vskip 1em {\normalsize Supervisor: 
 			\ifx \@supervisor \empty
 				\ClassError{cslthse-msc}{Missing supervisor. Use \protect\supervisor{name,email}}{You must specify your thesis supervisor.} 
-			\else \@supervisor \fi \\ Examiner: 
+			\else \@supervisor \fi \\ 
+			\ifx \@assSupervisor \empty
+			\else Supervisor: \@assSupervisor \fi \\ 
+			Examiner: 
 			\ifx \@examiner \empty
 				\ClassError{cslthse-msc}{Missing examiner. Use \protect\examiner{name,email}}{You must specify your thesis examiner.}
 			\else	 \@examiner \fi } \end{center}}

@@ -18,17 +18,22 @@
  \begin{equation}\label{eq:10}
  tasks = \{1 , \ldots , nbrTasks\}
  \end{equation}
- First we define the number of tasks to be scheduled. Each task is identified 
- \\\\
- As mentioned, this model is based on the technique of using predecessors to determine which task comes directly before another. This creates the need to have source and a sink node for each machine, we call them start tasks and goal tasks. As they are not provided as parameters, the model creates them and give them identifiers with numbers above the tasks to be scheduled. As seen later, this is a convenient way of numbering these tasks.
+ First we define the number of tasks to be scheduled. Each task is identified.
+
  \begin{equation}\label{eq:19}
  startTasks = \{nbrTasks+1 , \ldots , nbrTasks+nbrMachines\}
  \end{equation}
- As sources, the start tasks are the predecessors to the first tasks for each machine.
- 
  \begin{equation}\label{eq:20}
- goalTasks = \{nbrTasks+nbrMachines+1 , \ldots , nbrTasks+nbrMachines \times 2\}\end{equation}
- As sinks, the goal tasks has the last task as predecessor for each arm.
+ goalTasks = \{nbrTasks+nbrMachines+1 , \ldots , nbrTasks+nbrMachines \times 2\}
+ \end{equation}
+  As mentioned, this model is based on the technique of using predecessors to determine which task comes directly before another. This creates the need to have source and a sink node for each machine, we call them start tasks and goal tasks. As they are not provided as parameters, the model creates them and give them identifiers with numbers greater than the tasks to be scheduled. Each machine has to have a start task and a goal task. This means that there are as much start and goal tasks as there are machines. They are arranged such that first comes all the start tasks and then all the goal tasks. One can easily find the start task for a machine by $nbrTasks + m$, where $m$ is the machine in question. It is also easy to find the matching goal task by $nbrTask + m + nbrMachines$. If one thinks of the tasks, start and goal tasks as an array where the index is the number of the task, then it would look something like figure \ref{fig:tasks_array}.
+  
+\begin{figure}
+	\centering
+	\input{Figures/tasks_array}
+	\caption{An example of the tasks and start and goal tasks seen as an array for an assembly with $4$ tasks and $2$ machines}
+	\label{fig:tasks_array}
+\end{figure}
  
  \begin{equation}\label{eq:21}
  allTasks = tasks \cup startTasks \cup goalTasks
@@ -156,7 +161,7 @@
  \end{equation}
  \begin{equation}\label{eq:39}
  orderedSet = \bigcup_{\forall k \in orderedGroups}order(k), \; orderedSet \subset tasks\end{equation}
- $orderedGroup(k)$ is the $k$:th ordered group specified, there are $nbrOrderedGroups$ ordered groups. An ordered group is an array of tasks that has to come in a very specific order. An example of this could be if an assembly has many move tasks that needs to be performed one after another in order to make an intricate movement. As will be showed in the constraints[section?], we can reason the relation between tasks if they use a certain component and are a certain kind of action. But we can not reason using two move tasks, there is no way to tell which should come before the other based on the component they use. 
+ $orderedGroup(k)$ is the $k$:th ordered group specified, there are $nbrOrderedGroups$ ordered groups. An ordered group is an array of tasks that has to come in a very specific order. An example of this could be if an assembly has many move tasks that needs to be performed one after another in order to make an intricate movement. As will be showed in the constraints section, \ref{seq:constraints}, we can reason the relation between tasks if they use a certain component and are a certain kind of action. But we can not reason using two move tasks, there is no way to tell which should come before the other based on the component they use. 
  
  $orderedGroup(k)$ is an array and the tasks in it will be scheduled in the order they com in the array. All the tasks in the group will be performed on the same machine, it can not order tasks on different machines.
  
@@ -309,19 +314,16 @@ Since the goal of the assembly is to complete the assembly in as little time as 
 The last variable is for determine what tool should be used for a task. With $toolNeeded$ we specify what tool is needed for the specific task. But we do not need to specify a tool if the task does not need any specific tool. That is why we need to determine what tool should be used for those tasks. Leaving the option open by not specifying any particular tool opens up for optimisations since it could mean we can avoid costly tool changes.
   
  
- \section{Constraints}
+ \section{Constraints}\label{seq:constraints}
  
  \begin{equation}\label{eq:92}
  (\forall t \in tasks) \; end(t) \le makespan
  \end{equation}
- All ends has to be lesser than the total end
+$makespan$ should represent the total time of the whole assembly, since it is that which we want to minimize. That means it should be equal to the largest end time amongst all the tasks. We can enforce that by limiting the end time for each task to be less or equal to the $makespan$.
  
  \begin{equation}\label{eq:93}
  (\forall t \in startTasks \cup goalTasks) \; start(t) = 0
  \end{equation}
- Start and goal tasks are not temporal tasks, i.e. they are timeless. Therefore, their start time is set to 0
- 
- 
  \begin{equation}
  \begin{aligned}\label{eq:94}
  &(\forall m \in machines) \\
@@ -331,7 +333,7 @@ The last variable is for determine what tool should be used for a task. With $to
  \end{aligned}
  \end{aligned}
  \end{equation}
- The start tasks and goal tasks are assigned to machines, thereby there are start and goal tasks assigned to every machine. Because of the way start and goal tasks are created, the start tasks starts with number $nbrTasks + 1$, and the corresponding goal task for a start task can be accessed by $startTask + nbrMachines$.
+ Start and goal tasks are special tasks since they act as source and sink nodes. This means they never get scheduled in time as ordinary tasks, we set them to all start at time $0$ and they do not have a duration variable, since the do not take up any time. We also assign them to machines so each start and goal task pair have their own machine from the start.
  
  \begin{equation}\label{eq:95}
  \begin{aligned}
@@ -340,7 +342,12 @@ The last variable is for determine what tool should be used for a task. With $to
  usingMachine(t) &\neq m
  \end{aligned}
  \end{equation}
- Setting the tasks that are out of range for each machine
+We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in the variable can not be assigned the machine $m$.
+
+ \begin{equation}\label{eq:117}
+ (\forall t \in tasks, \; toolNeeded(t) \neq 0) \; toolUsed(t) = toolNeeded(t)
+ \end{equation}
+ As said before, the $toolNeeded$ contains what tool is needed for a task. We need to translate it into what tool is used. It is done by simply taking the value from $toolNeeded$ and assign it to $toolUsed$ for the tasks where a tool is specified, i.e. $toolNeeded$ is not $0$.
  
  \subsection{Precedences}
  
@@ -491,27 +498,45 @@ The last variable is for determine what tool should be used for a task. With $to
  (\forall t \in tasks) \; Start(t) \geq moveEnd(t)\end{equation}
  A task can only start after the move to it.
  
+ 
  \subsection{Predecessors}
- 
- \begin{equation}\label{eq:108}
- (\forall t \in tasks) \; moveStart(t) \geq end(pred(t))\end{equation}
- A task has to start after its predecessor.
- 
+ \begin{equation}\label{eq:111}
+ circuit(\{pred(t) : \forall t \in tasks\})
+ \end{equation}
  \begin{equation}\label{eq:109}
  \begin{aligned}
  (\forall startTask &\in startTasks / \{nbrTasks + 1\}) \\
  pred(startTask) &= startTask + nbrMachines - 1
  \end{aligned}
  \end{equation}
- In order to create a circuit containing the sub circuits, for all start tasks, except the first one, the start tasks predecessor is the previous goal task.
- 
  \begin{equation}\label{eq:110}
- pred(nbrTasks + 1) = nbrTasks + nbrMachines \times 2\end{equation}
- To complete the circuit, the first start tasks predecessor is the last goal task.
+ pred(nbrTasks + 1) = nbrTasks + nbrMachines \times 2
+ \end{equation}
+ All tasks has to have a predecessor that tells the model what task comes directly before said task on the same machine. This means that a task can only have one predecessor. It can be seen as the way a machine needs to travel through its tasks in order to complete the assembly, where we have a start task at the start and a goal task at the end. If we were to connect the start and the goal task we wold have a circuit, hence we could view each machine as a circuit. And we could model each machine as a circuit, but then we would need to synchronise all the sub-circuits and ensure that tasks only appeared in one sub-circuit. This would make for quite a few constraints and would make the model more complex. Instead we model all the machines as one circuit and we tie together the goal task of one sub-circuit with the start task of the next for each sub-circuit, to form a large circuit. Then we tie together the goal task of the last sub-circuit with the start task of the first, see \ref{eq:110}. Lastly we can apply the \texttt{circuit} constraint over all $pred$ variables.
  
- \begin{equation}\label{eq:111}
- circuit(\{pred(t) : \forall t \in tasks\})\end{equation}
- The predecessors has to form a circuit.
+ \begin{equation}\label{eq:108}
+ (\forall t \in tasks) \; moveStart(t) \geq end(pred(t))
+ \end{equation}
+A fundamental part of a predecessor is that it is the task directly before the task in question, therefore the predecessor has to end before the task starts, or more specific, even before the move to the task.
+ 
+ \begin{equation}\label{eq:115}
+ \begin{aligned}
+ (\forall t &\in tasks \cup goalTasks) \\
+ usingMachine(t) &= usingMachine(pred(t)) 
+ \end{aligned}
+ \end{equation}
+Another fundamental part is that a predecessor is a task performed on the same machine as the task in question. This is enforced by \ref{eq:115}.
+
+ \begin{equation}
+ \begin{aligned}\label{eq:114}
+ &\begin{aligned}
+ (\forall k &\in orderedGroups) \\
+ (\forall i &\in \{1 , \ldots , |orderedGroup(k)|-1\}) 
+ \end{aligned}\\
+ &pred(ordered(k, i + 1)) = ordered(k, i) \\
+ \end{aligned}
+ \end{equation}
+In a sense, the ordered groups are forced predecessors and hence we enforce that by simply the task predecessor to the next task in the array.
  
  \begin{equation}
  \begin{aligned}\label{eq:112}
@@ -525,7 +550,7 @@ The last variable is for determine what tool should be used for a task. With $to
  pred(mountTask) &= takeTask \\
  \end{aligned}
  \end{equation}
- If a set of tasks on a component involves a mount and a take task, but no move tasks or put task on the same fixture, tray or output as the mount, the take task is the predecessor of the mount task.
+ If a set of tasks on a component involves a mount and a take task, but no move tasks or put task on the same fixture, tray or output as the mount, the take task is the predecessor of the mount task.[rewrite]
  
  \begin{equation}
  \begin{aligned}\label{eq:113}
@@ -535,26 +560,7 @@ The last variable is for determine what tool should be used for a task. With $to
  pred(putTask) &= takeTask
  \end{aligned}
  \end{equation}
- If a set of tasks on a component involves a put task not in a tray and a take task, and there is no moves involved, the take task has to be the predecessor of the put task.
- 
- \begin{equation}
- \begin{aligned}\label{eq:114}
- &\begin{aligned}
- (\forall k &\in orderedGroups) \\
- (\forall i &\in \{1 , \ldots , |orderedGroup(k)|-1\}) 
- \end{aligned}\\
- &pred(ordered(k, i + 1)) = ordered(k, i) \\
- \end{aligned}
- \end{equation}
- Sets up the predecessors in accordance with the ordered groups.
- 
- \begin{equation}\label{eq:115}
- \begin{aligned}
- (\forall t &\in tasks \cup goalTasks) \\
- usingMachine(t) &= usingMachine(pred(t)) 
- \end{aligned}
- \end{equation}
- A task has to use the same machine as its predecessor.
+ If a set of tasks on a component involves a put task not in a tray and a take task, and there is no moves involved, the take task has to be the predecessor of the put task.[rewrite]
  
  \begin{equation}\label{eq:116}
  \begin{aligned}
@@ -563,12 +569,9 @@ The last variable is for determine what tool should be used for a task. With $to
  moveDuration(t) &= timeMatrix3D(pred(t), \; t, \; k)
  \end{aligned}
  \end{equation}
- Take tasks has to use the same tool as its predecessor or do a change first.
+\ref{eq:116} is the constraint that decides if there should be a tool change or not between two tasks. It first calculates what tool state transition will occur between the two tasks, $k$, by taking the difference between what tool is used in the task and its predecessor. If they use the same tool, no transition needs to occur, i.e. no tool change needed and the difference would be $0$. We add $1$ to $k$ since the indexes start at $1$ in \emph{MiniZinc} and a result of $0$ should take constraint to the first index dept-wise in the $timeMatrix3D$.
  
- \begin{equation}\label{eq:117}
- (\forall t \in tasks, \; toolNeeded(t) \neq 0) \; toolUsed(t) = toolNeeded(t)
- \end{equation}
- Set the tool used for each task in accordance with $toolNeeded$.
+
  
  
  \section{Filter}

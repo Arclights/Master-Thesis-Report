@@ -1,0 +1,29 @@
+\documentclass[border=4pt]{standalone}
+\begin{document}
+
+\sffamily
+\begin{tikzpicture}[
+  thick,
+  myrect/.style={
+    draw,
+    rectangle split,
+    rectangle split horizontal,
+    rectangle split parts=#1,
+    rectangle split part align=center
+    } 
+]
+
+\node[myrect=8]
+  {
+  \nodepart{one}task
+  \nodepart{two}task
+  \nodepart{three}task
+  \nodepart{four}task
+  \nodepart{five}sTask1
+  \nodepart{six}sTask2
+  \nodepart{seven}gTask1
+  \nodepart{eight}gTask2
+  };
+
+\end{tikzpicture}
+\end{document}

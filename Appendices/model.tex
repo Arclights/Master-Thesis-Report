@@ -81,15 +81,18 @@
  \\\\
  Since components also can be sub-assemblies, it means a component can have subcomponents. These have been grouped in different groups to assist the constraints.
  \begin{equation}\label{eq:53}
- taskSubComponents(t) \subset components, \; t \in tasks\end{equation}
+ taskSubComponents(t) \subset components, \; t \in tasks
+ \end{equation}
  $taskSubComponents(t)$ is the set of components that make up the subcomponents for the components used in task $t$. One can think of the subcomponents as layers with the component on top, call it origin component, and the layer below are the components that make up that component, and so on. $taskSubComponents(t)$ contains the components one layer down, if the component itself is not a \emph{primitve} component. In that case, $taskSubComponents(t)$ contains that component instead.
  
  \begin{equation}\label{eq:54}
- taskCompleteSubComponents(t) \subset components, \; t \in tasks\end{equation}
+ taskCompleteSubComponents(t) \subset components, \; t \in tasks
+ \end{equation}
  To use the layer metaphor again, $taskCompleteSubComponents(t)$ contains all the layers below the origin component, for all the components in task $t$. Not including the origin components themselves. If the origin component is a \emph{primitve} component, the set is empty.
  
  \begin{equation}\label{eq:55}
- subComponents(c) \subset components, \; c \in components\end{equation}
+ subComponents(c) \subset components, \; c \in components
+ \end{equation}
  $subComponents(c)$ contains only the the \emph{primitve} subcomponents for component $c$, one layer down. If $c$ is a \emph{primitve} component or is only made of sub-assemblies, the set is empty.
  
  \begin{equation}\label{eq:4}
@@ -160,7 +163,8 @@
  ordered(k,i) \in tasks, \; i \in \{1 , \ldots , |orderedGroup(k)|\}, \; k \in orderedGroups
  \end{equation}
  \begin{equation}\label{eq:39}
- orderedSet = \bigcup_{\forall k \in orderedGroups}order(k), \; orderedSet \subset tasks\end{equation}
+ orderedSet = \bigcup_{\forall k \in orderedGroups}order(k), \; orderedSet \subset tasks
+ \end{equation}
  $orderedGroup(k)$ is the $k$:th ordered group specified, there are $nbrOrderedGroups$ ordered groups. An ordered group is an array of tasks that has to come in a very specific order. An example of this could be if an assembly has many move tasks that needs to be performed one after another in order to make an intricate movement. As will be showed in the constraints section, \ref{seq:constraints}, we can reason the relation between tasks if they use a certain component and are a certain kind of action. But we can not reason using two move tasks, there is no way to tell which should come before the other based on the component they use. 
  
  $orderedGroup(k)$ is an array and the tasks in it will be scheduled in the order they com in the array. All the tasks in the group will be performed on the same machine, it can not order tasks on different machines.
@@ -306,11 +310,13 @@ To simplify notation we also introduce one more variable called $end(t)$. It is 
 As mentioned before, each task has a move time connected to it since it takes a certain amount of time to move from one task to another. Since this time depends on both what task comes before it and what tools is needed for both of the tasks, the duration for the move is a decision variable as opposed to the duration for the task itself.
  
  \begin{equation}\label{eq:48}
- makespan \in \{0 , \ldots , maxE\}\end{equation}
+ makespan \in \{0 , \ldots , maxE\}
+ \end{equation}
 Since the goal of the assembly is to complete the assembly in as little time as possible, we set up a variable for it, $makespan$. It is this variable the solver will try to minimize.
  
  \begin{equation}\label{eq:52}
- toolUsed(t) \in tools, \; t \in allTasks\end{equation}
+ toolUsed(t) \in tools, \; t \in allTasks
+ \end{equation}
 The last variable is for determine what tool should be used for a task. With $toolNeeded$ we specify what tool is needed for the specific task. But we do not need to specify a tool if the task does not need any specific tool. That is why we need to determine what tool should be used for those tasks. Leaving the option open by not specifying any particular tool opens up for optimisations since it could mean we can avoid costly tool changes.
   
  
@@ -350,6 +356,12 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  As said before, the $toolNeeded$ contains what tool is needed for a task. We need to translate it into what tool is used. It is done by simply taking the value from $toolNeeded$ and assign it to $toolUsed$ for the tasks where a tool is specified, i.e. $toolNeeded$ is not $0$.
  
  \subsection{Precedences}
+ These constraints deals with the order in time in which the tasks as to come.
+ 
+  \begin{equation}\label{eq:107}
+  (\forall t \in tasks) \; Start(t) \geq moveEnd(t)
+  \end{equation}
+A very fundamental part of the relation between a task and the move to it is that we cannot start a task before we have moved to it.
  
  \begin{equation}
  \begin{aligned}\label{eq:96}
@@ -359,8 +371,7 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  end(putTask) &\le moveStart(mountTask)
  \end{aligned}
  \end{equation}
- If a set of tasks on a component involves a mount task and a put task, the put task has to come before the mount task
- 
+ If we want to mount two components together, we first have to put the first component in a fixture before we can mount the other component on it. Hence, the put task has to end before we can start with the mount task. 
  
  \begin{equation}
  \begin{aligned}\label{eq:97}
@@ -370,30 +381,28 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  end(takeTask) &\le moveStart(mountTask)
  \end{aligned}
  \end{equation}
- If a set of tasks on a component involves a mount task and a take task, the take task has to come before the mount task
- 
+ In the case mentioned above we also have take tasks for both components and they must both be performed before we can start mounting anything. 
  
  \begin{equation}
  \begin{aligned}\label{eq:98}
  \forall comp &\in components \\
  (\forall putTask &\in putting(comp), \; tray(putTask) > 0)\\
- (\forall takeTask &\in taking(comp), tray(putTask) = tray(takeTask))\\
+ (\forall takeTask &\in taking(comp), \; tray(putTask) = tray(takeTask))\\
  end(putTask) &\le moveStart(takeTask)
  \end{aligned}
  \end{equation}
- If a component has a put and take performed on it in a tray, the put has to come before the take.
- 
+ Say we want to put a component away for a while and pick it up again later. Then we need to do that in a tray. This is the only time we put anything in a tray, usually we just take components from them. So we can apply the \ref{eq:98} constraint which says that if there is a take and a put on the same tray, then the take has to happen after the put. 
  
  \begin{equation}
  \begin{aligned}\label{eq:99}
  (\forall f &\in fixtures) \\
- (\forall putTask &\in putting(comp), \; fixture(putTask) = f)\\
- (\forall takeTask &\in taking(comp), \; fixture(takeTask) = f \; \land \\
+ (\forall putTask &\in putting, \; fixture(putTask) = f)\\
+ (\forall takeTask &\in taking, \; fixture(takeTask) = f \; \land \\
  &componentsUsed(putTask) \subset taskSubComponents(takeTask)) \\
  end(putTask) &\le moveStart(takeTask), \\
  \end{aligned}
  \end{equation}
- For every put action on a fixture, there is a take action. The put action has to come before the take action.
+ When there is a put task and a take task on a fixture where a sub-component of the component being taken is the component being put, the put task has to happen before the take task.
  
  \begin{equation}
  \begin{aligned}\label{eq:100}
@@ -412,7 +421,11 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  \end{aligned}\\
  \end{aligned}
  \end{equation}
- The intervals between when components are put and then taken again cannot overlap on the same fixture.
+ Since we can do many sub-assemblies on the same fixture, we need to ensure that if a component is put in the fixture, there cannot be a component from another sub-assembly put or mounted there before the sub-assembly is done.
+ 
+ We can observe that the task of doing a sub-assembly begins with a put of a component in a fixture and a take of a component from the same fixture. The taken component will have the put component as a sub-component. With this knowledge we start by extracting all put tasks for a fixture. Then we extract all the corresponding take tasks, i.e. the take tasks for that fixture where the component used in the put task is among the sub-components for the component in the take task. Although, there is the case where we construct a component by first doing some mounting, then we take it up to maybe turn it or fixate it, and then put it back in the fixture for further mounting. In this case we will get two takes matching with the first put. So we need to identify which take task is the first one. We do this by choosing the take task with the least amount of subcomponents.
+ 
+ Now we have a 1:1 matching of take tasks and put tasks. To ensure the time between when a put task occurs and when the take task occurs, we apply a \emph{cumulative} constraint over that time and the limit of the fixture is always $1$.
  
  \begin{equation}
  \begin{aligned}\label{eq:101}
@@ -423,7 +436,7 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  usingMahine(t_1) &\neq usingMachine(t_2), \\
  \end{aligned}
  \end{equation}
- Concurrent tasks has to happen at the same time.
+ The fundamental property of the tasks in a concurrent group is that they need to execute at the same time on different machines. We ensure this with \ref{eq:101}.
  
  \begin{equation}
  \begin{aligned}\label{eq:102}
@@ -432,7 +445,7 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  moveStart(t_2) &\geq end(t_1) \\
  \end{aligned}
  \end{equation}
- Components cannot be used before they are created.
+ A very logical observation we can do is that components cannot be used before they are created. This is enforced in \ref{eq:102}.
  
  \begin{equation}
  \begin{aligned}\label{eq:103}
@@ -444,7 +457,7 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  end(precTask) &\leq moveStart(t), \\
  \end{aligned}
  \end{equation}
- Task using a component cannot execute before all the tasks having it as subcomponent.
+ A similar observation as for \ref{eq:102} is that we have to perform all tasks with a component before it is part of a sub-assembly. Therefore we can say that all tasks needs to have an end time smaller than the start time of the tasks having the tasks component as sub-component.
  
  \begin{equation}
  \begin{aligned}\label{eq:104}
@@ -460,8 +473,6 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  \end{aligned}\\
  \end{aligned}
  \end{equation}
- Tasks on the same fixture cannot overlap.
- 
  \begin{equation}
  \begin{aligned}\label{eq:105}
  &\begin{aligned}
@@ -476,8 +487,6 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  \end{aligned}\\
  \end{aligned}
  \end{equation}
- Tasks on the same tray cannot overlap.
- 
  \begin{equation}
  \begin{aligned}\label{eq:106}
  &\begin{aligned}
@@ -492,11 +501,9 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  \end{aligned}\\
  \end{aligned}
  \end{equation}
- Tasks on the same output cannot overlap.
+Trays, fixtures and outputs can only be used one at a time. We can rephrase this into saying that tasks using trays cannot overlap, tasks using fixtures cannot overlap, etc. We ensure this by applying the \emph{cumulative} constraint through \ref{eq:104}, \ref{eq:105} and \ref{eq:106}.
  
- \begin{equation}\label{eq:107}
- (\forall t \in tasks) \; Start(t) \geq moveEnd(t)\end{equation}
- A task can only start after the move to it.
+
  
  
  \subsection{Predecessors}
@@ -872,7 +879,7 @@ The following two constraints can seem very specific, but are essential to the s
   pred(putTask) &\neq takeTask
   \end{aligned}
   \end{equation}
-  For every put action on a fixture, there is a take action. The predecessor of the put task cannot be the take task.
+  As with constraint \ref{eq:99}, but we limit the predecessors instead.
   
   \begin{equation}
   \begin{aligned}\label{eq:88}
@@ -903,7 +910,7 @@ The following two constraints can seem very specific, but are essential to the s
   &pred(precTask) \neq t
   \end{aligned}
   \end{equation}
- Referera \ref{eq:103}
+ As in \ref{eq:103}, tasks has to be performed before the tasks having the component in the task as sub-component. This means the task cannot have any of these tasks as predecessor.
   
   \begin{equation}
   \begin{aligned}\label{eq:91}

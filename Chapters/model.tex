@@ -539,9 +539,6 @@ Trays, fixtures and outputs can only be used one at a time. We can rephrase this
  
  \newpage
  \subsection{Predecessors}
- \begin{equation}\label{eq:111}
- circuit(\{pred(t) : \forall t \in tasks\})
- \end{equation}
  \begin{equation}\label{eq:109}
  \begin{aligned}
  (\forall startTask &\in startTasks / \{nbrTasks + 1\}) \\
@@ -551,7 +548,12 @@ Trays, fixtures and outputs can only be used one at a time. We can rephrase this
  \begin{equation}\label{eq:110}
  pred(nbrTasks + 1) = nbrTasks + nbrMachines \times 2
  \end{equation}
+ \begin{equation}\label{eq:111}
+ circuit(\{pred(t) : \forall t \in tasks\})
+ \end{equation}
  All tasks has to have a predecessor that tells the model what task comes directly before said task on the same machine. This means that a task can only have one predecessor. It can be seen as the way a machine needs to travel through its tasks in order to complete the assembly, where we have a start task at the start and a goal task at the end. If we were to connect the start and the goal task we wold have a circuit, hence we could view each machine as a circuit. And we could model each machine as a circuit, but then we would need to synchronise all the sub-circuits and ensure that tasks only appeared in one sub-circuit. This would make for quite a few constraints and would make the model more complex. Instead we model all the machines as one circuit and we tie together the goal task of one sub-circuit with the start task of the next for each sub-circuit, to form a large circuit. Then we tie together the goal task of the last sub-circuit with the start task of the first, see \ref{eq:110}. Lastly we can apply the \texttt{circuit} constraint over all $pred$ variables.
+ 
+The attentive reader might have observed that the nodes in the \texttt{circuit} constraint have successors and not predecessors. Even if it is the wrong way around, it does not matter if the constraint sees the predecessor variable as a successor or a predecessor, it will form a circuit anyway.
  
  \begin{equation}\label{eq:108}
  (\forall t \in tasks) \; moveStart(t) \geq end(pred(t))
@@ -805,12 +807,7 @@ The following two constraints can seem very specific, but are essential to the s
   
   \subsection{Predecessor filter}
   Since the predecessors are searched by the solver before searching the start variables, reducing their domains has potential to help reduce the total runtime considerably.
-  
-  \begin{equation}\label{eq:74}
-  alldifferent(\{pred(t) : \forall t \in tasks\})
-  \end{equation}
- The \texttt{circuit} constraint already sees to it that the predecessors of the tasks forms a circuit. This means that all the predecessors will take on different values. However, we apply this \texttt{alldifferent} constraint in order to help the \texttt{circuit} make the predecessor variables take on different values.
-  
+ 
   \begin{equation}\label{eq:75}
   (\forall t1, \forall t2 \in taking) \; pred(t1) \neq t2
   \end{equation}

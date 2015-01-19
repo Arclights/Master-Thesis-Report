@@ -1,0 +1,48 @@
+Introduction | Started
+	Background | Draft
+	Problem specification | TODO
+	Related work | Started
+	Report structure | TODO
+
+Approach | Started
+	Constraint Programming | Started
+		Constriants | Started
+		Global Constraints | Draft
+		Solver | Started
+		Reified | TODO
+	Job-shop scheduling | TODO
+		Flexible Job-shop | TODO
+	MiniZinc | TODO
+	Solvers | TODO
+		G12 | TODO
+		JaCoP | TODO
+		Gecode | TODO
+		OR-tools | TODO
+		Opturion CPX | TODO
+		Choco3 | TODO
+
+Model | Draft
+	Variables | Draft
+		Model Variables | Draft
+		Static Varibles | Draft
+		Decision Variables | Draft
+	Constraints | Draft
+		Precedences | Draft
+		Predecessors | Draft
+	Filter | Draft
+		Temporal filter | Draft
+		Predecessor filter | Draft
+
+Assembly | TODO
+
+Evaluation | TODO
+	The setup | TODO
+
+Discussion | TODO
+
+Conclusions | TODO
+	Further work | TODO
+
+Appendix Extended Model | Draft
+ 
+Appendix Tool Manuals | TODO

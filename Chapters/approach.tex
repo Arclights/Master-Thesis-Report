@@ -20,12 +20,27 @@ On this problem we can impose a constraint, for example $y > x$. Now we have set
 \end{figure}
 
 \subsection{Global constraints}
-\subsubsection{AllDifferent}
-\subsubsection{Circuit}
-\subsubsection{Cumulative}
-\subsubsection{Global_Cardinality}
+The general discription of the global constraints in this section come from the \emph{Global Constraint Catalogue} \cite{global_constraint_catalogue} and the adaption in MiniZinc is from MiniZinc:s global constraints listing \cite{mz_global_constraints}.
 
+\subsubsection{All Different Constraint (\texttt{allDifferent})}
+The \texttt{allDifferent} constraint is pretty straight forward. It takes a collection \texttt{VARIABLES} as argument and enforces all variables in \texttt{VARIABLES} to assume distinctly different values, i.e. all values will be different.
 
+In MiniZinc, \texttt{VARIABLES} is called \texttt{x} and consists of a set of variables.
+
+\subsubsection{Circuit Constraint (\texttt{circuit})}
+The \texttt{circuit} constraint takes a collection of nodes \texttt{NODES}, where each node has an index and a successor. \texttt{circuit} enforces the nodes to form a \emph{Hamiltonian circuit}.
+
+In MiniZinc, \texttt{NODES} is called \texttt{x} and consists of an array with variables where the index in the array is the index for the variable in that place and the successor value is the value of the variable.
+
+\subsubsection{Cumulative Constraint (\texttt{cumulative})}
+The \texttt{cumulative} constraint takes to arguments, a collection of tasks \texttt{TASKS} and a limit \texttt{LIMIT} for how many tasks can overlap simultaneously. The tasks have 5 attributes; \texttt{origin}, \texttt{duration}, \texttt{end} and \texttt{height}. The attributed are pretty self explanatory; \texttt{origin} is where in time the task starts, this is the value the constraint tries to determine, \texttt{duration} is the duration of the task, the \texttt{end} is at which time the task ends. \texttt{Height} might not be as straight forward though, it means how many resources the task consumes. \texttt{LIMIT} is the limit for how many resources there are available. So if we have a limit of $5$ resources and we have two tasks which consumes $3$ and $2$ resources respectively, they can execute simultaneously. But not if the limit was $3$.
+
+In MiniZinc, \texttt{TASKS} is split into $3$ arguments; \texttt{s}, \texttt{d} and \texttt{r}. Each of them are an array where the index represents a task. The \texttt{end} variable is skipped and is implied by the \texttt{s} and \texttt{d} arguments. \texttt{r} is \emph{height} here.
+
+\subsubsection{Global Cardinality constraint (\texttt{global\_cardinality})}
+The \texttt{global\_cardinality} constraint take two arguments; a collection of variables \texttt{VARIABLES} and a collection of values \texttt{VALUES}. Each element in \texttt{VALUES} have two attributes; \texttt{val} and \texttt{noccurence}. The constraint ensures that \texttt{val} is covered \linebreak\texttt{noccurence} times by the elements in \texttt{VARIABLES}.
+
+In MiniZinc, \texttt{VARIABLES} is split into two arguments; \texttt{cover} and \texttt{counts}, where \texttt{cover} corresponds to \texttt{val} and \texttt{counts} corresponds to \texttt{noccurence}. Both \texttt{val} and \texttt{counts} are arrays where the index identifies the element.
 
 \subsection{Solver}
 A constraint programming program is consisting of many of these constraints and variables. When the solution is specified in a model, a \emph{solver} runs the model. The goal of the solver is to satisfy all the constraints, i.e. set the domains of the variables so that the all follow the relationships of the constraints. This is called the \emph{constraint satisfaction problem}, and can  be defined as a triple $\langle Z,D,C \rangle$. $Z=\{x_1 \ldots x_n\}$ is a finite set of all the variables in the solution, $D(x_i), \; x_i \in Z$ is a set representing the domain of values the variable $x_i$ can assume, $C$ is the set of constraints imposed on the variables in $Z$. The solver accomplishes this by doing a \emph{search} on the space of possibilities, i.e.\ the \emph{search space}. The search space is in the form of a tree, where each branch is a selection of a variable where the variables domain is reduced into a smaller subset that conforms with the constraints. The solver traverses the tree in search for a solution. When all variables are set to conform with the constraints a solution is found. If the solver reaches a node where a variables domain becomes empty, it has to \emph{backtrack} to a previous node from which it can choose a new variable to set, i.e.\ traversing a new branch of that node.

@@ -2,6 +2,11 @@
 This appendix contains constraints that are included in the model, but not as essential for the assembly as the ones in chapter \ref{cha:model}.
 
 \section{Predecessor filter}
+\begin{equation}\label{eq:74}
+  alldifferent(\{pred(t) : \forall t \in tasks\})
+  \end{equation}
+ The \texttt{circuit} constraint already sees to it that the predecessors of the tasks forms a circuit. This means that all the predecessors will take on different values. However, we apply this \texttt{alldifferent} constraint in order to help the \texttt{circuit} make the predecessor variables take on different values.
+
  \begin{equation}
   \begin{aligned}\label{eq:85}
   (\forall comp &\in components) \\

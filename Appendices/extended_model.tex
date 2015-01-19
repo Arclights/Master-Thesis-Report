@@ -1,0 +1,82 @@
+ \chapter{Extended Model}
+This appendix contains constraints that are included in the model, but not as essential for the assembly as the ones in chapter \ref{cha:model}.
+
+\section{Predecessor filter}
+ \begin{equation}
+  \begin{aligned}\label{eq:85}
+  (\forall comp &\in components) \\
+  (\forall mountTask &\in mounting(comp)) \\
+  (\forall takeTask &\in taking(comp)) \\
+  pred(takeTask) &\neq mountTask
+  \end{aligned}
+  \end{equation}
+  For all the tasks that operate on the same component we can restrict so the mount task of the component cannot be the predecessor of the take task. 
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:86}
+  (\forall comp &\in components) \\
+  (\forall putTask &\in putting{comp}, \; tray(putTask) > 0) \\
+  (\forall takeTask &\in taking(comp), \; tray(putTask) = tray(takeTask)) \\
+  pred(putTask) &\neq takeTask
+  \end{aligned}
+  \end{equation}
+  We can also restrict the predecessor of a put task for a component to not be the take task for that component, if the two tasks are performed on the same tray. This can help in a situation when we want the assembly to put down a part for a moment and pick it up later, because if the part does not come in the tray from the beginning, i.e. it is not the component tray, we first need to put it in the tray before we are able to take it. 
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:87}
+  (\forall f &\in fixtures) \\
+  (\forall putTask &\in putting{comp}, \; fixture(putTask) = f) \\
+  (\forall takeTask &\in taking(comp), \; fixture(takeTask) = f,\\
+  &componentsUsed(putTask) \subset taskSubComponents(takeTask))\\
+  pred(putTask) &\neq takeTask
+  \end{aligned}
+  \end{equation}
+  As with constraint \ref{eq:99}, but we limit the predecessors instead.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:88}
+  (\forall group &\in \{1 , \ldots , nbrConcurrentGroups\}) \\
+  (\forall t_1 &\in concurrentTasks(group)) \\
+  (\forall t_2 &\in concurrentTasks(group) / \{t_1\}) \\
+  pred(t_1) &\neq t_2 \land pred(t_2) \neq t_1
+  \end{aligned}
+  \end{equation}
+  Since concurrent tasks need to happen simultaneously on different machines, they cannot be the predecessor to each other.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:89}
+  (\forall t_1 &\in tasks, \; componentCreated(t_1) > 0) \\
+  (\forall t_2 &\in tasks, \; componentCreated(t_1) \in componentUsed(t_2)) \\
+  pred(t_1) &\neq t_2
+  \end{aligned}
+  \end{equation}
+ Sub-assembly components can only be used after they are created. Therefore, we can say that a task that uses a component created at task $t$ cannot be the predecessor of task $t$.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:90}
+  &(\forall precTask \in tasks) \\
+  &(\forall t \in tasks, \; precTask \neq t,\\
+  &\begin{aligned}componentUsed(precTask) \cup taskCompleteSubComponent(t) \subset\\
+  taskCompleteSubComponents(t), \end{aligned}\\
+  &componentsUsed(precTask) \cup taskCompleteSubComponents(t) \neq \emptyset \\
+  &pred(precTask) \neq t
+  \end{aligned}
+  \end{equation}
+ As in \ref{eq:103}, tasks has to be performed before the tasks having the component in the task as sub-component. This means the task cannot have any of these tasks as predecessor.
+  
+  \begin{equation}
+  \begin{aligned}\label{eq:91}
+  (\forall concGroup &\in concurrentTasks, \; |concGroup| = nbrMachines) \\
+  concComps &= \bigcup_{\forall i \in concGroup}componentsUsed(i), \\
+  concSubComps &= \bigcup_{\forall i \in concGroup}taskCompleteSubComponents(i), \\
+  postTasks &= \{postTask : \forall postTask \in tasks,\\
+  &concComps \cap taskCompleteSubComponents(postTask) \neq \emptyset\}\\
+  preTasks &= \{preTask : \forall preTask \in tasks,\\
+  &componentsUsed(preTask) \cap concSubComps \neq \emptyset\}, \\
+  (\forall postTask &\in postTasks) \\
+  (\forall predTask &\in preTasks) \\
+  pred(postTask) &\neq preTask
+  \end{aligned}
+  \end{equation}
+  If there is a group of concurrently executing tasks that take up all machines available they will act as a wall between the tasks before and after the group. It is guaranteed that the tasks after the group cannot have the tasks before the group as predecessors. We can extract the tasks before and after the concurrent tasks by analysing the components used, since the components used in the concurrent tasks will have the components used before as sub-components.
+ 

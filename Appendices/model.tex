@@ -536,21 +536,25 @@ Another fundamental part is that a predecessor is a task performed on the same m
  &pred(ordered(k, i + 1)) = ordered(k, i) \\
  \end{aligned}
  \end{equation}
-In a sense, the ordered groups are forced predecessors and hence we enforce that by simply the task predecessor to the next task in the array.
- 
+In a sense, the ordered groups are forced predecessors and hence we enforce that by simply by making a task predecessor to the next task in the array.
+\\\\
+The following two constraints can seem very specific, but are essential to the scheduling in our model.
  \begin{equation}
  \begin{aligned}\label{eq:112}
  (\forall c &\in components) \\
  (\forall mountTask &\in mounting(c)) \\
  puts &= \{p : \forall p \in putting(c),\\
  &(fixture(p) > 0 \land fixture(p) = fixture(mountTask)) \; \lor  \\
- &(output(p) > 0 \land output(p) = output(mountTask)) \; \lor  \\
- &(tray(p) > 0 \land tray(p) = tray(mountTask))\}, \\
+ &(output(p) > 0 \land output(p) = output(mountTask)), \\
  (\forall takeTask &\in taking(c), \; takeTask \notin orderedSet, \; puts = \emptyset) \\
  pred(mountTask) &= takeTask \\
  \end{aligned}
  \end{equation}
- If a set of tasks on a component involves a mount and a take task, but no move tasks or put task on the same fixture, tray or output as the mount, the take task is the predecessor of the mount task.[rewrite]
+ In order to properly connect the taking of a component and the mounting of one, we need to ensure that if there is no put task, the take task has to be the predecessor of the mount task. 
+ 
+ But we must also ensure the following: The put cannot be on the same fixture or output as the mount. This is because a component that will be mounted in a fixture or output will always first be picked up, then put in either a fixture or output, then mounted with with another component. The component mounted on will also be part of the mounting task. Therefore, if the component is the one being mounted, there will be two tasks; one where the component is taken, and one where the component is mounted. And that is no problem, the constraint applies. But if the component is the one being mounted on, there will be three tasks; one where the component is taken, one where the component is put in a fixture or output, and one where it is mounted on. In this case the take task cannot be the predecessor of the mount task, since the component first must be put in the fixture or output, and then the other take task,  where the component being mounted on this component is taken, should be the predecessor of the mount task. Hence we ensure there are no put tasks working on the same fixture or output as the mount task.
+ 
+ The final case we must consider is when there are move tasks involved. There can be a case of a take task of a component, then a couple of move tasks, and lastly a mount task. In this case, the take task cannot be the predecessor of the mount task, and this constraint does not apply. If we applied it, it would contradict the \ref{eq:114} constraint. So we need to ensure the take task is not in an ordered group either.
  
  \begin{equation}
  \begin{aligned}\label{eq:113}
@@ -560,7 +564,11 @@ In a sense, the ordered groups are forced predecessors and hence we enforce that
  pred(putTask) &= takeTask
  \end{aligned}
  \end{equation}
- If a set of tasks on a component involves a put task not in a tray and a take task, and there is no moves involved, the take task has to be the predecessor of the put task.[rewrite]
+ As with \ref{eq:112}, in order to ensure the relation between when a component is picked up and when it is put that the take task is the predecessor of the put task, i.e. we must first pick up the components before we put it down, and there cannot be anyu other task in between.
+ 
+ Also as with \ref{eq:112}, there are a few cases to consider. If we want to put a component away for a while in order to pick it up later, there will be a put task and a take task on that component. But in this case the take task cannot come before the put task, since we need to put it down before we can pick it up. So we put in the clause that this constraint does not apply if the put task is on a tray.
+ 
+ We also need to consider the occurrence of move tasks. If there is a move task involved between the take and put, the take task cannot be the predecessor of the put task.
  
  \begin{equation}\label{eq:116}
  \begin{aligned}

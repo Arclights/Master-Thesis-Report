@@ -442,11 +442,9 @@ A very fundamental part of the relation between a task and the move to it is tha
  \begin{aligned}\label{eq:100}
  &(\forall f \in fixtures) \\
  &puts = [put : \forall put \in putting, \; fixture(put) = f], \\
- &takesForEachPut = [\{take : \forall take \in taking, \; fixture(take) = f, \\
- &componentsUsed(put) \subset taskCompleteSubComponent(take)\} : \forall put \in puts], \\
  &\begin{aligned}
- takes = [&\operatorname*{arg\,min}_{\forall take \in takesForEachPut(p)}{taskCompleteSubComponent(take)} : \\
- &\forall p \in \{1 , \ldots , |puts|\}], 
+ takes = [min(\{&take : \forall take \in taking, \; fixture(take) = f,\\ &componentsUsed(put) \subset taskCompleteSubComponent(take)\}) : \\
+ &\forall put \in puts], 
  \end{aligned}\\
  &\begin{aligned}
  cumulative(&[moveStart(task) : \forall task \in puts], \\ &[abs(end(takes(i))-moveStart(puts(i))) : \forall i \in \{1 , \ldots , |puts|\}], \\

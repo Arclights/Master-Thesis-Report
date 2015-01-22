@@ -37,3 +37,6 @@ Allmänna funderingar:
 
 Problem att modellera Ejenstams modell:
 	* Eftersom att det är tillåtet att plocka upp flera saker efter varandra i Ejenstams modell, så kan man inte ha constraint:et som kopplar ihop take och put av en komponent
+
+Blandat:
+	* Att köra själv fz medl fzn-fil tar mycket längre tid än att låta skriptet kompilera och köra direct -> går inte att mäta tiden för endast lösning och utan parsning -> vi kör alla test med parsning

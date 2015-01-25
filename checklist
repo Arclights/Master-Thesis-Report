@@ -12,9 +12,9 @@ Approach | Started
 		Reified | TODO
 	Job-shop scheduling | TODO
 		Flexible Job-shop | TODO
-	MiniZinc | TODO
-	Solvers | TODO
-		G12 | TODO
+	MiniZinc | Draft
+	Solvers | Started
+		G12 | Draft
 		JaCoP | TODO
 		Gecode | TODO
 		OR-tools | TODO

@@ -5,20 +5,20 @@ Introduction | Started
 	Report structure | TODO
 
 Approach | Started
-	Constraint Programming | Started
-		Constriants | Started
+	Constraint Programming | Draft
+		Constriants | Draft
 		Global Constraints | Draft
-		Solver | Started
+		Solver | Draft
 		Reified | TODO
 	Job-shop scheduling | TODO
 		Flexible Job-shop | TODO
 	MiniZinc | Draft
 	Solvers | Started
 		G12 | Draft
-		JaCoP | TODO
-		Gecode | TODO
-		OR-tools | TODO
-		Opturion CPX | TODO
+		JaCoP | Draft
+		Gecode | Draft
+		OR-tools | Draft
+		Opturion CPX | Draft
 		Choco3 | TODO
 
 Model | Draft
@@ -36,7 +36,7 @@ Model | Draft
 Assembly | TODO
 
 Evaluation | TODO
-	The setup | TODO
+	The setup | Started
 
 Discussion | TODO
 

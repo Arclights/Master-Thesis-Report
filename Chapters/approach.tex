@@ -66,17 +66,29 @@ This thesis will test the model using 6 different solvers; \emph{G12}, \emph{JaC
 \item The item has to be free to acquire, either via open source, free license or free academic license.
 \end{itemize}
 
+The model was initially tested during the implementation using G12/FD, but after a while G12/FD was unable to produce results and a switch was made to JaCoP. In other words, the model was developed and initially tested using JaCoP.
+
 \subsection{G12/FD}
 \emph{G12/FD} is a finite domain solver provided by the G12 team, the creators of MiniZinc. It is implemented in Mercury and is the default solver for the G12 FlatZinc interpreter
 \cite{nicta_2964}
 \cite{mz_result_2014}
 \subsection{JaCoP}
+JaCoP stands for Java Constraint Programming solver, and is an open source Java library for constraint programming that is available under the GNU Affero GPL license. It has been developed since 2001, mainly by Krzysztof Kuchcinski and Radoslaw Szymanek. The library provides many global constraints in order to make modeling more efficient. It is used by researchers all around the world and has proven its efficiency by winning silver price in the MiniZinc Challenge.
 \cite{jacop_overview}
+\cite{jacop_about}
 \subsection{Gecode}
+Gecode is a free constranit solver under the MIT License implemented in C++. It officially provides a MiniZinc interface, but many external projects provides additional interfaces. One of its strengths is that it can perform parallel searches using multiple cores and it gives the solver great efficiency. This has lead to Gecode winning all the gold medal of the MiniZinc challenge all 5 consecutive years between 2008 and 2012.
 \cite{gecode}
-\subsection{OR-tools}
+\subsection{or-tools}
+or-tools is an open source constraint solver under the Apache License 2.0 implemented in C++. or-tools is developed by Google and is part of their Operational Research. In addition to C++ and MiniZinc, or-tools also has interfaces for Python, Java and C\#.
 \cite{or_manual}
 \subsection{Opturion CPX}
+Opturion CPX is a constraint solver developed by Opturion Pty Ltd, a commercial outcome of the G12 project. The same ones that created G12/FD, MiniZinc and FlatZinc. Opturion CPX is a commercial product and therefore not free. Although, they provide academic licenses which was used for the thesis. Since it originated from G12, the language for implementing models is MiniZinc.
+
+Unlike the other solvers used, Opturion CPX is not a pure \emph{finite domain} solver. But rather a combination of solving techniques from CP and propositional logic (SAT). This makes CPX extremely efficient in solving large models.
+It is said that because Opturion CPX only generates propositional variables needed for the search, the search is not necessarily slowed down due to large domains.
 \cite{cpx}
+\cite{cpx_about}
+\cite{cpx_site}
 \subsection{Choco3}
 \cite{choco}

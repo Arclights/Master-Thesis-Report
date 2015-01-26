@@ -20,7 +20,7 @@ On this problem we can impose a constraint, for example $y > x$. Now we have set
 \end{figure}
 
 \subsection{Global constraints}
-[Beskriv vad gloabal constraints är och varför vi använder dem]
+[Describe what global constraints are and why we use them]
 The general discription of the global constraints in this section come from the \emph{Global Constraint Catalogue} \cite{global_constraint_catalogue} and the adaption in MiniZinc is from MiniZinc:s global constraints listing \cite{mz_global_constraints}.
 
 \subsubsection{All Different Constraint (\texttt{allDifferent})}
@@ -87,8 +87,10 @@ Opturion CPX is a constraint solver developed by Opturion Pty Ltd, a commercial 
 
 Unlike the other solvers used, Opturion CPX is not a pure \emph{finite domain} solver. But rather a combination of solving techniques from CP and propositional logic (SAT). This makes CPX extremely efficient in solving large models.
 It is said that because Opturion CPX only generates propositional variables needed for the search, the search is not necessarily slowed down due to large domains.
+Proof of this can be shown by the number of awards claimed in the MiniZinc challange.
 \cite{cpx}
 \cite{cpx_about}
 \cite{cpx_site}
 \subsection{Choco3}
+Choco3 is a finite domain\cite{choco_paper} constraint solver implemented in Java and it is free under the BSD license. The development of Choco has been going on since the early 2000s and Choco3 is the latest version. Although sharing the name, Choco3 is not the same syustem as its predecessor Choco2, but a complete rewriting of the previous system.
 \cite{choco}

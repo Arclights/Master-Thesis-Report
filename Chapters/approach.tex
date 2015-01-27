@@ -20,7 +20,8 @@ On this problem we can impose a constraint, for example $y > x$. Now we have set
 \end{figure}
 
 \subsection{Global constraints}
-[Describe what global constraints are and why we use them]
+Global constraints are constraints that encapsulate a set of constraints. This makes them quite convenient to use when modeling. But they can also have powerful filtering algorithms attached to them that can reduce the domains of the variables further and can make them more efficient than using the constraints on their own.\cite{global_constraints} Therefore, we are using a couple of global constraints listed below.
+
 The general discription of the global constraints in this section come from the \emph{Global Constraint Catalogue} \cite{global_constraint_catalogue} and the adaption in MiniZinc is from MiniZinc:s global constraints listing \cite{mz_global_constraints}.
 
 \subsubsection{All Different Constraint (\texttt{allDifferent})}
@@ -50,13 +51,27 @@ A constraint programming program is consisting of many of these constraints and 
 \cite{marriott_1998}
 \cite{mz_manual}
 
-\subsection{Reified}
+\subsection{Reified Constraints}
+Reified constraints are constraints that couples that couples a primitive constraint with a boolean variable and provides a relationship between the both. An example could be the constraint $c$ and the boolean variable $B$, the relationship between the both could be $c \Leftrightarrow B$. This says that if $c$ holds, $B = 1$ and if $\neg c$ holds, $B = 0$. This form of expression can be very useful in expressing complex relations and constraints.\cite{marriott_1998}
+
+Although it is an convenient way of expressing complex relations, it has its disadvantages. They can be inefficient since every reified constraint needs to be propagated all the time. And can propagate poorly, for example if a variable occurs multiple times in an expression.\cite{jefferson_2010} Due to this, we have tried to avoid direct reified constraints in the MiniZinc code in hopes of reducing the total amount of reified constraints in the resulting code.
 
 \section{Job-shop scheduling problem}
-\subsection{Flexible job-shop scheduling problem}
+The job shop problem can be described as $n$ jobs of varying size containing a number of operations, to be executed in a certain order, needed to be scheduled on $m$ identical machines. Commonly the goal is to minimize the total time for the schedule, called the makespan. The traveling salesman problem is a version of the job shop problem where $m = 1$. Garey shows that the job shop problem is NP-complete for $m \geq 2$ and $n \geq 3$\cite{garey_1976}, hence more complex versions of the job shop problem will be at least this hard.
+
+As described above, the schedule is composed of jobs containing operations. This is the usual way of describing it in the literature, but we will look at it a slightly different way. Instead of looking at many jobs, we will focus on one job and the operations within that job. In this thesis we will refer to these operations as tasks.
+\\\\
+An extension of the job shop problem is the flexible job shop problem. In it, tasks are not locked to be scheduled on a particular machine, but can be scheduled for any of the machines.\cite{thornblad_2013} This increases the complexity of the problem.
+\\\\
+Yet another extension of the job shop problem is the job shop problem with sequence-dependent setups. This means the time for a task is not just the time it takes to execute the task itself, but also the time it takes to set up the machine, depending on the previous task, in order to execute the task at hand. This si also something that increases the complexity compared to the basic job shop problem.
+\\\\
+Our case will be a combination of the flexible job shop problem and the job shop problem with sequence-dependent setup times since, as will be shown later, we can change the tools of the machines. The ability to change tools means that all machines can execute all tasks, and the change of tool takes time which means we get a sequence-dependence.
 
 \section{MiniZinc}
 There are many solvers for CP problems, but they all use different languages and as a modeler, it might be of interest to test how well ones model performs on different solver. To eliminate the need to rewrite models to fit the language of the different solver in order to perform a comparison, MiniZinc was introduced. MiniZinc is a modeling language similar to \emph{Optimized Programming Language} (OPL), but is scaled down and lacks some of OPL's features. MiniZinc's' strength lies in that it is coupled with another language called FLatZinc. The difference between MiniZinc and FlatZinc is that MiniZinc is a medium-level language where it is easy for modelers to express themselves and FlatZinc is a low-level language that is easy for interpreters to parse. There is a translator from MiniZinc to FlatZinc provided, the translation is called \emph{flattening}. MiniZinc provides a set of already defined constraints that solvers can use, however, the translator takes in consideration the solver that is going to be used and can apply custom versions of the constraints specified for that particular solver.
+\cite{mz_paper}
+
+Although MiniZinc aims at being a standard language in CP, it does not have support for implementing custom search algorithms, as many other languages do. This means we cannot utilize algorithms for random restart, local search, etc.
 \cite{mz_paper}
 
 \section{Solvers}

@@ -5,33 +5,30 @@ More and more of the production in today's society is getting automated. Manufac
 
 Current robot setups usually have one robot performing one task all the time, as oppose to flexible robots which will be performing many different tasks and assemblies. This poses the demand for the scheduling of such robots to be flexible as well. A scheduling of a robot can be a time consuming task. Since manufacturers want as effective assemblies as possible, it can take from days to weeks to perfect an assembly schedule. This is not feasible if you want to use the robot for many different tasks and assemblies. In this thesis we would like to try and automate this scheduling process in order to cut down on the scheduling time. To accomplish this we will be using Constraint programming, as it provides a general interface to solve problems without needing to build a complete framework from scratch. Also, scheduling is a classical constraint problem, thus constraint programming suits this problem well.
 
-One of those robots are ABB's robot YuMi\textregistered(formerly known as FRIDA). YuMi\textregistered is a dual armed robot made to work along side humans and able to perform the some of the most complex tasks, such as mount a nut or thread a needle.\cite{_yumi_} It accomplishes this by using a wide variety of sensors, e.g. force sensor, visual sensors, etc. Usually robot replaces humans to perform dangerous or heavy tasks, YuMi\textregistered is mainly designed for small parts assembly, i.e. usually humans roles in todays manufacturing environment.
+One of those robots are ABB's robot YuMi\textsuperscript\textregistered(formerly known as FRIDA). YuMi\textsuperscript\textregistered is a dual armed robot made to work along side humans and able to perform the some of the most complex tasks, such as mount a nut or thread a needle.\cite{_yumi_} It accomplishes this by using a wide variety of sensors, e.g. force sensor, visual sensors, etc. Usually robot replaces humans to perform dangerous or heavy tasks, YuMi\textsuperscript\textregistered is mainly designed for small parts assembly, i.e. usually humans roles in todays manufacturing environment.
 
 
 
-
-
-\section{Problem specification}
-What does our problem look like
+\section{Project goal}
+The goal of this thesis is to present a CP model suitable for a robot such as YuMi\textsuperscript\textregistered, able to handle the type of jobs YuMi\textsuperscript\textregistered is able to perform. It will be constructed using the MiniZinc language and tested using a couple of CP solvers and compare the results. Both to see how well our model can perform and how well the solvers perform relative to one another.
 
 \section{Related work}
-[brucker 2009] mentions the solving of 15x15 benchmark(15 jobs with 15 operations) being solved without heuristics (although not necessarily in CP).\cite{brucker_2009}
-\\
+In Drobouchevitch et.al. 2006 they conclude that the increasing number of machines in a robotic cell causes an explosive growth in combinatorial possibilites. They also provide evidence that a dual-gripper cell is more productive than a single-gripper cell.\cite{sethi_2006}
 
-[Thornblad] concludes that when a cell is part of an assembly flow, the use of targeting due dates is to prefer. Because makespan can exacerbate an already unreliable flow. The assembly we perform is not a part of a flow, and such we do not concern ourselves with maintaining a stable flow through the cell, but only to optimize the assembly in the cell.\cite{thornblad_2013}
-\\
+Thörnblad et. al. 2009 concludes that when a cell is part of an assembly flow, the targeting of due dates instead of makespan is to prefer. The reason is that the focusing on makespan runs the risk of exacerbating an already unreliable flow.\cite{thornblad_2013} However, the assembly we perform is not a part of a flow, and thus we do not concern ourselves with maintaining a stable flow through the cell, but only to optimize the assembly in the cell.
 
-[Garey] shows that job shop problems for size $m \geq 2$ and $n \geq 3$ are NP-complete \cite{garey_1976}
+Yuan and Xu 2013 states that constraint programming is only effective on small problems of flexible job shop scheduling. In order to effectively solve problems of larger size they suggest to use methods such as large neighbourhood search(LNS) or iterative flattening search. They also show that LNS together with Hybrid Harmonic Search produces good results.\cite{yuan_2013}
 \\
+Unfortunately MiniZinc does not support the implementation of custom searches such as LNS. Therefore we try to solve the problem of ineffectiveness by using filter such as them presented by Vilím in \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} and \cite{VilimBartak2002Sequence}.
+\\\\
+Unfortunately, not many comparisons between MiniZinc solvers where found. There is an annual competition held by NICTA where solvers can compete, this is the most comprehensive documentation of the performance of the solvers we have found. Unfortunately, they only present which solver wins a category and no statistics are presented. Hence, no deeper comparison can be made from the result. In the latest competition held, 2014, or-tools won three out of the four gold medals, Opturion CPX won all four silver medals and Choco won three out of the four bronze medals.\cite{mz_result_2014}
 
-[yuan] says pure CP is only effective on small problems of FJSP. To effectively perform larger sizes, methods such as discrepancy search, large neighborhood search(LNS) or iterative flattening search. It also shows LNS together with Hybrid Harmonic Search produces good results.\cite{yuan_2013}
-\\
+When presenting MiniZinc for the first time, initial tests was also presented comparing, amongst others, G12/FD, Gecode using FlatZinc code and native Gecode. The tests shows that MiniZinc was competitive with the native Gecode model and on average the Gecode front-end for FlatZinc was about 200ms faster than the G12/FD.\cite{mz_paper}
+
+Another comparison found was done by Becket et. el. 2008 where they tested 10 solver on 12 problems. Unfortunately, the only solver tested there that we also used in this thesis is the G12/FD solver. So comparison with our results is hard. Although they did not draw any conclusions, G12/FD seem to fear relatively well compared to the other solvers tested.\cite{nicta_2964}
+
 
 [ejenstam]\cite{ejenstam_2014}
 
-[andra test med solvers]\\
-During construction of MiniZinc, initial tests comparing, amongst others, G12 and Gecode\cite{mz_paper}
-
-Compared solvers included in MiniZinc, including G12/FD, unfortunately no more that we use\cite{nicta_2964}
 
 \section{Report structure}

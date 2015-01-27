@@ -1,17 +1,16 @@
 Introduction | Started
 	Background | Draft
-	Problem specification | TODO
+	Problem specification | Draft
 	Related work | Started
 	Report structure | TODO
 
-Approach | Started
+Approach | Draft
 	Constraint Programming | Draft
 		Constriants | Draft
 		Global Constraints | Draft
 		Solver | Draft
-		Reified | TODO
-	Job-shop scheduling | TODO
-		Flexible Job-shop | TODO
+		Reified | Draft
+	Job-shop scheduling | Draft
 	MiniZinc | Draft
 	Solvers | Draft
 		G12 | Draft

@@ -1,6 +1,5 @@
 \chapter{Introduction} 
 
-\section{Background}
 More and more of the production in today's society is getting automated. Manufacturers want to cut cost and make the production more effective by eliminating the human work and replace it with robots. But there are drawbacks; robots are expensive and robots does not have the versatility of a human. This puts pressure on the robot manufacturers to develop robots that are more versatile. Thus eliminating the need for manufacturers to have multiple robots to do multiple tasks and thereby lowering costs. And also by making the robots more versatile the close the gap of what a human and robots are able to do.
 
 Current robot setups usually have one robot performing one task all the time, as oppose to flexible robots which will be performing many different tasks and assemblies. This poses the demand for the scheduling of such robots to be flexible as well. A scheduling of a robot can be a time consuming task. Since manufacturers want as effective assemblies as possible, it can take from days to weeks to perfect an assembly schedule. This is not feasible if you want to use the robot for many different tasks and assemblies. In this thesis we would like to try and automate this scheduling process in order to cut down on the scheduling time. To accomplish this we will be using Constraint programming, as it provides a general interface to solve problems without needing to build a complete framework from scratch. Also, scheduling is a classical constraint problem, thus constraint programming suits this problem well.
@@ -20,15 +19,17 @@ Thörnblad et. al. 2009 concludes that when a cell is part of an assembly flow, 
 Yuan and Xu 2013 states that constraint programming is only effective on small problems of flexible job shop scheduling. In order to effectively solve problems of larger size they suggest to use methods such as large neighbourhood search(LNS) or iterative flattening search. They also show that LNS together with Hybrid Harmonic Search produces good results.\cite{yuan_2013}
 \\
 Unfortunately MiniZinc does not support the implementation of custom searches such as LNS. Therefore we try to solve the problem of ineffectiveness by using filter such as them presented by Vilím in \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} and \cite{VilimBartak2002Sequence}.
+
+Ejenstam 2014 conducted a similar study also on the YuMi\textsuperscript\textregistered robot. They used Google or-tools to write the model and also implemented \emph{Systematic Tree Search}, \emph{Random Restart} and \emph{Local Search} and compared the results of using different combinations of them. The case study and goal of the study is different from this thesis and therefore the resulting models differs, as is discussed in chapter \ref{cha:discuss}. In the study they conclude that \emph{Systematic Tree Search} combined with \emph{Random Restart} produced schedules with better results than their reference solution.\cite{ejenstam_2014}
 \\\\
 Unfortunately, not many comparisons between MiniZinc solvers where found. There is an annual competition held by NICTA where solvers can compete, this is the most comprehensive documentation of the performance of the solvers we have found. Unfortunately, they only present which solver wins a category and no statistics are presented. Hence, no deeper comparison can be made from the result. In the latest competition held, 2014, or-tools won three out of the four gold medals, Opturion CPX won all four silver medals and Choco won three out of the four bronze medals.\cite{mz_result_2014}
 
 When presenting MiniZinc for the first time, initial tests was also presented comparing, amongst others, G12/FD, Gecode using FlatZinc code and native Gecode. The tests shows that MiniZinc was competitive with the native Gecode model and on average the Gecode front-end for FlatZinc was about 200ms faster than the G12/FD.\cite{mz_paper}
 
-Another comparison found was done by Becket et. el. 2008 where they tested 10 solver on 12 problems. Unfortunately, the only solver tested there that we also used in this thesis is the G12/FD solver. So comparison with our results is hard. Although they did not draw any conclusions, G12/FD seem to fear relatively well compared to the other solvers tested.\cite{nicta_2964}
-
-
-[ejenstam]\cite{ejenstam_2014}
+Another comparison found was done by Becket et. al. 2008 where they tested 10 solver on 12 problems. Unfortunately, the only solver tested there that we also used in this thesis is the G12/FD solver. So comparison with our results is hard. Although they did not draw any conclusions, G12/FD seem to fair relatively well compared to the other solvers tested.\cite{nicta_2964}
 
 
 \section{Report structure}
+First we will present the approach we have taken in the thesis and present the relevant background information in chapter \ref{cha:approach}. Then we will present an in depth view of the model created in chapter \ref{cha:model}. In chapter \ref{cha:assembly} we will present the case study used in the thesis. In chapter \ref{cha:eval} we will present the setup used to evaluate the model and the result of the evaluation. In chapter \ref{cha:discuss} we will discuss the results and we will come to a conclusion in chapter \ref{cha:conc}.
+\\\\
+Lastly we have two appendices. Appendix \ref{app:ext_mod} contains part of the model which is not as crucial to the solving of the problem, but is still a part of the model. In appendix \ref{app:tool_manuals} we present all the tools used, which are free for anyone to use, and where to acquire them.

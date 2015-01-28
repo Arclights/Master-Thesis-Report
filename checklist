@@ -1,8 +1,8 @@
-Introduction | Started
+Introduction | Draft
 	Background | Draft
 	Problem specification | Draft
-	Related work | Started
-	Report structure | TODO
+	Related work | Draft
+	Report structure | Draft
 
 Approach | Draft
 	Constraint Programming | Draft
@@ -32,7 +32,7 @@ Model | Draft
 		Temporal filter | Draft
 		Predecessor filter | Draft
 
-Assembly | TODO
+Case Study | TODO
 
 Evaluation | TODO
 	The setup | Started

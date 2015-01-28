@@ -1,8 +1,21 @@
 \chapter{Evaluation}\label{cha:eval}
-The evaluation of the model
+Here we will present the evaluation of the model. Each model was given a time limit of 4 hours to complete as it seemed long enough to guarantee us a result from all the solver, but short enough to be manageable to test. But as can be seen in section \ref{sec:res}, this was not the case. In the case where the solvers could produce a result in the given time frame the solvers where run 10 times and the average time was used.
+
+Originally, the 1.6 version of MiniZinc was used. But during the making of the model version 2.0 was released. According to NICTA, the 2.0 version is a complete rewrite of the MiniZinc-to-FlatZinc comipiler but that the resulting FlatZinc file is compatile with 1.6 solvers, and therefore no changes should be required for the solvers.\cite{mz2} We therefore thought it could be of interest to compare how the 2.0 version performed compare to the 1.6 version. During the test phase of the thesis version 2.0.1 was released that should fix some bugs in 2.0.\cite{mz2_changelog} Therefore, version 2.0.1 is used.
+
+Apart from measuring the the time, we also analysed the resulting FlatZinc file to see if we could see any correlation between the running time and the data run. The data extracted was the number of integer and boolean variables, the number of arrays, the number of constraints and the percentage of constraints that where reified. We measure the reifieds since even if we try to avoid direct reifieds in the MiniZinc code, the FlatZinc could still contain reified depending on how it translates the MiniZinc code.
+
+In order to see if the filtering we introduced made any difference, we also measure the different combinations of the filters and the absence of filters.
+
+Because of all the combinations of parameters we want to test, there will be 8 test cases for each solver.
+
+What we want to achieve is to get the solver to reach the optimal solution, that is what we mean when we say result.
 
 \section{The Setup}
-
+The computer used to run the solvers was equipped with an Intel i7 2.8GHz quad core CPU and 8GB DDR3 1333MHz memories running Mageia 4.
+\\\\
+The versions of each of the solvers are presented in the table below.
+\begin{table}[h]
 \begin{tabular}{l|l}
 Solver                    & Version \\ \hline
 G12/FD                    & 1.6.0\\
@@ -13,34 +26,34 @@ Opturion CPX              & 1.0.2 \\
 \multirow{2}{*}{Chcoco 3} & Solver: 3.2.2 \\
                           & Parser: 3.2.0
 \end{tabular}
+\end{table}
+Note that for Choco3, the solver and parser has different version number. This is because they are not distributed together and therefore have slightly different version numbers.
 
-\begin{landscape}
-\hspace*{\fill}
-\noindent\input{Tables/results_g12}
-\hspace*{\fill}
-\\
-\hspace*{\fill}
+The versions of the solvers used are the latest as of December 2014.
+
+\section{The results}\label{sec:res}
+We will present the result for each of the solvers and give some comments about the results.
+
+
+\subsection{G12/FD}
+\input{Tables/results_g12}
+
+For G12/FD we could not get any results for any of the tests despite using filter. Comparing 1.6 and 2.0.1 shows that there is an increase in variables and a decrease in constraints for the 2.0.1 version. Also interesting to note is that in version 2.0.1, the domain constraints does not introduce any new constraints. This should be expected for filters. This is not the case for 1.6. The filters does not seem introduce any new reified constraints as the percentage of reified constraints decrease as more filters are introduced.
+
+\subsection{JaCoP}
 \input{Tables/results_jacop}
-\hspace*{\fill}
-\\
-\hspace*{\fill}
+
+\subsection{Gecode}
 \input{Tables/results_gecode}
-\hspace*{\fill}
-\\
-\hspace*{\fill}
+
+\subsection{or-tools}
 \input{Tables/results_or}
-\hspace*{\fill}
-\\
-\hspace*{\fill}
+
+\subsection{Opturion CPX}
 \input{Tables/results_cpx_nws}
-\hspace*{\fill}
-\\
-\hspace*{\fill}
+
 \input{Tables/results_cpx_ws}
-\hspace*{\fill}
-\\
-\hspace*{\fill}
+
+\subsection{Choco3}
 \input{Tables/results_choco}
-\hspace*{\fill}
-\end{landscape}
 

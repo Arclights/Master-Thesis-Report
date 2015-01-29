@@ -12,7 +12,7 @@ Because of all the combinations of parameters we want to test, there will be 8 t
 What we want to achieve is to get the solver to reach the optimal solution, that is what we mean when we say result.
 
 \section{The Setup}
-The computer used to run the solvers was equipped with an Intel i7 2.8GHz quad core CPU and 8GB DDR3 1333MHz memories running Mageia 4.
+The computer used to run the solvers was equipped with an Intel i7 2.8GHz quad core CPU, 8GB DDR3 1333MHz memory and running Mageia 4.
 \\\\
 The versions of each of the solvers are presented in the table below.
 \begin{table}[h]
@@ -31,29 +31,36 @@ Note that for Choco3, the solver and parser has different version number. This i
 
 The versions of the solvers used are the latest as of December 2014.
 
+As mentioned before, the versions of MiniZinc tested are $1.6$ and $2.0.1$.
+
 \section{The results}\label{sec:res}
-We will present the result for each of the solvers and give some comments about the results.
+The results presented in the tables \ref{tab:res_g12} to \ref{tab:res_choco} are the analysis of the FlatZinc files. The tests are grouped into 4 categories of runs; with predecessor filter and domain filter, with only predecessor filter, with only domain filter and with no filter at all. In each of these groups there are two groups, one for each version we tests, i.e. $1.6$ and $2.0.1$
+
+In the tables presented the filter names has been shortened to \emph{pred} and \emph{dom}. \emph{pred} means the predecessor filter and \emph{dom} means the domain filter. 
 
 
-\subsection{G12/FD}
 \input{Tables/results_g12}
 
-For G12/FD we could not get any results for any of the tests despite using filter. Comparing 1.6 and 2.0.1 shows that there is an increase in variables and a decrease in constraints for the 2.0.1 version. Also interesting to note is that in version 2.0.1, the domain constraints does not introduce any new constraints. This should be expected for filters. This is not the case for 1.6. The filters does not seem introduce any new reified constraints as the percentage of reified constraints decrease as more filters are introduced.
-
-\subsection{JaCoP}
 \input{Tables/results_jacop}
 
-\subsection{Gecode}
+\input{Tables/results_cpx}
+
 \input{Tables/results_gecode}
 
-\subsection{or-tools}
 \input{Tables/results_or}
 
-\subsection{Opturion CPX}
-\input{Tables/results_cpx_nws}
-
-\input{Tables/results_cpx_ws}
-
-\subsection{Choco3}
 \input{Tables/results_choco}
 
+If one just do a quick comparison of the numbers in the tables without doing any deeper analysis, one can see that the results from Gecode, or-tools and Choco3, shown in tables \ref{tab:res_gecode}, \ref{tab:res_or} and \ref{tab:res_choco}, respectively, are identical. This hints that the FlatZinc files for these solvers should be very similar. And indeed, if one compares the FlatZinc files for these three solvers for one of the cases, they are as good as identical. The difference between them is the naming of some constraints and sometimes the placement in the file.
+
+We will present some more tables that show the change in the values. The first 4 columns are grouped by the version of MiniZinc and in each of those groups we show the change in the values if each of the filters are added. The last column shows the change in values if going from using the $1.6$ version to using the $2.0.1$ version. The values presented are averages. For example, the value for when adding the domain filter for version $1.6$ is the average of the changes from not using any filters to using the domain filter and from using the predecessor filter to using the domain and predecessor filters. The average for the last column is just the average of the changes for all cases when switching from $1.6$ to $2.0.1$
+
+\input{Tables/results_diff_g12}
+
+\input{Tables/results_diff_jacop}
+
+\input{Tables/results_diff_cpx}
+
+\input{Tables/results_diff_gecode_or_choco}
+
+For G12/FD we could not get any results for any of the tests despite using filter. Comparing 1.6 and 2.0.1 shows that there is an increase in variables and a decrease in constraints for the 2.0.1 version. Also interesting to note is that in version 2.0.1, the domain constraints does not introduce any new constraints. This should be expected for filters. This is not the case for 1.6. The filters does not seem introduce any new reified constraints as the percentage of reified constraints decrease as more filters are introduced.

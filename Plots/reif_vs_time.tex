@@ -1,0 +1,7 @@
+\begin{tikzpicture}
+\begin{semilogyaxis}[
+    xticklabel=\pgfmathprintnumber{\tick}\,\%
+]
+\addplot+[only marks] table[x=int,y=time] {Plots/reif_vs_time.dat};
+\end{semilogyaxis}
+\end{tikzpicture}

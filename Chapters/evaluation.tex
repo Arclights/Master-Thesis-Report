@@ -9,13 +9,14 @@ In order to see if the filtering we introduced made any difference, we also meas
 
 Because of all the combinations of parameters we want to test, there will be 8 test cases for each solver.
 
-What we want to achieve is to get the solver to reach the optimal solution, that is what we mean when we say result.
+What we want to achieve is to get the solver to reach the optimal solution and conclude that it is the optimal solution, that is what we mean when we say result.
 
 \section{The Setup}
 The computer used to run the solvers was equipped with an Intel i7 2.8GHz quad core CPU, 8GB DDR3 1333MHz memory and running Mageia 4.
 \\\\
 The versions of each of the solvers are presented in the table below.
 \begin{table}[h]
+\centering
 \begin{tabular}{l|l}
 Solver                    & Version \\ \hline
 G12/FD                    & 1.6.0\\
@@ -31,12 +32,12 @@ Note that for Choco3, the solver and parser has different version number. This i
 
 The versions of the solvers used are the latest as of December 2014.
 
-As mentioned before, the versions of MiniZinc tested are $1.6$ and $2.0.1$.
+As mentioned before, the versions of MiniZinc tested are 1.6 and 2.0.1.
 
 \section{The results}\label{sec:res}
-The results presented in the tables \ref{tab:res_g12} to \ref{tab:res_choco} are the analysis of the FlatZinc files. The tests are grouped into 4 categories of runs; with predecessor filter and domain filter, with only predecessor filter, with only domain filter and with no filter at all. In each of these groups there are two groups, one for each version we tests, i.e. $1.6$ and $2.0.1$
+The results presented in the tables \ref{tab:res_g12} to \ref{tab:res_choco} are the analysis of the FlatZinc files. The tests are grouped into 4 categories of runs; with predecessor filter and temporal filter, with only predecessor filter, with only temporal filter and with no filter at all. In each of these groups there are two groups, one for each version we tests, i.e. 1.6 and 2.0.1.
 
-In the tables presented the filter names has been shortened to \emph{pred} and \emph{dom}. \emph{pred} means the predecessor filter and \emph{dom} means the domain filter. 
+In the tables presented the filter names has been shortened to \emph{Pred} and \emph{Temp}. \emph{Pred} means the predecessor filter and \emph{Temp} means the temporal filter. We will also use two additional notations in the rime rows; "-" and "!". "-" means that the run did not complete within the given time frame. "!" means that the solver raised an error when reading the FlatZinc file.
 
 
 \input{Tables/results_g12}
@@ -53,7 +54,25 @@ In the tables presented the filter names has been shortened to \emph{pred} and \
 
 If one just do a quick comparison of the numbers in the tables without doing any deeper analysis, one can see that the results from Gecode, or-tools and Choco3, shown in tables \ref{tab:res_gecode}, \ref{tab:res_or} and \ref{tab:res_choco}, respectively, are identical. This hints that the FlatZinc files for these solvers should be very similar. And indeed, if one compares the FlatZinc files for these three solvers for one of the cases, they are as good as identical. The difference between them is the naming of some constraints and sometimes the placement in the file.
 
-We will present some more tables that show the change in the values. The first 4 columns are grouped by the version of MiniZinc and in each of those groups we show the change in the values if each of the filters are added. The last column shows the change in values if going from using the $1.6$ version to using the $2.0.1$ version. The values presented are averages. For example, the value for when adding the domain filter for version $1.6$ is the average of the changes from not using any filters to using the domain filter and from using the predecessor filter to using the domain and predecessor filters. The average for the last column is just the average of the changes for all cases when switching from $1.6$ to $2.0.1$
+As can be seen in the times or the runs, not many of the runs completed in time. Only 9 runs completed by 3 solvers. Interesting to note is the very varying times of the results. It ranges from 60 milliseconds to 16 minutes. Almost no solver could solve the problem using MiniZinc 2.0.1, two of them got errors reading the FlatZinc file, despite its claimed backwards compatibility, and most others took too long time solving it. But, interestingly Gecode manages to solve the problem using 2.0.1, even faster than using 1.6, and even being the fastest to solve the problem of all the runs in just 60 milliseconds.
+\\\\
+By our definition of a result, these are the runs that found the optimal solution and ended the search by concluding that the optimal solution was found. This means that there are other runs that still produced results, sometimes even the optimal, but did not end the search in time and therefore not qualifying as a result.
+
+The G12/FD runs using predecessor filter with version 1.6, using predecessor filter with version 1.6 and using predecessor filter with version 2.0.1 all finds solutions, although non of them are the optimal.
+
+The JaCoP runs using predecessor and temporal filter with version 2.0.1 and using predecessor filter with version 2.0.1 both finds all the solutions, including the optimal solution, immediately. This is also the case for JaCoP using predecessor filter with version 1.6.
+
+The Gecode run using predecessor filter with version 2.0.1 finds three solution immediately of which one is the optimal. Interestingly, the run using no filter also with version 2.0.1 finds only one solution and that one is the optimal in roughly the same time.
+
+The Choco3 runs using the predecessor and temporal filters and the ones using predecessor filter, independent of version, all finds two solutions immediately.
+
+We should mention that due to when some of the tests were conducted, some of the tests ran for much longer than the time limit set at 4 hours. And although not all produced results even when left for more than 4 hours, some managed to produce results. One that could be mentioned is Opturion CPX that in some cases took around 6 hours to complete.
+
+We should also mention that Opturion CPX has the option to use the search strategy "warm start". This was tested but, as with regular complete search, did not produce a result within the time frame and thus we have not specifically included the results here.
+\\\\
+We will present some more tables that show the change in the values. The first 4 columns are grouped by the version of MiniZinc and in each of those groups we show the change in the values if each of the filters are added. The last column shows the change in values if going from using the 1.6 version to using the 2.0.1 version. The values presented are averages. For example, the change for when adding the temporal filter for version 1.6 is the average of the changes from not using any filters to using the temporal filter and from using the predecessor filter to using the temporal and predecessor filters. The average for the last column is just the average of the changes for all cases when switching from 1.6 to 2.0.1.
+
+As mentioned before, the results for Gecode, or-tools and Choco3 are identical, and thus we grouped them together into one table below.
 
 \input{Tables/results_diff_g12}
 
@@ -63,4 +82,44 @@ We will present some more tables that show the change in the values. The first 4
 
 \input{Tables/results_diff_gecode_or_choco}
 
-For G12/FD we could not get any results for any of the tests despite using filter. Comparing 1.6 and 2.0.1 shows that there is an increase in variables and a decrease in constraints for the 2.0.1 version. Also interesting to note is that in version 2.0.1, the domain constraints does not introduce any new constraints. This should be expected for filters. This is not the case for 1.6. The filters does not seem introduce any new reified constraints as the percentage of reified constraints decrease as more filters are introduced.
+When we look at the change in values for the filters we see that the predecessor filter for G12/FD using version 1.6 increases the number of variables, both integer and boolean, as opposed to the other solvers which does not change the number of variables at all. Except for Opturion CPX, which adds a very small amount of variables. When using G12/FD with 2.0.1 the predecessor filter increases the number of integer variables as well, as opposed to the other solvers decreasing the number of integer variables. Again except Optuion CPX who increases the number a very small amount.
+
+Both the predecessor filter and temporal filter increases the number of constraints quiet a lot, except for Opturion CPX where the change is not that great. And the largest increase is for the temporal constraint, which lies around 200\% for all the solvers. This can be compared to using 2.0.1, where the change is 0\%. The same can be observed for the predecessor filter, but here we still have a small change in the number of constraints, but not as large as with 1.6. The temporal filter also decreases the number of variables in 2.0.1, as opposed to 1.6 where it did not change that number at all. When using the temporal filter with Opturion CPX with 2.0.1, the filter helps reduce all the values, and quite dramatically so, all except reified lies around 67\%.
+\\\\
+Compared to 1.6, 2.0.1 seems to increase the number of integer variables by a lot, around 50\%. And once again except for Opturion CPX where it decreases by around 30\%. The same goes for boolean variables, but in the other direction. For all solvers, including Opturion CPX, the number of boolean variables decreases by around 33\%. The number of arrays also increases for all the solvers, especially for Opturion CPX, where the increase is a staggering almost 32000\%. 2.0.1 also decreases the number of constraints by about 48\% on average for all the solvers. But despite removing constraints, the amount of reified constraints increases by about 40\%, except for Opturion CPX where the change is only almost 0.2\%.
+\\\\
+Unfortunately no solver was able to run both the 1.6 version and the 2.0.1 version. Therefore we cannot make a good comparison and make a definitive statement about which version is the most effective.
+
+\begin{figure}
+\centering
+\input{Plots/int_vs_time}
+\caption{\# integer variables vs time}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{Plots/bool_vs_time}
+\caption{\# boolean variables vs time}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{Plots/arr_vs_time}
+\caption{\# arrays vs time}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{Plots/const_vs_time}
+\caption{\# constraints vs time}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{Plots/reif_vs_time}
+\caption{\% reified vs time}
+\end{figure}
+
+Since we get identical values for three solvers which solves, or not, the problem in very different times. 
+
+same values for three different solver giving totally different times -> no link between FlatZinc and values

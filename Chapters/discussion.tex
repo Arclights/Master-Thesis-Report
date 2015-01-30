@@ -1,6 +1,12 @@
 \chapter{Discussion}\label{cha:discuss}
 The discussion of the results
 
+As mentioned, in 1.6 the filters increase the number of constraints quite a bit. But the number of reified constraints are decreasing by quite a lot as well. This seems to indicate that the filters does not introduce more reified constraints, which is good.
+
+Decrease in constraints could be connected to the difference in number of constraint when applying filters in 1.6 vs 2.0.1.
+
+in 2.0.1 temp filter adds no constraints, pred filter adds small amount -> hints of pruning instead of relying on the solver to prune
+
 Concurrent tasks vs. en task med två maskiner.
 Två tasks ger mer generella constraints, man kan säga att all tasks tar upp en maskin alltid och att man begränsar det med ett constraint att vissa måste ske samtidigt. Man kan ha constraintet att alla tasks kan ha en predecessor.
 En task gör att man måste kunna säga att tasks kan ta upp till så många maskiner som finns tillgängliga -> fler constraints. Man måste kunna säga att en task ska kunna ha flera predecessors -> fler constraints.

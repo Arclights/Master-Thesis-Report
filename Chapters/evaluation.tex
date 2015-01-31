@@ -90,36 +90,41 @@ Compared to 1.6, 2.0.1 seems to increase the number of integer variables by a lo
 \\\\
 Unfortunately no solver was able to run both the 1.6 version and the 2.0.1 version. Therefore we cannot make a good comparison and make a definitive statement about which version is the most effective.
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \input{Plots/int_vs_time}
 \caption{\# integer variables vs time}
+\label{fig:int_vs_time}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \input{Plots/bool_vs_time}
 \caption{\# boolean variables vs time}
+\label{fig:bool_vs_time}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \input{Plots/arr_vs_time}
 \caption{\# arrays vs time}
+\label{fig:arr_vs_time}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \input{Plots/const_vs_time}
 \caption{\# constraints vs time}
+\label{fig:const_vs_time}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \input{Plots/reif_vs_time}
 \caption{\% reified vs time}
+\label{fig:reif_vs_time}
 \end{figure}
 
-Since we get identical values for three solvers which solves, or not, the problem in very different times. 
+In figures \ref{fig:int_vs_time}, \ref{fig:bool_vs_time}, \ref{fig:arr_vs_time}, \ref{fig:const_vs_time} and \ref{fig:reif_vs_time} we plot the values int tables \ref{tab:res_g12}, \ref{tab:res_jacop}, \ref{tab:res_cpx}, \ref{tab:res_gecode}, \ref{tab:res_or} and \ref{tab:res_choco} versus time. The time is on the y-axis and is logarithmic.
 
-same values for three different solver giving totally different times -> no link between FlatZinc and values
+As can be seen in figures \ref{fig:int_vs_time}, \ref{fig:bool_vs_time}, \ref{fig:arr_vs_time}, \ref{fig:const_vs_time} and \ref{fig:reif_vs_time}, we cannot conclude any relation between the time for the solution and the number of either integer, booleans, arrays, constraints or the percentage of reified constraints. This can also be seen if we study the results for Gecode, or-tools and Choco3. Since they get the same values for the FlatZinc files but completely different times, we can conclude that our data does not show any relation between time and those values.

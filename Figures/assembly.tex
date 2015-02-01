@@ -1,0 +1,65 @@
+\documentclass{standalone}
+\usepackage{standalone}
+\begin{document}
+\tikzstyle{task} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\begin{tikzpicture}[node distance=2cm]
+\node (1) [task] {Take top};
+\node (2) [task, right of=1, xshift=2.5cm] {Put top in fixture};
+
+\node (3) [task, below of=1] {Take button};
+\node (4) [task, below of=2] {Mount button on top};
+
+\node (5) [task, xshift=2.5cm, right of=4] {Angle top-button};
+
+\node (6) [task, right of=5, xshift=3cm, yshift=1cm] {Lift top-button, hold};
+\node (7) [task, below of=6] {Lift top-button, support};
+
+\node (8) [task, right of=7, xshift=3.5cm, yshift=1cm] {Turn top-button};
+
+\node (10) [task, below of=8] {Mount ring, hold};
+\node (11) [task, below of=10] {Mount ring, mount};
+
+\node (9) [task, below of=11] {Take ring};
+
+\node (12) [task, left of=11, xshift=-4cm, yshift=1cm] {Fixate top-button-ring};
+
+\node (13) [task, left of=12, xshift=-10cm] {Put top-button-ring in top tray};
+\node (14) [task, below of=13] {Take top-button-ring from top tray};
+
+\node (15) [task, below of=9, yshift=-1.5cm] {Take switch};
+\node (16) [task, left of=15, xshift=-3cm] {Mount switch};
+
+\node (17) [task, below of=15] {Take bottom};
+\node (18) [task, below of=16] {Put button in fixture};
+
+\node (19) [task, left of=16, xshift=-3.5cm] {Take button-switch};
+
+\node (20) [task, left of=19, xshift=-5cm] {Put bottom-switch on table};
+
+\node (21) [task, above of=20] {Mount top-button-ring on bottom-switch};
+
+\draw [arrow] (1) -- (2);
+\draw [arrow] (3) -- (4);
+\draw [arrow] (2) -- (4);
+\draw [arrow] (4) -- (5);
+\draw [arrow] (5) -- (6);
+\draw [arrow] (5) -- (7);
+\draw [arrow] (7) -- (8);
+\draw [arrow] (6) -- (8);
+\draw [arrow] (8) -- (10);
+\draw [arrow] (10) -- (12);
+\draw [arrow] (9) -- (11);
+\draw [arrow] (11) -- (12);
+\draw [arrow] (12) -- (13);
+\draw [arrow] (13) -- (14);
+\draw [arrow] (15) -- (16);
+\draw [arrow] (17) -- (18);
+\draw [arrow] (18) -- (16);
+\draw [arrow] (16) -- (19);
+\draw [arrow] (19) -- (20);
+\draw [arrow] (20) -- (21);
+\draw [arrow] (14) -- (21);
+
+\end{tikzpicture}
+\end{document}

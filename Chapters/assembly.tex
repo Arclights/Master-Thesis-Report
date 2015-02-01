@@ -1,2 +1,62 @@
 \chapter{Case Study}\label{cha:assembly}
-Describing our assembly
+In order to develop and test the model, we have chosen to focus on one case study. In this case study the robot is assembling an enclosed emergency stop button used in industrial environments[bild?]. This assembly is composed of 5 components; a top, a button, a ring, a switch and a bottom. The button needs to be inserted in the top and then the ring needs to be screwed onto the underside of the button in order to secure it to the top. The switch needs to be mounted in the bottom and lastly the top part, with button and ring, needs to be mounted on the bottom, with the switch. For a exploded-view of the assembly, see figure [??].
+
+The assembly includes objects such as trays and fixtures. A tray is a holder where components reside until they are needed in the assembly. A fixture is a holder in which components can be put and another components can be mounted on it.
+
+21 steps has been identified as steps needed for the assembly and they are taken from a video of an existing assembly created by hand. The steps are as follows:
+
+\begin{description}
+\item[Take top] Takes the top component from its tray
+
+\item[Put top in fixture] Puts the taken top component and puts it in a fixture
+
+\item[Take button] Takes the button component from its tray
+
+\item[Mount button on top] Mounts the taken button component onto the top component in a fixture
+
+\item[Angle top-button] Angles the assembly that is the top and button component, from here on called top-button
+
+\item[Lift top-button, hold top button] Lifts the top-button by holding the button
+
+\item[Lift top-button, support] Lifts the top-button by supporting the top from underneath
+
+\item[Turn top-button] Turns the top-button by holding the button
+
+\item[Take ring] Takes the ring from its tray
+
+\item[Mount ring on top-button, hold] Mounts the ring on top-button by holding the button
+
+\item[Mount ring on top-button, mount] Mounts the ring on the top-button holding and screwing the ring. The assembly created by the top-button and the ring is here on after called top-button-ring
+
+\item[Fixate top-button-ring] Fixates the top-button ring using the side of a fixture in order to get it straight.
+
+\item[Put top-button-ring in top tray] The top-button-ring is put in the top tray in order to put it away for a while and then to be picked up later.
+
+\item[Take top-button-ring from top tray] Takes the top-button-ring from the top tray where it was previously put.
+
+\item[Take bottom] Takes the bottom component from its tray.
+
+\item[Put bottom in fixture] Puts the bottom component in a fixture.
+
+\item[Take switch] Takes the switch component from its tray.
+
+\item[Mount switch in bottom] Mounts the switch on the bottom in the fixture the bottom was put in. The created assembly created here will here on after be called bottom-switch.
+
+\item[Take bottom-switch] Takes the created bottom-switch from the fixture it was created in.
+
+\item[Put bottom-switch on table] Puts the bottom-switch on the table.
+
+\item[Mount top-button-ring on bottom-switch] Mounts the top-button-ring on the button-switch on the table.
+\end{description}
+
+\noindent Most of the steps are self explanatory, but there are a few steps which are quite special that might need some more explanation. In steps \textbf{Mount ring on top-button, hold} and \textbf{Mount ring on top-button, mount} we have the button component put in the hole of the top and we need to secure it using the ring component. To do this we utilize something that is special for YuMi\textsuperscript\textregistered, we will use only the two arms in order to mount the ring. We will do it mid air with one arm holding the top-button by holding the button part, having it upside-down compared to how it was in the fixture, and with the other arm screwing the ring in place. In order to prepare for this, we start at the end of step \textbf{Mount button on top}, where we just created the assembly top-button, but the button is only loosely sitting in the hole of the top. We angle the assembly in task \textbf{Angle top-button} about 45$^\circ$ in order to create a gap under the assembly so the other arm can reach under the assembly and help lift it from the fixture in tasks \textbf{Lift top-button, support} and \textbf{Lift top-button, hold top button}. Finally we rotate the top-button by only holding it with one arm in the button part of the assembly and are now ready for the ring to be mounted.
+It should be noted that since the operations of lifting the top-button and mounting the ring takes two arms and we have here split the operations into two tasks each, one for each arm, the tasks \textbf{Mount ring on top-button, hold} and \textbf{Mount ring on top-button, mount} needs to be performed at the same time. The same goes for  \textbf{Lift top-button, support} and \textbf{Lift top-button, hold top button}.
+
+\begin{landscape}
+\begin{figure}
+\include{Figures/assembly}
+\caption{The case study assembly}
+\end{figure}
+\end{landscape}
+
+%\include{Tables/assembly_steps}

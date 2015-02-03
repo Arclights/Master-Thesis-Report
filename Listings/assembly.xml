@@ -1,0 +1,52 @@
+<Assembly>
+	<Output id="Output"/>
+
+	<Tray id="top-tray"/>
+
+	<Fixture id="Front fixture"/>
+
+	<Component id="Top"/>
+	<Component id="Button"/>
+	<Component id="Top-Button"/>
+
+	<Subcomponents id="Top-Button">
+		<Component id="Top"/>
+		<Component id="Button"/>
+	</Subcomponents>
+
+	<Tool id="tool1"/>
+	<Tool id="tool2"/>
+
+	<Machine id="m1"/>
+
+	<Task id="Mount button on top" Duration="25">
+		<Tray id="top-tray"/>
+		<Fixture id="Front fixture"/>
+		<Component id="Top"/>
+		<Component id="Button"/>
+		<ComponentCreated id="Top-Button"/>
+		<ToolNeeded id="tool1"/>
+		<Action id="Mounting"/>
+	</Task>
+
+	<OrderedGroup>
+		<Task id="Angle top-button"/>
+		<Task id="Lift top-button, hold top-button"/>
+		<Task id="Turn top-button"/>
+	</OrderedGroup>
+
+	<ConcurrentGroup>
+		<Task id="Lift top-button, hold top-button"/>
+		<Task id="Lift top-button, support"/>
+	</ConcurrentGroup>
+
+	<TasksOutOfRange id="m1">
+		<Task id="Take ring"/>
+		<Task id="Take bottom"/>
+		<Task id="Take switch"/>
+	</TasksOutOfRange>
+
+	<ToolChangeDurations>
+		<Change FromToolId="tool1" ToToolId="tool2" Duration="60"/>
+	</ToolChangeDurations>
+</Assembly>

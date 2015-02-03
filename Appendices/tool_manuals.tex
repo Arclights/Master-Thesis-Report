@@ -1,1 +1,31 @@
 \chapter{Tool Manuals}\label{app:tool_manuals}
+The data and tools used in this thesis are available for free to download and use at [link]. In this section we will describe the tools and data.
+
+\section{File Formats}
+There are two files used to produce the data for the solvers; it is the XML file that describes the assembly, and the time matrix file that describes the time it takes an arm to move between two tasks.
+\subsection{Assembly XML}
+In order to more easily create the data needed by the solvers, we created an XML format that that is more easy to deal with, that later is translated into MiniZinc code. For an outline of the XML format see listing \ref{list:xml}. Note that although it contain the basic parts, it is not a legit assembly XML file. For a complete version of the XML used in the thesis see [link].
+
+All ids must be unique within the area they are used. So for example there can only be one tray called "tray1", but there could be a fixture called "tray1" as well, but that would be bad practise since it would be confusing. Ids used must also be declared before they are used again. For example a component must be declared through a \texttt{Component} tag before being referenced to in a task. The number of declarations can theoretically be infinite, but since everything will be represented by integers in the model we are practically limited to the limit of integers.
+
+The \texttt{Output} tag, \texttt{Tray} tag and \texttt{Fixture} tag defines an output, a tray and a fixture respectively. The \texttt{Component} tag defines a component. All components used in the assembly needs to be defined, including the sub assemblies, since we treat sub assemblies as components in our model. We also describe what components make up a subcomponent using the \texttt{SubComponent} tag, it can both be regular components or sub assemblies.
+
+To define tools we use the \texttt{tool} tag and to define machines we use the \texttt{Machine tag}
+
+To define a task we use the \texttt{Task} tag. Together with the id we specify the length of the task in some time unit. Inside the tag we declare the properties of the task. If the task is performed in a tray, we specify the tray used. The same goes for fixture. Only one of them can be declared at a time, since we cannot be at a tray and a fixture at the same time. We specify which components are used in the task. There can be multiple components associated with a task, but it is limited by the number of machines available. Although the translation program does not check whether or not this limit is exceeded. If there is a component created at the task we specify if by the \texttt{ComponentCreated} tag. There can only be a most one component created per task and can only occur in tasks where the action is mounting, but this is not checked by the translator either. If there is a particular tool needed for the task we specify it with the \texttt{ToolNeeded} tag. We specify what kind of action a task is using the \texttt{Action} tag.
+
+To define a set of tasks that comes in an ordered group we use the \texttt{OrderedGroup} tag. The order of them listed in the XML file is the order in which they will be scheduled. There can be multiple ordered groups specified.
+
+To define a set of task that needs to be performed concurrently we use the \texttt{ConcurrentGroup} tag. The order in the XML does not matter.
+
+To define a set of tasks out of range of a machine we use the \texttt{TasksOutOfRange} tag. The id is the id of the machine that the tasks are out of range for. This is not declaring the machine, so it needs to be defined previously.
+
+To define the tool change durations we use the \texttt{ToolChangeDurations} tag and for each tool change we want to define we use the \texttt{Change} tag. And we supply the toll we are changing from and the tool we are changing to.
+
+\begin{figure}
+\lstinputlisting[label=list:xml,captionpos=b,caption=The basic parts of the assembly XML. This is not a legit assembly file. format,tabsize=3,frame=L,basicstyle=\footnotesize\ttfamily]{Listings/assembly.xml}
+\end{figure}
+\subsection{Time Matrix}
+\section{AssemblyConv}
+\section{SchedPrinter}
+\section{FZNstat}

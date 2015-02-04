@@ -1,5 +1,5 @@
 \chapter{Tool Manuals}\label{app:tool_manuals}
-The data and tools used in this thesis are available for free to download and use at [link]. In this section we will describe the tools and data.
+The data and tools used in this thesis are available for free to download and use at [link]. In this section we will describe the tools and data. All the tools are written in Java and are run using the \texttt{java -jar} command.
 
 \section{File Formats}
 There are two files used to produce the data for the solvers; it is the XML file that describes the assembly, and the time matrix file that describes the time it takes an arm to move between two tasks.
@@ -45,5 +45,10 @@ Mount button on top & 8 & 0 & \dots & 0
 \end{figure}
 
 \section{AssemblyConv}
+\texttt{AssemblyConv} is the program used to convert the XML file and the time matrix file into data for the solver. It takes the matrix file and the XML as arguments and produces a MiniZinc file. For a detailed description of the syntax run the program without parameters of with \texttt{-h} as parameter.
+
 \section{SchedPrinter}
+\texttt{SchedPrinter} is used for visualising the outputted assembly from the solvers. It creates a Gant diagram in ASCII and outputs it to a text file. It can be shown in a regular text editor. But make sure that text wrapping is turned of as it will interfere with the visualisation. It takes a text file containing the output from the solver. This can easily be obtained by piping the output from a solver into a file. The program also takes an argument whether the text file provided is from a JaCoP solver or some other solver [kolla upp!]. Since the other solver conform to the printing format set up in the model, while JaCoP formats its print out in its own format. For a detailed description of the syntax run the program without parameters of with \texttt{-h} as parameter.
+
 \section{FZNstat}
+To obtain the statistics used in chapter \ref{cha:eval} we use \texttt{FZNstat}. The program does not take any parameters but will go over all the \texttt{.fzn} files in the directory it is run in and produce a result file for each of the \texttt{.fzn} files. The names of the result files are the same as the \texttt{.fzn} files but with \texttt{\_stat} at the end. So for example \texttt{jacop.fzn} will get the result file \texttt{jacop\_stat}. The result files will contain a little bit more information about individual constraints than what was presented in chapter \ref{cha:eval}.

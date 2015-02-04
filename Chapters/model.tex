@@ -256,7 +256,7 @@ The tools used to generate the data used in this thesis are free to use and are 
     	\caption{The timeMatrix3D}
     	\label{fig:3d_matrix}
    \end{figure}
- For the model to decide how long a move between two tasks should be and if there should be a change of tool in between, a matrix is used, $timeMatrix3D$, see figure \ref{fig:3d_matrix}. This is a 3-dimensional matrix and contains the times for moving between all the tasks depending on what tool change occurs. On its y-axis it has the tasks to move from, on the x-axis the tasks to move to, and on the z-axis the different transitions between tools that can occur.
+ For the model to decide how long a move between two tasks should be and if there should be a change of tool in between, a matrix is used, $timeMatrix3D$, see figure \ref{fig:3d_matrix}. This is a 3-dimensional matrix and contains the times for moving between all the tasks depending on what tool change occurs. On its y-axis it has the tasks to move from, on the x-axis the tasks to move to, and on the z-axis the different transitions between tools that can occur. There are $nbrMachines$ more rows on the y-axis than there are columns on the x-axis. This is because we also account for the starting position of the machines, so each start task has move times associated with them for moving to the other tasks. As the matrix is constructed the way it is, there is no move times between start tasks. 
  \begin{equation}\label{eq:timeMatrixDepth}
  timeMatrixDepth = \frac{n^2 - n + 2}{2}, \; n = nbrTools
  \end{equation}

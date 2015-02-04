@@ -46,9 +46,9 @@ Conclusions | TODO
 Appendix Extended Model | Draft
  
 Appendix Tool Manuals | Started
-	File formats | TODO
-		Assembly XML | TODO
-		Time matrix | TODO
+	File formats | Draft
+		Assembly XML | Draft
+		Time matrix | Draft
 	Assembly Conv | TODO & fixa numberformatexception
 	SchedPrinter | TODO & Fixa utskrift av usage när inga argument skickas in & Fixa ArrayOutOfBound med JaCoP data & kontrollera vilka solvers som kan läsas av G12 parsern
 	FZNstat | TODO

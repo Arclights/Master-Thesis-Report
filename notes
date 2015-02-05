@@ -15,6 +15,7 @@ Med i rapporten:
 		Hittar lösning inom rimlig tid?
 		Tid?
 		Antal genererade constraints. FlatZinc filens storlek
+	* Ta med att man måste tänka på att maskinerna måste flytta på sig efter en utförd task för att inte krocka. Borde kanske inkorporeras i vidare studie
 	* Att ha begränsningar på var armarna kan röra sig vs inte ha det
 	* Diskutera valet av att definiera plats/tid för varje task istället för att definiera positioner i rummet och länka varje task till en position. Och på så sätt slippa definiera tider för varje task när de egentligen hänvisar till samma plats.
 	* Diskutera huruvida de constraints som begränsar moveDuration är nödvändiga då moveDuration väljs från en matris baserat på dess predecessor och dessa begränsningar bygger på matrisen
@@ -27,7 +28,7 @@ Begränsningar:
 Allmänna funderingar:
 	* Att ha möjlighet att byta tool och kunna ha flera "tools" på ett tool kan ge en väldigt stor och komplex sökrymd. Möjligheten att optimera genom att byta "tool" finns på många ställen -> komplext problem
 	* Vår modell mer komplicerad genom att vi kan göra fler avancerade rörelser, t.ex. montera saker i luften mellan två armar. Alltså inte bara i fixturer.
-	  Ejenstams mer komplex genom större sökrymd som inte går att begränsa på ett vettigt sätt. De olika vägarna som kan tas genom att ta upp flera saker efter varandra gör att möjligheterna ökar drastiskt. Och att läga på vårt alternativ att byta verktyg ökar på denna komplexitet. Därav krävs det sökalgoritmer liknande de som används av Ejenstam.
+	* Ejenstams mer komplex genom större sökrymd som inte går att begränsa på ett vettigt sätt. De olika vägarna som kan tas genom att ta upp flera saker efter varandra gör att möjligheterna ökar drastiskt. Och att läga på vårt alternativ att byta verktyg ökar på denna komplexitet. Därav krävs det sökalgoritmer liknande de som används av Ejenstam.
 	  Analysera mindre fall matematiskt?
 	* Ejenstam gör det lätt för sig genom att säga att varje subassembyl måste utföras i sin helhet på en fixture och varje subassembly måste utföras på olika fixtures. Detta innebär att han inte behöver hålla reda på om det finns något i fixture:n eller inte, så länge fixture tasks inte överlappar.
 	  Detta är nog svårt att generalisera då det måste finnas lika många fixtures som subassemblies.

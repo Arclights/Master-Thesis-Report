@@ -1,5 +1,50 @@
 \chapter{Discussion}\label{cha:discuss}
-The discussion of the results
+
+\section{Model}
+As we mentioned earlier, the design of this model has taken inspiration from Ejenstam's model \cite{ejenstam_2014}. Although, there are some differences in our case studies that affect our models in different ways.
+
+In Ejenstam's model each sub assembly has its own dedicated fixture. Or rather, each sub assembly that does not require any lifting from the fixture. Where the limit goes is not clear. Take for example the case of putting \emph{component1} in a fixture, mounting \emph{component2} on \emph{component1}, pick upp sub assembly \emph{component1-component2}, do some operation, maybe turning it over, putting it back in a fixture, and mount \emph{component3} on sub assembly \emph{component1-component2}. Do we need two fixtures or does one suffice? In our model we can cope with only one fixture even if we have more than one sub assembly, as in our case study. But this also means we need to ensure that no part is put in each fixture before the fixture has been emptied. We do this with constraint \ref{eq:100} where we identify which put and take is associated with each sub assembly on the fixtures. One does not need to do that in Ejenstams model since there is as many fixtures as sub assemblies and therefore automatically only one put and one take task for a single fixture. It makes Ejenstams model simpler in this aspect, since the problem of assigning which sub assembly gets which fixture and when it gets it is solved before the solver tries to solve the problem. In our model it is part of the problem for the solver to solve.
+
+In both Ejenstam's model and our model we try to perform collision avoidance. By that we mean that we avoid collisions in, for example, fixture, it does not mean that we avoid collisions all together. We do not assure that arms does not collide in mid air. This is somewhat accounted for when we say that arms cannot reach certain tasks. Since the robot has two arms positioned in such a way that we could divide the work area in two parts where one arm is responsible for one part and the other arm for the other part. In this way we could avoid them colliding when moving about. Although, this might not be the best strategy when aiming for the smallest makespan. The feature of being able to assign tasks that certain arms cannot reach was developed last in our model and right before implementing that feature we got the makespan of 504 time units. Compared to the result we got after that feature it made a great improvement of the result. This isa hinting that it could be beneficial to not constrain the tasks the arms can reach too much.
+
+Instead of be able to change tool as in our model, Ejenstam's model gives the possibility to have many tools on the same arm at the same time. Our ambition was to be able to solve the data for Ejenstam's case study using our model. And thanks to Johan Wessen at ABB we were allowed access to the data used. Unfortunately, this was the part that put a spanner in the works for that ambition. Because if we wanted to solve Ejenstam's data we would need to be able to have hands with many tools. As it is now we can have one tool mounted no a machine at a time with the possibility to switch to another tool. If we have a case were we have \emph{tool1} mounted on the machine but we need \emph{tool2} there is only one thing we can do, and that is to change the tool. If we incorporated the possibility to have many tools on one hand and have the case of having three hands were \emph{hand1} having one \emph{tool1}, \emph{hand2} and two \emph{tool2} and \emph{hand3} having one \emph{tool2} and one \emph{tool3}, having \emph{hand1} mounted on the machine and needing \emph{tool2}. This gives the possibility to either switch to \emph{hand2} or \emph{hand3} and thereby increasing the complexity of the problem because a decision on what hand to mount on the machine at this time will affect the need to change hands in the future in a greater way compared to changing single tools as we do in our model.
+
+By only allowing one tool mounted at a time in our model we make it possible to
+
+* Att ha möjlighet att byta tool och kunna ha flera "tools" på ett tool kan ge en väldigt stor och komplex sökrymd. Möjligheten att optimera genom att byta "tool" finns på många ställen -> komplext problem
+
+* Vår modell mer komplicerad genom att vi kan göra fler avancerade rörelser, t.ex. montera saker i luften mellan två armar. Alltså inte bara i fixturer.
+Ejenstams mer komplex genom större sökrymd som inte går att begränsa på ett vettigt sätt. De olika vägarna som kan tas genom att ta upp flera saker efter varandra gör att möjligheterna ökar drastiskt. Och att läga på vårt alternativ att byta verktyg ökar på denna komplexitet. Därav krävs det sökalgoritmer liknande de som används av Ejenstam.
+Analysera mindre fall matematiskt?
+
+* Ejenstams tider bygger på riktig uppmätta tider. Dessa varierar dock även för samma tasks beroende på vilken arm som utför det. Detta kan te sig lite märkligt, då en task i sig borde ta lika lång tid oavsett vilken arm som gör det. De borde även kunna röra sig lika snabbt mellan tasks. Det enda som skiljer armar åt borde vara ifall armen kan utföra task:en eller inte, alltså om den kan nå punkten i rummet eller inte.
+Vi utgår ifrån att alla tasks och rörelser mellan tasks tar lika lång tid för alla armar.
+
+* Modellen begränsar inte antalet tools som finns till hands. I stort sätt utgår den ifrån att det finns en uppsättning av alla sorters tools till alla maskiner.
+
+Concurrent tasks vs. en task med två maskiner.
+Två tasks ger mer generella constraints, man kan säga att all tasks tar upp en maskin alltid och att man begränsar det med ett constraint att vissa måste ske samtidigt. Man kan ha constraintet att alla tasks kan ha en predecessor.
+En task gör att man måste kunna säga att tasks kan ta upp till så många maskiner som finns tillgängliga -> fler constraints. Man måste kunna säga att en task ska kunna ha flera predecessors -> fler constraints.
+
+* Diskutera att timeMatrix3D kan vara rätt sparse. Vilket medför att en del filter, som involverar move time, inte påverkar något. Det uppstår nollor på en rad för de tasks som utförs på samma ställe, tex. de som involverar fixtures. Medan tasks som utförs på unika platser, tex. att ta upp en ring från ring-tray, inte borde få några nollor på sin rad.
+
+* Att ha begränsningar på var armarna kan röra sig vs inte ha det
+
+* Diskutera valet av att definiera plats/tid för varje task istället för att definiera positioner i rummet och länka varje task till en position. Och på så sätt slippa definiera tider för varje task när de egentligen hänvisar till samma plats.
+
+* Diskutera huruvida de constraints som begränsar moveDuration är nödvändiga då moveDuration väljs från en matris baserat på dess predecessor och dessa begränsningar bygger på matrisen
+
+Ta med att man måste tänka på att maskinerna måste flytta på sig efter en utförd task för att inte krocka. Borde kanske inkorporeras i vidare studie
+
+
+\section{Results}
+Nämn något om makespan resultatet
+
+* Att köra själv fz medl fzn-fil tar mycket längre tid än att låta skriptet kompilera och köra direct -> går inte att mäta tiden för endast lösning och utan parsning -> vi kör alla test med parsning
+
+* Anledningen till de stora filerna för G12 Lazy och Opturion CPX kan bero på att de använder sig av SAT. Båda är hybrider, Lazy SAT och FD [T.Feydy,P.J.Stuckey] och Opturion SAT och något odefinierat(Kolla upp!). Kolla mer i literatur
+
+Skillnader mellan tider för mauell assembly och beräknad assembly beror på vissa constraints som gör att tasksen inte kan linea upp precis som i den manuella assemblyn, beroende på hur move till en task kan börja relativt till när relaterade tasks avslutas.
 
 As mentioned, in 1.6 the filters increase the number of constraints quite a bit. But the number of reified constraints are decreasing by quite a lot as well. This seems to indicate that the filters does not introduce more reified constraints, which is good.
 
@@ -7,7 +52,5 @@ Decrease in constraints could be connected to the difference in number of constr
 
 in 2.0.1 temp filter adds no constraints, pred filter adds small amount -> hints of pruning instead of relying on the solver to prune
 
-Concurrent tasks vs. en task med två maskiner.
-Två tasks ger mer generella constraints, man kan säga att all tasks tar upp en maskin alltid och att man begränsar det med ett constraint att vissa måste ske samtidigt. Man kan ha constraintet att alla tasks kan ha en predecessor.
-En task gör att man måste kunna säga att tasks kan ta upp till så många maskiner som finns tillgängliga -> fler constraints. Man måste kunna säga att en task ska kunna ha flera predecessors -> fler constraints.
+
 

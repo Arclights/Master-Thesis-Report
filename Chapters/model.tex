@@ -390,7 +390,7 @@ We enforce the $tasksOutOfRange(m)$ variables by simply saying that the tasks in
  As said before, the $toolNeeded$ contains what tool is needed for a task. We need to translate it into what tool is used. It is done by simply taking the value from $toolNeeded$ and assign it to $toolUsed$ for the tasks where a tool is specified, i.e. $toolNeeded$ is not $0$.
  
  \subsection{Precedences}
- These constraints deals with the order in time in which the tasks as to come.
+ These constraints deals with the order in time in which the tasks has to come.
  
   \begin{equation}\label{eq:107}
   (\forall t \in tasks) \; Start(t) \geq moveEnd(t)
@@ -708,22 +708,6 @@ The following two constraints can seem very specific, but are essential to the s
   \end{aligned}
   \end{equation}
   We have already calculated the limits for the whole assembly, $maxEnd$ and $minEnd$. Now we just enforce them on the makespan.
-  
-  \begin{equation}
-  \begin{aligned}\label{eq:67}
-  &(\forall t \in tasks)\\
-  &\begin{aligned}
-  (\forall i \in \{0 , \ldots , maxMoveDurs(t)\} / \{&timeMatrix3D(task,j,k) :\\
-  &\forall j \in tasks,\\
-  &\begin{aligned}
-  &\forall k \in \{1 , \ldots , timeMatrixDepth\}\\
-  &t \neq j\})
-  \end{aligned}
-  \end{aligned}\\
-  &moveDuration(t) \neq i
-  \end{aligned}
-  \end{equation}
- We know that the value for move duration will be one of the values in the time matrix, hence we can restrict the duration to only those values. We do that by coming up with the values that the duration cannot assume, and limits the duration to not have those values in its domain.
   
   \begin{equation}
   \begin{aligned}\label{eq:69}

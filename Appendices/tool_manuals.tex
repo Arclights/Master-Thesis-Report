@@ -3,7 +3,7 @@ The data and tools used in this thesis are available for free to download and us
 
 \section{File Formats}
 There are two files used to produce the data for the solvers; it is the XML file that describes the assembly, and the time matrix file that describes the time it takes an arm to move between two tasks.
-\subsection{Assembly XML}
+\subsection{Assembly XML}\label{sec:xml}
 In order to more easily create the data needed by the solvers, we created an XML format that that is more easy to deal with, that later is translated into MiniZinc code. For an outline of the XML format see listing \ref{list:xml}. Note that although it contain the basic parts, it is not a legit assembly XML file as it is not complete. For a complete version of the XML used in the thesis see [link].
 
 All ids must be unique within the area they are used. So for example there can only be one tray called "tray1", but there could be a fixture called "tray1" as well, but that would be bad practise since it would be confusing. Ids used must also be declared before they are used again. For example a component must be declared through a \texttt{Component} tag before being referenced to in a task. The number of declarations can theoretically be infinite, but since everything will be represented by integers in the model we are practically limited to the limit of integers.
@@ -26,7 +26,7 @@ To define the tool change durations we use the \texttt{ToolChangeDurations} tag 
 \lstinputlisting[label=list:xml,captionpos=b,caption=The basic parts of the assembly XML. This is not a legit assembly file.,tabsize=3,frame=L,basicstyle=\footnotesize\ttfamily]{Listings/assembly.xml}
 \end{figure}
 
-\subsection{Time Matrix}
+\subsection{Time Matrix}\label{sec:time_matrix}
 To supply the time it takes to move between the tasks we provide a time matrix using a time matrix. A row represents the task we are going from and the column represents the task we are going to. There are as many columns as there are tasks in the XML file, but there are one more rows than there are columns. This is to account for the starting position of the machines.
 
 The file format is a comma separated values file (CSV). To identify which row and column belongs to the correct task, each row and column starts with the corresponding id from the XML file. The row for the start task must be named \emph{Start}. The file needs to be separated with semicolons in order to allow for commas in the ids. This means that the ids used in the assembly cannot have semicolons in them. The values for the times can be decimal values, they will be rounded of after the calculations by the translator. Figure \ref{fig:time_matrix} shows an example of the structure of the time matrix.
@@ -44,7 +44,7 @@ Mount button on top & 8 & 0 & \dots & 0
 \label{fig:time_matrix}
 \end{figure}
 
-\section{AssemblyConv}
+\section{AssemblyConv}\label{sec:assemblyConv}
 \texttt{AssemblyConv} is the program used to convert the XML file and the time matrix file into data for the solver. It takes the matrix file and the XML as arguments and produces a MiniZinc file. For a detailed description of the syntax run the program without parameters of with \texttt{-h} as parameter.
 
 \section{SchedPrinter}

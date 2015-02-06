@@ -1,6 +1,23 @@
  \chapter{Extended Model}\label{app:ext_mod}
 This appendix contains constraints that are included in the model, but not as essential for the assembly as the ones in chapter \ref{cha:model}.
 
+\section{Temporal filter}
+  \begin{equation}
+  \begin{aligned}\label{eq:67}
+  &(\forall t \in tasks)\\
+  &\begin{aligned}
+  (\forall i \in \{0 , \ldots , maxMoveDurs(t)\} / \{&timeMatrix3D(task,j,k) :\\
+  &\forall j \in tasks,\\
+  &\begin{aligned}
+  &\forall k \in \{1 , \ldots , timeMatrixDepth\}\\
+  &t \neq j\})
+  \end{aligned}
+  \end{aligned}\\
+  &moveDuration(t) \neq i
+  \end{aligned}
+  \end{equation}
+ We know that the value for move duration will be one of the values in the time matrix, hence we can restrict the duration to only those values. We do that by coming up with the values that the duration cannot assume, and limits the duration to not have those values in its domain.
+
 \section{Predecessor filter}
 \begin{equation}\label{eq:74}
   alldifferent(\{pred(t) : \forall t \in tasks\})

@@ -186,6 +186,6 @@
 	\cleardoublepage
 	\phantomsection
 	\addcontentsline{toc}{chapter}{Bibliography}
-	\bibliographystyle{plain}
+	\bibliographystyle{apalike}
 	\bibliography{#1}
 }

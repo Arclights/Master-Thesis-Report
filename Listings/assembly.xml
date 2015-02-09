@@ -48,5 +48,6 @@
 
 	<ToolChangeDurations>
 		<Change FromToolId="tool1" ToToolId="tool2" Duration="60"/>
+		<Change FromToolId="tool2" ToToolId="tool1" Duration="60"/>
 	</ToolChangeDurations>
 </Assembly>

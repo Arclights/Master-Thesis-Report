@@ -28,7 +28,7 @@ Opturion CPX              & 1.0.2 \\
                           & Parser: 3.2.0
 \end{tabular}
 \end{table}
-Note that for Choco3, the solver and parser has different version number. This is because they are not distributed together and therefore have slightly different version numbers.
+Note that for Choco3, the solver and parser has different version number. This is because they are not distributed together and therefore have slightly different version numbers. It is possible to specify the number of cores used by the solver for Gecode, or-tools and Choco3. Hence, these three were given access to all 4 cores when running.
 
 The versions of the solvers used are the latest as of December 2014.
 
@@ -40,6 +40,8 @@ The time for the assembly reached by the solvers as the optimal was 512 time uni
 The results presented in the tables \ref{tab:res_g12} to \ref{tab:res_choco} are the analysis of the FlatZinc files. The tests are grouped into 4 categories of runs; with predecessor filter and temporal filter, with only predecessor filter, with only temporal filter and with no filter at all. In each of these groups there are two groups, one for each version we tests, i.e. 1.6 and 2.0.1.
 
 In the tables presented the filter names has been shortened to \emph{Pred} and \emph{Temp}. \emph{Pred} means the predecessor filter and \emph{Temp} means the temporal filter. We will also use two additional notations in the rime rows; "-" and "!". "-" means that the run did not complete within the given time frame. "!" means that the solver raised an error when reading the FlatZinc file.
+
+The runtime will be presented in two formats, milliseconds and \emph{hours:minutes:seconds}, in the latter the remaining milliseconds are omitted.
 
 
 \input{Tables/results_g12}
@@ -90,7 +92,7 @@ Both the predecessor filter and temporal filter increases the number of constrai
 \\\\
 Compared to 1.6, 2.0.1 seems to increase the number of integer variables by a lot, around 50\%. And once again except for Opturion CPX where it decreases by around 30\%. The same goes for boolean variables, but in the other direction. For all solvers, including Opturion CPX, the number of boolean variables decreases by around 33\%. The number of arrays also increases for all the solvers, especially for Opturion CPX, where the increase is a staggering almost 32000\%. 2.0.1 also decreases the number of constraints by about 48\% on average for all the solvers. But despite removing constraints, the amount of reified constraints increases by about 40\%, except for Opturion CPX where the change is only almost 0.2\%.
 \\\\
-Unfortunately no solver was able to run both the 1.6 version and the 2.0.1 version. Therefore we cannot make a good comparison and make a definitive statement about which version is the most effective.
+Unfortunately no solver was able to run both the 1.6 version and the 2.0.1 version. Therefore we cannot make a good comparison and make a definitive statement about which version is the most effective. Although, the 2.0.1 version shows promising results for Gecode.
 
 \begin{figure}[H]
 \centering

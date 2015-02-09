@@ -20,7 +20,7 @@ To define a set of task that needs to be performed concurrently we use the \text
 
 To define a set of tasks out of range of a machine we use the \texttt{TasksOutOfRange} tag. The id is the id of the machine that the tasks are out of range for. This is not declaring the machine, so it needs to be defined previously.
 
-To define the tool change durations we use the \texttt{ToolChangeDurations} tag and for each tool change we want to define we use the \texttt{Change} tag. And we supply the toll we are changing from, the tool we are changing to and the duration it takes to perform.
+To define the tool change durations we use the \texttt{ToolChangeDurations} tag and for each tool change we want to define we use the \texttt{Change} tag. And we supply the tool we are changing from, the tool we are changing to and the duration it takes to perform.
 
 \begin{figure}
 \lstinputlisting[label=list:xml,captionpos=b,caption=The basic parts of the assembly XML. This is not a legit assembly file.,tabsize=3,frame=L,basicstyle=\footnotesize\ttfamily]{Listings/assembly.xml}
@@ -29,7 +29,7 @@ To define the tool change durations we use the \texttt{ToolChangeDurations} tag 
 \subsection{Time Matrix}\label{sec:time_matrix}
 To supply the time it takes to move between the tasks we provide a time matrix using a time matrix. A row represents the task we are going from and the column represents the task we are going to. There are as many columns as there are tasks in the XML file, but there are one more rows than there are columns. This is to account for the starting position of the machines.
 
-The file format is a comma separated values file (CSV). To identify which row and column belongs to the correct task, each row and column starts with the corresponding id from the XML file. The row for the start task must be named \emph{Start}. The file needs to be separated with semicolons in order to allow for commas in the ids. This means that the ids used in the assembly cannot have semicolons in them. The values for the times can be decimal values, they will be rounded of after the calculations by the translator. Figure \ref{fig:time_matrix} shows an example of the structure of the time matrix.
+The file format is a comma separated values file (CSV). To identify which row and column belongs to the correct task, each row and column starts with the corresponding id from the XML file. The row for the start task must be named \emph{Start}. The times from every task to the place where the tools are changed and vice versa needs to be included as a column and a row with the name \emph{Change tool}. The file needs to be separated with semicolons in order to allow for commas in the ids. This means that the ids used in the assembly cannot have semicolons in them. The values for the times can be decimal values, they will be rounded of after the calculations by the translator. Figure \ref{fig:time_matrix} shows an example of the structure of the time matrix.
 
 \begin{figure}[h]
 \begin{tabular}{c|c|c|c|c}

@@ -1,0 +1,53 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning, calc}
+\usepackage{standalone}
+\usepackage{amsmath, amssymb}
+
+
+\begin{document}
+\begin{tikzpicture}[node distance=2cm,remember picture,
+outer/.style={draw=black,thick,inner sep=5pt}]
+
+\node(ex1){
+\begin{tikzpicture}
+\node[outer] (A) {
+	\begin{tikzpicture}
+		\node(task1){Task t1};
+		\node[shape = ellipse,draw, below of=task1, yshift=1cm](tbr){Top-Button-Ring};
+	\end{tikzpicture}
+};
+
+\node[outer, dashed, below of=A] (B) {
+	\begin{tikzpicture}
+		\node[shape = ellipse,draw, solid](tb){Top-Button};
+		\node[shape = ellipse,draw, right of=tb, xshift=1cm, solid](r){Ring};
+	\end{tikzpicture}
+};
+
+\path[thick,->,>=stealth](tbr)edge(tb);
+\path[thick,->,>=stealth](tbr)edge(r);
+\end{tikzpicture}
+};
+
+\node[right of=ex1, xshift=5cm](ex2){
+\begin{tikzpicture}
+\node[outer] (A) {
+	\begin{tikzpicture}
+		\node(task1){Task t2};
+		\node[shape = ellipse,draw, below of=task1, yshift=1cm](s1){Switch};
+	\end{tikzpicture}
+};
+
+\node[outer, dashed, below of=A] (B) {
+	\begin{tikzpicture}
+		\node[shape = ellipse,draw, solid](s2){Switch};
+	\end{tikzpicture}
+};
+
+\path[thick,->,>=stealth](s1)edge(s2);
+\end{tikzpicture}
+};
+
+\end{tikzpicture}
+\end{document} 

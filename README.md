@@ -1,1 +1,4 @@
-Report for my master thesis
+# Task scheduling for dual-arm industrial robots through constraint programming - MiniZinc modeling and solver comparison
+This is the report for my master thesis.
+
+For the associated files and tools, please see Arclights/Thesis-Tools

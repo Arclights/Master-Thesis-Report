@@ -273,9 +273,9 @@ The tools used to generate the data used in this thesis are free to use and are 
 
  $timeMatrixDepth$ is the length of the z-axis, i.e. the depth of the matrix. It should be said that the reason for using the method described below is to reduce the size of the matrix and avoid too much redundancy.
  
- What we mean with ''different transitions'' is easiest to show through an example. Lets say we have $3$ tools available for each machine. We consider each tool state as a node in a graph, see figure \ref{fig:tools_trans}, with the old tool state to the left and the new tool state to the right. Between them we can draw the different ways we can change state. The we start to consider which ones we actually need. We can change from tool $1$ to tool $1$, which is not changing tool at all. The same can be done for tool $2$, but not changing tool here costs just as much time as with tool $1$. So the change from tool $1$ to itself covers not changing tool for this tool, as well as for all the other tools, thereby we only need to keep track of one of these changes. We can also change from tool $1$ to tool $2$. And we can change back from $2$ to $1$, although here in the model we assume the change from one tool to another takes the same time the other way around as well. Therefore, we consider the change from tool $1$ to tool $2$ the same as from tool $2$ to tool $1$, and only keep track of one of them. If we keep consider the rest of the transitions this way, we will end up with a reduced number of transitions, in our case $4$, see figure \ref{fig:tools_trans}
+ What we mean with ''different transitions'' is easiest shown through an example. Lets say we have $3$ tools available for each machine. We consider each tool state as a node in a graph, see figure \ref{fig:tools_trans}, with the old tool state to the left and the new tool state to the right. Between them we can draw the different ways we can change state. The we start to consider which ones we actually need. We can change from tool $1$ to tool $1$, which is not changing tool at all. The same can be done for tool $2$, but not changing tool here costs just as much time as with tool $1$. So the change from tool $1$ to itself covers not changing tool for this tool, as well as for all the other tools, thereby we only need to keep track of one of these changes. We can also change from tool $1$ to tool $2$. And we can change back from $2$ to $1$, although here in the model we assume the change from one tool to another takes the same time the other way around as well. Therefore, we consider the change from tool $1$ to tool $2$ the same as from tool $2$ to tool $1$, and only keep track of one of them. If we keep consider the rest of the transitions this way, we will end up with a reduced number of transitions, in our case $4$, see figure \ref{fig:tools_trans}
  
- It has been observed that using the reasoning above, $timeMatrixDepth$ follows the function (\ref{eq:timeMatrixDepth}).
+ It has been observed that using the reasoning above, $timeMatrixDepth$ follows the function (\ref{eq:timeMatrixDepth}). 
  \begin{equation}\label{eq:timeMatrixDepth}
  timeMatrixDepth = \frac{n^2 - n + 2}{2}, \; n = nbrTools
  \end{equation}
@@ -618,6 +618,8 @@ The attentive reader might have observed that the nodes in the \texttt{circuit} 
  \end{equation}
 
   \noindent (\ref{eq:116}) is the constraint that decides if there should be a tool change or not between two tasks. It first calculates what tool state transition will occur between the two tasks, $k$, by taking the difference between what tool is used in the task and its predecessor. If they use the same tool, no transition needs to occur, i.e. no tool change needed and the difference would be $0$. We add $1$ to $k$ since the indexes start at $1$ in \emph{MiniZinc} and a result of $0$ should take constraint to the first index dept-wise in the $timeMatrix3D$.
+  \\
+  Please note that there is a bug in the reasoning of $k$. We will discuss it further in section \ref{sec:discuss_bug}.
  \begin{equation}\label{eq:116}
  \begin{aligned}
  (\forall t &\in tasks) \\

@@ -10,6 +10,8 @@ The analysis of the resulting FlatZinc files showed that there was no relation b
 
 \section{Further work}
 
+A possible continuation of this work is to implement a fix for the bug in constraint (\ref{eq:116}) as discussed before. Either as a table or as a 4-dimensional matrix that also could account for the direction of the tool change.
+\\\\
 Since the result from the solver was not evaluated on physical robot it could be a suitable continuation to try out the result on an actual robot. It could show problems not seen in the result itself, such as collisions etc.
 \\\\
 In this thesis we present a set of filter constraints to reduce the domains of the variables. The tests performed compared the result of using the filters versus not using the filters. It is not necessarily the case that all filters are needed, and all filters does probably not perform equally well. Therefore it might be of interest to test the each individual filter fro it self and compare the filters against each other to see which performs the best and take that experience to come up with further filters.

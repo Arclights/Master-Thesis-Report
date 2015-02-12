@@ -872,3 +872,18 @@ The attentive reader might have observed that the nodes in the \texttt{circuit} 
    &\sum counts > 0
    \end{aligned}
    \end{equation}
+   
+   \section{Heuristics}
+   The search was declared to go over the variables through a sequential search\cite{mz_tute} in the following order:
+   
+   \begin{enumerate}
+   \item The $usingMachine$ variables
+   \item The predecessor variables for take tasks that are not on an output
+   \item The predecessor variables for put tasks that are not on an output
+   \item The predecessor variables for mount tasks that are not on an output
+   \item The predecessor variables for tasks that are on an output
+   \item The predecessor variables in general
+   \item The start times of the tasks
+   \end{enumerate}
+   
+   The branching heuristics chosen in the searches 1-6 above was \texttt{indomain\_median}. This means the median value of the domain will be chosen to branch on. This is because there is no numerical relationship between the value the variables can take and the order in which they should come. If constructing the MiniZinc data file using \texttt{AssemblyConv}, see appendix \ref{app:tool_manuals}, the values of the variables depends on the order in which entities are declared. For search 7 above, the heuristic is \texttt{indomain\_min}, which means the smallest value of the domain will be chosen to branch on. This heuristic is chosen since the values of the start variables are the ones we want to minimize, so we search from the bottom up.

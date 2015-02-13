@@ -27,7 +27,7 @@ Opturion CPX              & 1.0.2 \\
 \multirow{2}{*}{Chcoco 3} & Solver: 3.2.2 \\
                           & Parser: 3.2.0
 \end{tabular}
-\end{table}
+\end{table}\\\\
 Note that for Choco3, the solver and parser has different version number. This is because they are not distributed together and therefore have slightly different version numbers. It is possible to specify the number of cores used by the solver for Gecode, or-tools and Choco3. Hence, these three were given access to all 4 cores when running.
 
 The versions of the solvers used are the latest as of December 2014.
@@ -62,7 +62,7 @@ As can be seen in the times or the runs, not many of the runs completed in time.
 \\\\
 By our definition of a result, these are the runs that found the optimal solution and ended the search by concluding that the optimal solution was found. This means that there are other runs that still produced results, sometimes even the optimal one, but did not end the search in time and therefore not qualify as a result.
 
-The G12/FD runs using predecessor filter with version 1.6, using predecessor filter with version 1.6 and using predecessor filter with version 2.0.1 all find solutions, although none of them are the optimal.
+The G12/FD runs using predecessor and temporal filter with version 2.0.1, using predecessor filter with version 1.6 and using predecessor filter with version 2.0.1 all find solutions, although none of them are the optimal.
 
 The JaCoP runs using predecessor and temporal filter with version 2.0.1 and using predecessor filter with version 2.0.1 both finds all the solutions, including the optimal solution, immediately. This is also the case for JaCoP using predecessor filter with version 1.6.
 

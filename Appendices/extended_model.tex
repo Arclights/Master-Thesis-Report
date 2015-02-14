@@ -6,12 +6,8 @@ This appendix contains constraints that are included in the model, but not as es
   \begin{aligned}\label{eq:67}
   &(\forall t \in tasks)\\
   &\begin{aligned}
-  (\forall i \in \{0 , \ldots , maxMoveDurs(t)\} / \{&timeMatrix3D(task,j,k) :\\
-  &\forall j \in tasks,\\
-  &\begin{aligned}
-  &\forall k \in \{1 , \ldots , timeMatrixDepth\}\\
-  &t \neq j\})
-  \end{aligned}
+  (\forall i \in \{0 , \ldots , maxMoveDurs(t)\} \setminus \{timeMatrix3D(task,j,k) :\\
+  \forall j \in tasks, \; \forall k \in \{1 , \ldots , timeMatrixDepth\}, \; t \neq j\})
   \end{aligned}\\
   &moveDuration(t) \neq i
   \end{aligned}
@@ -78,9 +74,8 @@ This appendix contains constraints that are included in the model, but not as es
   \begin{aligned}\label{eq:90}
   &(\forall precTask \in tasks) \\
   &(\forall t \in tasks, \; precTask \neq t,\\
-  &\begin{aligned}componentUsed(precTask) \cup taskCompleteSubComponent(t) \subset\\
-  taskCompleteSubComponents(t), \end{aligned}\\
-  &componentsUsed(precTask) \cup taskCompleteSubComponents(t) \neq \emptyset \\
+  &\begin{aligned}componentUsed(precTask) \cup taskCompleteSubComponents(t) \\ \subset taskCompleteSubComponents(t), \end{aligned}\\
+  &componentsUsed(precTask) \cup taskCompleteSubComponents(t) \neq \emptyset) \\
   &pred(precTask) \neq t
   \end{aligned}
   \end{equation}
@@ -91,9 +86,9 @@ This appendix contains constraints that are included in the model, but not as es
   (\forall concGroup &\in concurrentTasks, \; |concGroup| = nbrMachines) \\
   concComps &= \bigcup_{\forall i \in concGroup}componentsUsed(i), \\
   concSubComps &= \bigcup_{\forall i \in concGroup}taskCompleteSubComponents(i), \\
-  postTasks &= \{postTask : \forall postTask \in tasks,\\
+  postTasks &= \{postTask : \; postTask \in tasks,\\
   &concComps \cap taskCompleteSubComponents(postTask) \neq \emptyset\}\\
-  preTasks &= \{preTask : \forall preTask \in tasks,\\
+  preTasks &= \{preTask : \; preTask \in tasks,\\
   &componentsUsed(preTask) \cap concSubComps \neq \emptyset\}, \\
   (\forall postTask &\in postTasks) \\
   (\forall predTask &\in preTasks) \\

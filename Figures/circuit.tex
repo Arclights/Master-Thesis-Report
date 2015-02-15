@@ -1,0 +1,41 @@
+\documentclass[border=4pt]{standalone}
+\begin{document}
+
+\sffamily
+\begin{tikzpicture}[
+  thick,
+  myrect/.style={
+    draw,
+    rectangle split,
+    rectangle split horizontal,
+    rectangle split parts=#1,
+    rectangle split part align=center
+    } 
+]
+
+\node[myrect=8, draw=none](index)
+  {
+  \nodepart{one}1
+  \nodepart{two}2
+  \nodepart{three}3
+  \nodepart{four}4
+  \nodepart{five}5
+  \nodepart{six}6
+  \nodepart{seven}7
+  \nodepart{eight}8
+  };
+
+\node[myrect=8, below of=index, yshift=0.4cm]
+  {
+  \nodepart{one}5
+  \nodepart{two}8
+  \nodepart{three}7
+  \nodepart{four}2
+  \nodepart{five}4
+  \nodepart{six}1
+  \nodepart{seven}6
+  \nodepart{eight}3
+  };
+
+\end{tikzpicture}
+\end{document}

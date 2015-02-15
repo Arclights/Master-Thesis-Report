@@ -1,0 +1,30 @@
+\documentclass[border=4pt]{standalone}
+\usetikzlibrary{arrows}
+\begin{document}
+
+\sffamily
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\begin{tikzpicture}[node distance=1.5cm,
+  thick
+]
+
+\node[draw, circle](1){1};
+\node[draw, circle, right of=1](5){5};
+\node[draw, circle, right of=5](4){4};
+\node[draw, circle, right of=4](2){2};
+\node[draw, circle, right of=2](8){8};
+\node[draw, circle, right of=8](3){3};
+\node[draw, circle, right of=3](7){7};
+\node[draw, circle, right of=7](6){6}
+	edge[arrow, bend left] (1);
+
+\draw[arrow](1) -- (5);
+\draw[arrow](5) -- (4);
+\draw[arrow](4) -- (2);
+\draw[arrow](2) -- (8);
+\draw[arrow](8) -- (3);
+\draw[arrow](3) -- (7);
+\draw[arrow](7) -- (6);
+
+\end{tikzpicture}
+\end{document}

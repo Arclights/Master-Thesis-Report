@@ -29,7 +29,7 @@
 	{\normalsize \href{mailto:ada09tkv@student.lu.se}{\texttt{ada09tkv@student.lu.se}}}
 }
 
-\title{Task scheduling for dual-arm industrial robots through constraint programming}
+\title{Task scheduling for dual-arm industrial robots through Constraint Programming}
 \subtitle{MiniZinc modeling and solver comparison}
 
 \supervisor{Jacek Malec, \href{mailto:jacek.malek@cs.lth.se}{\texttt{jacek.malec@cs.lth.se}}}
@@ -40,16 +40,16 @@
 \acknowledgements{
 I would like to thank my supervisors, Jacek Malec and Maj Stenmark, for their support and constructive feedback.
 \\
-I would also like to thank Krzysztof Kuchcinski at the Institute of Computer Science, Lund University for his valuable input on the model.
+I would also like to thank Krzysztof Kuchcinski at the Institute of Computer Science, Lund University, for his valuable input on the model.
 \\
 Lastly I would like to thank Johan Wessén at ABB for giving us access to the data used in \cite{ejenstam_2014} and providing help interpreting the data.
 }
 
 \theabstract{
-In a society where more and more production gets automated it demands robots that are as flexible and versatile as humans. Such flexibility demands flexible scheduling. In this thesis we approach the problem using Constraint Programming and through a case study we present a model for a dual-armed robot that is able to deal with a more flexible workload. We also introduce filters to cut down the runtime of the solver. To evaluate the model we tested it on 6 solvers; G12/FD, JaCoP, Gecode, or-tools, Opturion CPX and Choco3. The results show that the model can produce a solution as good as the one manually implemented for the case study. The filters used made an improvement on the runtime for many of the solvers. We also found that the runtime of the solvers varied a lot and could range from several hours to just a couple of milliseconds using the same data. Unfortunately, in many of the tests the solvers did not complete their searches within the time limit of 4 hours and in some cases when using MiniZinc version 2.0.1, the solvers were not able to read the FlatZinc files. The fastest solver in our tests was Gecode using MiniZinc version 2.0.1.
+In a society where more and more production becomes automated it demands robots that are as flexible and versatile as humans. Such flexibility demands automatic scheduling of tasks. In this thesis we approach the problem using Constraint Programming and through a case study we present a model for a dual-armed robot that is able to deal with a more flexible workload. We also introduce filters to cut down the runtime of the solver. To evaluate the model we tested it on 6 solvers; G12/FD, JaCoP, Gecode, or-tools, Opturion CPX and Choco3. The results show that the model can produce a solution as good as the one manually implemented for the case study. We introduce filters on the domains of some of the variables and they made an improvement on the runtime for many of the solvers. We also found that the runtime of the solvers varied a lot and could range from several hours to just a few milliseconds using the same data. Unfortunately, in many of the tests the solvers did not complete their searches within the time limit of 4 hours. In some cases when using MiniZinc version 2.0.1, the solvers were not able to read the FlatZinc files. The fastest solver in our tests was Gecode using MiniZinc version 2.0.1.
 }
 
-\keywords{Constraint Programming, MiniZinc, JaCoP, G12, Gecode, or-tools, Opturion CPX, Choco3}
+\keywords{Constraint Programming, MiniZinc, JaCoP, G12, Gecode, or-tools, Opturion CPX, Choco3, scheduling, dual-arm robots}
 
 \begin{document}
 \makefrontmatter

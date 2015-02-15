@@ -42,6 +42,8 @@ The tools used to generate the data used in this thesis are free to use and are 
 \item $tasksOutOfRange(t)$
 \end{itemize*}
  
+ \newpage
+ 
  \subsection{Static variables}
  Static variables are variables that have a fixed value, or is a set or list containing fixed values.
  \\\\
@@ -114,7 +116,7 @@ The tools used to generate the data used in this thesis are free to use and are 
 
   \noindent Since components also can be sub-assemblies, it means a component can have subcomponents. These have been grouped in different groups to assist the constraints.
 
-  $taskSubComponents(t)$ is the set of components that make up the subcomponents for the components used in task $t$. One can think of the subcomponents as layers with the component on top, call it origin component, and the layer below are the components that make up that component, and so on. $taskSubComponents(t)$ contains the components one layer down, if the component itself is not a \emph{primitve} component. In that case, $taskSubComponents(t)$ contains that component instead. See figure \ref{fig:taskSubComponents} for an example.
+  $taskSubComponents(t)$ is the set of components that make up the subcomponents for the components used in task $t$. One can think of the subcomponents as layers with the component on top, call it origin component, and the layer below are the components that make up that component, and so on. $taskSubComponents(t)$ contains the components one layer down, if the component itself is not a \emph{primitve} component. In that case, $taskSubComponents(t)$ contains that component instead. See Figure \ref{fig:taskSubComponents} for an example.
  \begin{equation}\label{eq:53}
  taskSubComponents(t) \subset components, \; t \in tasks
  \end{equation}
@@ -125,7 +127,7 @@ The tools used to generate the data used in this thesis are free to use and are 
  \label{fig:taskSubComponents}
  \end{figure}
  
- \noindent To use the layer metaphor again, $taskCompleteSubComponents(t)$ contains all the layers below the origin component, for all the components in task $t$, not including the origin component itself. If the origin component is a \emph{primitve} component, the set is empty. See figure \ref{fig:taskCompleteSubComponents} for an example.
+ \noindent To use the layer metaphor again, $taskCompleteSubComponents(t)$ contains all the layers below the origin component, for all the components in task $t$, not including the origin component itself. If the origin component is a \emph{primitve} component, the set is empty. See Figure \ref{fig:taskCompleteSubComponents} for an example.
  \begin{equation}\label{eq:54}
  taskCompleteSubComponents(t) \subset components, \; t \in tasks
  \end{equation}
@@ -267,11 +269,11 @@ The tools used to generate the data used in this thesis are free to use and are 
     	\label{fig:3d_matrix}
    \end{figure}
 
-\noindent For the model to decide how long a move between two tasks should take and whether there should be a change of tool in between, a matrix is used, $timeMatrix3D$, see figure \ref{fig:3d_matrix}. This is a 3-dimensional matrix and contains the times for moving between all the tasks depending on what tool change occurs. On its y-axis it has the tasks to move from, on the x-axis the tasks to move to, and on the z-axis the different transitions between tools that can occur. There are $nbrMachines$ more rows on the y-axis than there are columns on the x-axis. This is because we also account for the starting position of the machines, so each start task has move times associated with them for moving to the other tasks. As the matrix is constructed the way it is, there is no move times between start tasks. 
+\noindent For the model to decide how long a move between two tasks should take and whether there should be a change of tool in between, a matrix is used, $timeMatrix3D$, see Figure \ref{fig:3d_matrix}. This is a 3-dimensional matrix and contains the times for moving between all the tasks depending on what tool change occurs. On its y-axis it has the tasks to move from, on the x-axis the tasks to move to, and on the z-axis the different transitions between tools that can occur. There are $nbrMachines$ more rows on the y-axis than there are columns on the x-axis. This is because we also account for the starting position of the machines, so each start task has move times associated with them for moving to the other tasks. As the matrix is constructed the way it is, there is no move times between start tasks. 
 
  $timeMatrixDepth$ is the length of the z-axis, i.e. the depth of the matrix. It should be said that the reason for using the method described below is to reduce the size of the matrix and avoid redundancy.
  
- What we mean with ''different transitions'' is easiest shown through an example. Let us say we have $3$ tools available for each machine. We consider each tool state as a node in a graph, see figure \ref{fig:tools_trans}, with the old tool state to the left and the new tool state to the right. Between them we can draw the different ways we can change state. The we start to consider which ones we actually need. We can change from tool $1$ to tool $1$, which is not changing tool at all. The same can be done for tool $2$, but not changing tool here costs just as much time as with tool $1$. So the change from tool $1$ to itself covers not changing tool for this tool, as well as for all the other tools, thereby we only need to keep track of one of these changes. We can also change from tool $1$ to tool $2$. And we can change back from $2$ to $1$, although here in the model we assume the change from one tool to another takes the same time the other way around as well. Therefore, we consider the change from tool $1$ to tool $2$ the same as from tool $2$ to tool $1$, and only keep track of one of them. If we keep considering the rest of the transitions this way, we will end up with a reduced number of transitions, in our case $4$, see figure \ref{fig:tools_trans}
+ What we mean with ''different transitions'' is easiest shown through an example. Let us say we have $3$ tools available for each machine. We consider each tool state as a node in a graph, see Figure \ref{fig:tools_trans}, with the old tool state to the left and the new tool state to the right. Between them we can draw the different ways we can change state. The we start to consider which ones we actually need. We can change from tool $1$ to tool $1$, which is not changing tool at all. The same can be done for tool $2$, but not changing tool here costs just as much time as with tool $1$. So the change from tool $1$ to itself covers not changing tool for this tool, as well as for all the other tools, thereby we only need to keep track of one of these changes. We can also change from tool $1$ to tool $2$. And we can change back from $2$ to $1$, although here in the model we assume the change from one tool to another takes the same time the other way around as well. Therefore, we consider the change from tool $1$ to tool $2$ the same as from tool $2$ to tool $1$, and only keep track of one of them. If we keep considering the rest of the transitions this way, we will end up with a reduced number of transitions, in our case $4$, see Figure \ref{fig:tools_trans}
  
  It is clear that, $timeMatrixDepth$ obeys the equation (\ref{eq:timeMatrixDepth}). 
  \begin{equation}\label{eq:timeMatrixDepth}
@@ -442,6 +444,8 @@ The tools used to generate the data used in this thesis are free to use and are 
   We can observe that the task of doing a sub-assembly begins with a put of a component in a fixture and a take of a component from the same fixture. The taken component will have the put component as a sub-component. With this knowledge we start by extracting all put tasks for a fixture. Then we extract all the corresponding take tasks, i.e. the take tasks for that fixture where the component used in the put task is among the sub-components for the component in the take task. Although, there is the case where we construct a component by first doing some mounting, then we take it up to maybe turn it or fixate it, and then put it back in the fixture for further mounting. In this case we will get two takes matching with the first put. So we need to identify which take task is the first one. We do this by choosing the take task with the least amount of subcomponents.
   
   Now we have a 1:1 matching of take tasks and put tasks. To ensure the time between when a put task occurs and when the take task occurs, we apply a \emph{cumulative} constraint over that time and the limit of the fixture is always $1$.
+  
+  When $[$ and $]$ are used together with $:$ as below, it means they are array generators. What is left of the $:$ is what is put in the array and what is right of it is the condition. A case here which might be confusing is the last argument to the cumulative constraint. It simply states that it is an array of ones with the same length as $puts$.
  \begin{equation}
  \begin{aligned}\label{eq:100}
  &(\forall f \in fixtures) \\
@@ -542,7 +546,7 @@ The tools used to generate the data used in this thesis are free to use and are 
  
  \begin{equation}\label{eq:109}
  \begin{aligned}
- (\forall startTask &\in startTasks / \{nbrTasks + 1\}) \\
+ (\forall startTask &\in startTasks \setminus \{nbrTasks + 1\}) \\
  pred(startTask) &= startTask + nbrMachines - 1
  \end{aligned}
  \end{equation}
@@ -611,8 +615,6 @@ The tools used to generate the data used in this thesis are free to use and are 
  \end{equation}
 
   \noindent (\ref{eq:116}) is the constraint that decides if there should be a tool change or not between two tasks. It first calculates what tool state transition will occur between the two tasks, $k$, by taking the difference between what tool is used in the task and its predecessor. If they use the same tool, no transition needs to occur, i.e. no tool change needed and the difference would be $0$. We add $1$ to $k$ since the indexes start at $1$ in \emph{MiniZinc} and a result of $0$ should take constraint to the first index dept-wise in the $timeMatrix3D$.
-  \\
-  Please note that there is a bug in the reasoning of $k$. We will discuss it further in section \ref{sec:discuss_bug}.
  \begin{equation}\label{eq:116}
  \begin{aligned}
  (\forall t &\in tasks) \\
@@ -621,6 +623,7 @@ The tools used to generate the data used in this thesis are free to use and are 
  \end{aligned}
  \end{equation}
  
+ \newpage
  
  \section{Filter}
   In \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} \cite{VilimBartak2002Sequence} Vilím shows that filtering the domains of variables when, as in our case, using sequence dependent setup times can have a great effect on the runtime. Here we present a set of filters in order to minimize the domains of the variables.
@@ -654,9 +657,9 @@ The tools used to generate the data used in this thesis are free to use and are 
 
   \noindent By using the newly created variables we can -*define yet another two. These define a new maximum for the total time of the assembly, $maxEnd$. It is similar to $maxE$ in equation (\ref{eq:maxE}), although much more thorough in the filtering. These variables also define a new minimum for the total time of the assembly, it was earlier ju set to 0.
    
-   To calculate the maximum end we look at the worst case scenario for the assembly. The worst case would be if all the tasks had to be done one after the other, one at a time, on the same machine and they would take the longest time, according to the time matrix, to move between them. See figure \ref{fig:worst_case}. This can simply be defined by summing the durations and maximum move durations for all the tasks.
+   To calculate the maximum end we look at the worst case scenario for the assembly. The worst case would be if all the tasks had to be done one after the other, one at a time, on the same machine and they would take the longest time, according to the time matrix, to move between them. See Figure \ref{fig:worst_case}. This can simply be defined by summing the durations and maximum move durations for all the tasks.
    
-   To calculate the minimum end we look at the best case scenario. The best case scenario is if all the tasks can be evenly scheduled over all machines, taking the shortest, according to the time matrix, time to move between them. See figure \ref{fig:best_case}. We can define this by summing up the durations and minimum move durations for all the task end divide the sum with the number of machines available. If the tasks can be perfectly evenly scheduled across all the machines, the total assembly time will be equal to $minEnd$, if they cannot $minEnd$ will always be smaller than the total assembly time.
+   To calculate the minimum end we look at the best case scenario. The best case scenario is if all the tasks can be evenly scheduled over all machines, taking the shortest, according to the time matrix, time to move between them. See Figure \ref{fig:best_case}. We can define this by summing up the durations and minimum move durations for all the task end divide the sum with the number of machines available. If the tasks can be perfectly evenly scheduled across all the machines, the total assembly time will be equal to $minEnd$, if they cannot $minEnd$ will always be smaller than the total assembly time.
   \begin{equation}\label{eq:59}
  	maxEnd = \sum_{\forall t \in tasks} duration(t) + maxMoveDurs(t)
   \end{equation}
@@ -699,6 +702,8 @@ The tools used to generate the data used in this thesis are free to use and are 
  &start(t) \ge minMoveDurs(t)
   \end{aligned}
   \end{equation}
+
+\newpage
 
   \noindent In order to limit the move start to a task we use the same reasoning as with start. But now we have to account for that there comes a task after the move and a duration of the move itself. So we have to subtract the duration of the task and the duration of the move. Since we do not know the exact length of the move, we have to use the value we know the duration can not be lower than, which is $minMoveDuration$.
   \begin{equation}\label{eq:63}
@@ -799,7 +804,7 @@ The tools used to generate the data used in this thesis are free to use and are 
   \begin{equation}\label{eq:76}
   (\forall t1, \forall t2 \in putting \cup mounting) \; pred(t1) \neq t2
   \end{equation}
-
+\newpage
    \noindent Using a similar reasoning as in (\ref{eq:72}) and (\ref{eq:73}), we can find the tasks that cannot be the predecessor of task $t$. We look at what tasks uses the components that has the components used in $t$ as sub-components. This means that those components cannot come before task $t$, and therefore cannot be predecessors of $t$.
   \begin{equation}
   \begin{aligned}\label{eq:78}
@@ -866,7 +871,7 @@ The tools used to generate the data used in this thesis are free to use and are 
    \end{equation}
    
    \section{Heuristics}
-   The search was declared to go over the variables through a sequential search\cite{mz_tute} in the following order:
+   The search was declared to go over the variables through a sequential search\\\cite{mz_tute} in the following order:
    
    \begin{enumerate}
    \item The $usingMachine$ variables

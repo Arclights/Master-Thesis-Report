@@ -1,14 +1,14 @@
 \chapter{Approach}\label{cha:approach}
 
 \section{Constraint Programming}
-Constraint programing is a \emph{declarative} paradigm. This means that in contrast to \emph{imperative} paradigm languages, such as C or Java, the focus of solving problems using constraint programming is on specifying the problem and not the algorithm to solve it. However, \emph{declarative} languages, such as Java and C, can be used as a framework Constraint Programming, as in Jacop, or-tools, and others. One specifies the \emph{domain variables}, or simply variables, and \emph{constraints}. Variables have domains of values, meaning they can take any value in their domain. Variables can often be, depending on language and solver, either integers, floating-points, boolean or symbolic, symbolic being a text or label. For example a symbolic variable representing a week would have the domain\\
-$\{Monday,Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday\}$, while a integer one could have $\{0,1,2,3,4,5,6\}$
+Constraint programing is a \emph{declarative} paradigm. This means that in contrast to \emph{imperative} paradigm languages, such as C or Java, the focus of solving problems using constraint programming is on specifying the problem and not the algorithm to solve it. However, \emph{declarative} languages, such as Java and C, can be used as a framework Constraint Programming, as in JaCoP, or-tools, and others. One specifies the \emph{domain variables}, or simply variables, and \emph{constraints}. Variables have domains of values, meaning they can take any value in their domain. Variables can often be, depending on language and solver, either integers, floating-points, boolean or symbolic, symbolic being a text or label. For example a symbolic variable representing a week would have the domain\\
+$\{Monday,Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday\}$, while a integer one could have $\{0,1,2,3,4,5,6\}$.
 
 \subsection{Constraints}
-Constraints are set up as relationships between the variables, and thereby limiting the domains of the variables. Integer domains are often used for variables, so for the rest of this section we will assume variables have integer domains. For this domain the following function symbols can be used: $+$, $\times$, $-$ and $\div$. The constraint relation symbols are $=$, $<$, $\leq$, $>$, $\geq$. Together with the function symbols and the constraint relation symbols, one can create simple constraint, called \emph{primitive constraint}. An example of a primitive constraint is $X < Y$, i.e.\ the values in $X$'s domain has to be lower than in $Y$'s. Primitive constraints can be used to create more complex constraints using the conjunctive connective $\land$. An example of this is $X < Y \land Y < 10$, i.e.\ $Y$ has to be less than $10$ and $X$ has to be less than $Y$. Since all constraints have to hold when the model is evaluated, all constraints are implicitly joined by a conjunction. The disjunctive connective $\lor$ is also available and can be used in the same way as $\land$. 
+Constraints are set up as relationships between the variables, and thereby limiting the domains of the variables. Integer domains are often used for variables, so for the rest of this section we will assume variables have integer domains. For this domain the following function symbols can be used: $+$, $\times$, $-$ and $\div$. The constraint relation symbols are $=$, $<$, $\leq$, $>$, $\geq$, $\neq$. Together with the function symbols and the constraint relation symbols, one can create simple constraint, called \emph{primitive constraint}. An example of a primitive constraint is $X < Y$, i.e.\ the values in $X$'s domain has to be lower than in $Y$'s. Primitive constraints can be used to create more complex constraints using the conjunctive connective $\land$. An example of this is $X < Y \land Y < 10$, i.e.\ $Y$ has to be less than $10$ and $X$ has to be less than $Y$. Since all constraints have to hold when the model is evaluated, all constraints are implicitly joined by a conjunction. The disjunctive connective $\lor$ is also available and can be used in the same way as $\land$. 
 
 For example, lets assume we have a problem with two variables, $X$ and $Y$, $X = 4$ and $Y = \{1..10\}$. Here $X$ has the value $4$ and can thereby only take the value $4$. $Y$ on the other hand can take the values $1$ to $10$. This means a solution to this problem can be $X = 4$ and $Y = 1$ or likewise $X = 4$ and $Y = 5$ , they are equally correct.\\
-On this problem we can impose a constraint, for example $Y > X$. Now we have set the constraint that $Y$ needs to be larger than $X$. And since $X$ has a fixed known value we can directly see that $Y > 4$, since $x = 4$. Now with this constraint, we can get rid of the lower part of $Y$'s domain and now $Y = \{5..10\}$ instead. And now a viable solution can be $X = 4$ and $Y = 7$, but not $X = 4$ and $Y = 3$.
+On this problem we can impose a constraint, for example $Y > X$. Now we have set the constraint that $Y$ needs to be larger than $X$. And since $X$ has a fixed known value we can directly see that $Y > 4$, since $x = 4$. Now with this constraint, we can reduce the domain of $Y$ and now $Y = \{5..10\}$ instead. And now a viable solution can be $X = 4$ and $Y = 7$, but not $X = 4$ and $Y = 3$.
 
 \begin{figure}
   \input{Figures/search_example}%     without .tex extension
@@ -18,35 +18,34 @@ On this problem we can impose a constraint, for example $Y > X$. Now we have set
 \end{figure}
 
 \subsection{Global constraints}
-Global constraints are constraints that sets up a relation between an non-fixed number of variables and they can be reduce to a set of simpler binary constraints\\\cite{global_const}. They are also context independent, meaning they can be used in many contexts and does not take into account what context it is in\\\cite{global_constraint_catalogue}. This makes them quite convenient to use when modeling and we are using a couple of global constraints that are listed below.
+Global constraints are constraints that sets up a relation between an non-fixed number of variables and they can be reduce to a set of simpler binary constraints\\\cite{global_const}. They are also context independent\cite{global_constraint_catalogue}, which makes them quite convenient to use when modeling and we are using a couple of global constraints that are listed below.
 
-The general discription of the global constraints in this section come from the \emph{Global Constraint Catalogue} \cite{global_constraint_catalogue} and the adaption in MiniZinc is from MiniZinc:s global constraints listing \cite{mz_global_constraints}.
+The discription of the global constraints in this section come from MiniZinc:s global constraints listing \cite{mz_global_constraints} and MiniZinc:s tutorial, \cite{mz_tute}.
 
 \subsubsection{All Different Constraint (\texttt{allDifferent})}
-The \texttt{allDifferent} constraint is pretty straightforward. It takes a collection \texttt{VARIABLES} as argument and enforces all variables in \texttt{VARIABLES} to assume distinctly different values, i.e. all values will be different.
-\\
-In MiniZinc, \texttt{VARIABLES} is called \texttt{x} and consists of a set of variables.
+The \texttt{allDifferent} constraint is pretty straightforward. It takes a set or array \texttt{x} as argument and enforces all variables in \texttt{x} to take distinctly different values, i.e. all values will be different.
 
 \subsubsection{Circuit Constraint (\texttt{circuit})}
-The \texttt{circuit} constraint takes a collection of nodes \texttt{NODES}, where each node has an index and a successor. \texttt{circuit} enforces the nodes to form a \emph{Hamiltonian circuit}.
+The \texttt{circuit} constraint takes an array of integers representing  nodes, \texttt{x}. Each index is represents a node and the index the  number of the node. The value at the index represents the successor of the node at the index. \texttt{circuit} enforces the nodes to form a \emph{Hamiltonian circuit}. This means all nodes will be part of the circuit that is formed and no node have itself as successor. See Figure \ref{fig:circuit} for an example.
 
-In MiniZinc, \texttt{NODES} is called \texttt{x} and consists of an array with variables where the index in the array is the index for the variable in that place and the successor value is the value of the variable.
+\begin{figure}
+\centering
+\include{Figures/circuit}
+\include{Figures/circuit_nodes}
+\caption{Example of the \texttt{circuit} constraint enforced on an array of length 8. The visualisation of the array on top. The visualisation of the nodes beneath with arrows from the node to its successor}
+\label{fig:circuit}
+\end{figure}
 
 \subsubsection{Cumulative Constraint (\texttt{cumulative})}
-The \texttt{cumulative} constraint takes two arguments, a collection of tasks \texttt{TASKS} and a limit \texttt{LIMIT} for how many tasks can overlap simultaneously. The tasks have 4 attributes; \texttt{origin}, \texttt{duration}, \texttt{end} and \texttt{height}. The attributes are pretty self explanatory; \texttt{origin} is where in time the task starts, this is the value the constraint tries to determine, \texttt{duration} is the duration of the task, the \texttt{end} is at which time the task ends. \texttt{Height} might not be as straight forward though, it means how many resources the task consumes. \texttt{LIMIT} is the limit for how many resources there are available. So if we have a limit of $5$ resources and we have two tasks which consume $3$ and $2$ resources respectively, they can execute simultaneously. But not if the limit were $3$.
-
-In MiniZinc, \texttt{TASKS} is split into $3$ arguments; \texttt{s}, \texttt{d} and \texttt{r}. Each of them is an array where the index represents a task. The \texttt{end} variable is skipped and is implied by the \texttt{s} and \texttt{d} arguments. The \texttt{r} variable in MiniZinc represents the \texttt{height} variable.
+The \texttt{cumulative} constraint is used to schedule entities that takes a given amount of resources in a system with a known amount of resources available. The constraint takes 5 arguments; an array of start times, an array of durations, an array of resources needed and an integer for how many resources available. So if we have $5$ resources available and we have two tasks which requires $3$ and $2$ resources respectively, they can execute simultaneously. But not if the number of available resources were $3$. Each index in the arrays corresponds to an entity.
 
 \subsubsection{Global Cardinality constraint (\texttt{global\_cardinality})}
-The \texttt{global\_cardinality} constraint takes two arguments; a collection of variables \texttt{VARIABLES} and a collection of values \texttt{VALUES}. Each element in \texttt{VALUES} has two attributes; \texttt{val} and \texttt{noccurence}. The constraint ensures that \texttt{val} is covered \linebreak\texttt{noccurence} times by the elements in \texttt{VARIABLES}.
+The \texttt{global\_cardinality} constraint takes three arguments; an array of variables \texttt{x}, an array of integer \texttt{cover}, and an array of variables \texttt{counts}. The constraint assures that the occurrences of \texttt{cover(i)} in \texttt{x} is equal to \texttt{counts(i)}.
 
-In MiniZinc, \texttt{VARIABLES} is split into two arguments; \texttt{cover} and \texttt{counts}, where \texttt{cover} corresponds to \texttt{val} and \texttt{counts} corresponds to \texttt{noccurence}. Both \texttt{val} and \texttt{counts} are arrays where the index identifies the element.
-
-\subsection{Propagation}
-To make sure 
+\newpage
 
 \subsection{Solver}
-A constraint programming program consists of many of these constraints and variables. When the solution is specified in a model, a \emph{solver} runs the model. The goal of the solver is to satisfy all the constraints, i.e. set the domains of the variables so that they all follow the relationships of the constraints. This is called the \emph{constraint satisfaction problem}, and can  be defined as a triple $\langle Z,D,C \rangle$. $Z=\{x_1 \ldots x_n\}$ is a finite set of all the variables in the solution, $D(x_i), \; x_i \in Z$ is a set representing the domain of values the variable $x_i$ can assume, $C$ is the set of constraints imposed on the variables in $Z$. In order to satisfy all constraints imposed, the solver performs a \emph{search} on the space of possibilities, i.e.\ the \emph{search space}. The search space has the form of a tree, where each branch is a selection of a variable where the variables domain is reduced into a smaller subset that conforms with the constraints. The solver traverses the tree in search for a solution. When all variables are set to conform with the constraints a solution is found. If the solver reaches a node where a variable domain becomes empty, it has to \emph{backtrack} to a previous node from which it can choose a new variable to set, i.e.\ traversing a new branch of that node. To make sure that all constraints holds true, called \emph{consistency}, when a change occurs in a variable during search or by propagation itself, the solver performs \emph{propagation}. When a change occurs to a variable, lets call it $X$, the solver looks at the variables related to this variable through constraints, lets call the $Y$ and $Z$, and may prune the domains of $Y$ and $Z$ in order to uphold the consistency of the constraints. The solver then propagates onward to the variables related to $Y$ and $Z$ and performs the same procedure. More about solvers can be found in \cite{tsang_1993}, \cite{marriott_1998} and \cite{mz_manual}.
+A Constraint Programming program consists of many of these constraints and variables. When the problem is specified in a model, a \emph{solver} runs the model. The goal of the solver is to satisfy all the constraints, i.e. set the domains of the variables so that they all follow the relationships of the constraints. This is called the \emph{constraint satisfaction problem}, and can  be defined as a triple $\langle Z,D,C \rangle$. $Z=\{x_1 \ldots x_n\}$ is a finite set of all the variables in the solution, $D(x_i), \; x_i \in Z$ is a set representing the domain of values the variable $x_i$ can assume, $C$ is the set of constraints imposed on the variables in $Z$. In order to satisfy all constraints imposed, the solver performs a \emph{search} on the space of possibilities, i.e.\ the \emph{search space}. The search space has the form of a tree, where each branch is a selection of a variable where the variables domain is reduced into a smaller subset that conforms with the constraints. The solver traverses the tree in search for a solution. When all variables are set to conform with the constraints a solution is found. If the solver reaches a node where a variable domain becomes empty, it has to \emph{backtrack} to a previous node from which it can choose a new variable to set, i.e.\ traversing a new branch of that node. To make sure that all constraints holds true, called \emph{consistency}, when a change occurs in a variable during search or by propagation itself, the solver performs \emph{propagation}. When a change occurs to a variable, lets call it $X$, the solver looks at the variables related to this variable through constraints, lets call them $Y$ and $Z$, and may prune the domains of $Y$ and $Z$ in order to uphold the consistency of the constraints. The solver then propagates onward to the variables related to $Y$ and $Z$ and performs the same procedure. More about solvers can be found in \cite{tsang_1993}, \cite{marriott_1998} and \cite{mz_manual}.
 
 \subsection{Reified Constraints}
 Reified constraints are constraints that couple a primitive constraint with a boolean variable and provide a relationship between the both. An example could be the constraint $c$ and a boolean variable $B$, the relationship between the both could be $c \Leftrightarrow B$. This says that if $c$ holds, $B = true$ and if $\neg c$ holds, $B = false$. This form of expression can be very useful in expressing complex relations and constraints \cite{marriott_1998}.
@@ -81,28 +80,28 @@ This thesis will test the model using 6 different solvers; \emph{G12}, \emph{JaC
 \item The item has to be free to acquire, either via open source, free license or free academic license.
 \end{itemize}
 
-The model was initially tested during the implementation phase using G12/FD, but after a while G12/FD was unable to produce results and a switch was made to JaCoP. In other words, the model was developed and initially tested using JaCoP.
+The model was initially tested during the implementation phase using G12/FD, but after a while G12/FD was unable to produce results and a switch was made to JaCoP. In other words, the model was developed and tested using JaCoP.
 
 \subsection{G12/FD}
-\emph{G12/FD} is a finite domain solver provided by the G12 team, the creators of MiniZinc. It is implemented in Mercury and is the default solver for the G12 FlatZinc interpreter. \cite{nicta_2964} \cite{mz_result_2014}
+\emph{G12/FD} is a finite domain solver provided by the G12 team, the creators of MiniZinc. It is implemented in Mercury and is the default solver for the G12 FlatZinc interpreter \cite{nicta_2964} \cite{mz_result_2014}.
 \subsection{JaCoP}
-JaCoP stands for Java Constraint Programming solver, and is an open source Java library for constraint programming that is available under the GNU Affero GPL license. It has been developed since 2001, mainly by Krzysztof Kuchcinski and Radoslaw Szymanek. The library provides many global constraints in order to make modeling more efficient. It is used by researchers all around the world and has proven its efficiency by winning silver medal in the MiniZinc Challenge.
+JaCoP stands for Java Constraint Programming solver, and is an open source Java library for Constraint Programming that is available under the GNU Affero GPL license. It has been developed since 2001, mainly by Krzysztof Kuchcinski and Radoslaw Szymanek. The library provides many global constraints in order to make modeling more efficient. It is used by researchers all around the world and has proven its efficiency by winning silver medal in the MiniZinc Challenge
 \cite{jacop_overview}
-\cite{jacop_about}
+\cite{jacop_about}.
 \subsection{Gecode}
 Gecode is a free constraint solver under the MIT License implemented in C++. It officially provide a MiniZinc interface, but many external projects provides additional interfaces. One of its strengths is that it can perform parallel searches using multiple cores and it gives the solver great efficiency. This has lead to Gecode winning all the gold medals of the MiniZinc challenge in all 5 consecutive years between 2008 and 2012.
 \cite{gecode}
 \subsection{or-tools}
-or-tools is an open source constraint solver under the Apache License 2.0 implemented in C++. or-tools is developed by Google and is part of their Operational Research. In addition to C++ and MiniZinc, or-tools also has interfaces for Python, Java and C\#.
-\cite{or_manual}
+or-tools is an open source constraint solver under the Apache License 2.0 implemented in C++. or-tools is developed by Google and is part of their Operational Research. In addition to C++ and MiniZinc, or-tools also has interfaces for Python, Java and C\#\\
+\cite{or_manual}.
 \subsection{Opturion CPX}
 Opturion CPX is a constraint solver developed by Opturion Pty Ltd, a commercial outcome of the G12 project. The same ones that created G12/FD, MiniZinc and FlatZinc. Opturion CPX is a commercial product and therefore not free. Although, they provide academic licenses which was used for the thesis. Since it originated from G12, the language for implementing models is MiniZinc.
 
 Unlike the other solvers used, Opturion CPX is not a pure \emph{finite domain} solver, but rather a combination of solving techniques from CP and propositional logic (SAT). This makes CPX extremely efficient in solving large models.
 It is said that because Opturion CPX only generates propositional variables needed for the search, the search is not necessarily slowed down due to large domains.
-Proof of this can be shown by the number of awards claimed in the MiniZinc challange.
-\cite{cpx}
+Proof of this can be shown by the number of awards claimed in the MiniZinc challange
+\cite{cpx}\\
 \cite{cpx_about}
-\cite{cpx_site}
+\cite{cpx_site}.
 \subsection{Choco3}
-Choco3 is a finite domain \cite{choco_paper} constraint solver implemented in Java and it is free under the BSD license. The development of Choco has been going on since the early 2000s and Choco3 is the latest version. Although sharing the name, Choco3 is not the same system as its predecessor Choco2, but a complete rewriting of the previous system \cite{choco}.
+Choco3 is a finite domain \cite{choco_paper} constraint solver implemented in Java and it is free under the BSD license. The development of Choco has been going on since the early 2000s and Choco3 is the latest version. Although sharing the name, Choco3 is not the same system as its predecessor Choco2, but a complete new implementation of the previous system \cite{choco}.

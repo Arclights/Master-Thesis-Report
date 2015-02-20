@@ -850,7 +850,7 @@ The tools used to generate the data used in this thesis are free to use and are 
   \begin{equation}
   \begin{aligned}\label{eq:82}
   &\begin{aligned}
-  counts &= [i : \; task \in outputTasks, \; i \in \{0 , \ldots , 1\}], \\
+  counts &= [i : \; task \in outputTasks, \; i \in \{0, 1\}], \\
   outputTasks &= [task : \; task \in tasks, \; output(task) > 0], \\
   goalPreds &= [pred(task) : \; task \in goalTasks],
   \end{aligned} \\
@@ -861,7 +861,7 @@ The tools used to generate the data used in this thesis are free to use and are 
    \begin{equation}
    \begin{aligned}\label{eq:83}
    &\begin{aligned}
-   counts &= [i : \forall task \in startTasks, \; i \in \{0 , \ldots , 1\}], \\
+   counts &= [i : \forall task \in startTasks, \; i \in \{0, 1\}], \\
    takePreds &= [pred(task) : \forall task \in taking], \\
    startTasksArray &= [task : \; task \in startTasks], 
    \end{aligned}\\

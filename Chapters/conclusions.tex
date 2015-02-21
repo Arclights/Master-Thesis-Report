@@ -3,7 +3,7 @@ Through this thesis we can conclude that the presented model representing the pr
 
 We can also conclude that when it comes to choosing solvers there can be a very large difference in the performance. It can range from not being able to solve a problem in 4 hours to solve it in under 100 milliseconds. The best performance was achieved by Gecode in 60 milliseconds using the 2.0.1 version of MiniZinc. This is promising result for the new version. Interestingly the 1.6 version of the same solver could not solve the problem in 4 hours. But although the 2.0.1 version performed remarkably well for Gecode, two of the solvers were not able to read the FlatZinc file produced by that version, more specifically Opturion CPX and or-tools.
 
-We tested applying filters that reduced the domains of temporal variables and predecessor variables. Our tests showed that these filters can have an positive inpact on the runtime result, and thereby confirming the results of Vilím in \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} and \cite{VilimBartak2002Sequence}.
+We tested applying filters that reduced the domains of temporal variables and predecessor variables. Our tests showed that these filters can have an positive impact on the runtime result, and thereby confirming the results of Vilím in \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} and \cite{VilimBartak2002Sequence}.
 
 The analysis of the resulting FlatZinc files showed that there was no relation between the resulting FlatZinc file and the runtime of the solver. Moreover, we found no relation between the percentage of reified constraints and the runtime of the solver.
 

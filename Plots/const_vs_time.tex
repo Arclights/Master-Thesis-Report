@@ -1,5 +1,5 @@
 \begin{tikzpicture}
-\begin{semilogyaxis}
+\begin{semilogyaxis}[xlabel=\# Constraints, ylabel=Time (ms)]
 \addplot+[only marks] table[ x=int,y=time] {Plots/const_vs_time.dat};
 \end{semilogyaxis}
 \end{tikzpicture}

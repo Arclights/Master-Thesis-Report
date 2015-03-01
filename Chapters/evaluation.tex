@@ -3,7 +3,7 @@ Here we will present the evaluation of the model. Each solver was given a time l
 
 Originally, the 1.6 version of MiniZinc was used. But during the making of the model version 2.0 was released. According to NICTA, the 2.0 version is a complete rewrite of the MiniZinc-to-FlatZinc comipiler but that the resulting FlatZinc file is compatile with 1.6 solvers, and therefore no changes should be required for the solvers \cite{mz2}. We therefore thought it could be of interest to compare how the 2.0 version performed compare to the 1.6 version. During the test phase of the thesis version 2.0.1 was released that should fix some bugs in 2.0 \cite{mz2_changelog}. Therefore, version 2.0.1 is used.
 
-Apart from measuring the the time, we also analysed the resulting FlatZinc file to see if we could see any correlation between the running time and the data run. The data extracted was the number of integer and boolean variables, the number of arrays, the number of constraints and the percentage of constraints that were reified. We measure the reifieds since even if we try to avoid direct reifieds in the MiniZinc code, the FlatZinc could still contain reified depending on how it translates the MiniZinc code.
+Apart from measuring the time, we also analysed the resulting FlatZinc file to see if we could see any correlation between the running time and the data run. The data extracted was the number of integer and boolean variables, the number of arrays, the number of constraints and the percentage of constraints that were reified. We measure the reifieds since even if we try to avoid direct reifieds in the MiniZinc code, the FlatZinc could still contain reified constraints depending on how it translates the MiniZinc code.
 
 In order to see if the filtering we introduced made any difference, we also measure the different combinations of the filters and the absence of filters. Because of all the combinations of parameters we want to test, there will be 8 test cases for each solver.
 
@@ -26,12 +26,12 @@ Opturion CPX              & 1.0.2 \\
                           & Parser: 3.2.0
 \end{tabular}
 \end{table}\\\\
-Note that for Choco3, the solver and parser has different version number. This is because they are not distributed together and therefore have slightly different version numbers. It is possible to specify the number of cores used by the solver for Gecode, or-tools and Choco3. Hence, these three were given access to all 4 cores when running.
+Note that for Choco3, the solver and parser has different version numbers. This is because they are not distributed together and therefore have slightly different version numbers. It is possible to specify the number of cores used by the solver for Gecode, or-tools and Choco3. Hence, these three were given access to all 4 cores when running.
 
 The versions of the solvers used are the latest as of December 2014.
 
 \section{The results}\label{sec:res}
-The time for the assembly reached by the solvers as the optimal was 512 time units. This the time we will use as the optimal when we henceforth talk about which solvers reached the optimal but did not finish the search.
+The time for the assembly reached by the solvers as the optimal was 512 time units. This is the time we will use as the optimal when we henceforth talk about which solvers reached the optimal but did not finish the search.
 
 The results presented in the tables \ref{tab:res_g12} to \ref{tab:res_choco} are the analysis of the FlatZinc files. The tests are grouped into 4 categories of runs; with predecessor filter and temporal filter, with only predecessor filter, with only temporal filter and with no filter at all. In each of these groups there are two groups, one for each version we tests, i.e. MiniZinc 1.6 and 2.0.1.
 
@@ -89,50 +89,50 @@ Both the predecessor filter and temporal filter increases the number of constrai
 Compared to 1.6, 2.0.1 seems to increase the number of integer variables by a lot, around 50\%. And once again except for Opturion CPX where it decreases by around 30\%. The same goes for boolean variables, but in the other direction. For all solvers, including Opturion CPX, the number of boolean variables decreases by around 33\%. The number of arrays also increases for all the solvers, especially for Opturion CPX, where the increase is a staggering almost 32000\%. 2.0.1 also decreases the number of constraints by about 48\% on average for all the solvers. But despite removing constraints, the amount of reified constraints increases by about 40\%, except for Opturion CPX where the change is only 0.2\%.
 \\\\
 Unfortunately no solver was able to run both the 1.6 version and the 2.0.1 version. Therefore we cannot make a good comparison and make a definitive statement about which version is the most effective. Although, the 2.0.1 version shows promising results for Gecode.
-
-\begin{figure}[H]
+\\\\
+\begin{figure}[h]
 \centering
 \input{Plots/int_vs_time}
 \caption{\# integer variables vs time}
 \label{fig:int_vs_time}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \input{Plots/bool_vs_time}
 \caption{\# boolean variables vs time}
 \label{fig:bool_vs_time}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \input{Plots/tot_vs_time}
 \caption{Total \# of variables vs time}
 \label{fig:tot_vs_time}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \input{Plots/arr_vs_time}
 \caption{\# arrays vs time}
 \label{fig:arr_vs_time}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \input{Plots/const_vs_time}
 \caption{\# constraints vs time}
 \label{fig:const_vs_time}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \input{Plots/reif_vs_time}
 \caption{\% reified vs time}
 \label{fig:reif_vs_time}
 \end{figure}
 
-In Figures \ref{fig:int_vs_time}, \ref{fig:bool_vs_time}, \ref{fig:tot_vs_time}, \ref{fig:arr_vs_time}, \ref{fig:const_vs_time} and \ref{fig:reif_vs_time} we plot the values taken from tables \ref{tab:res_g12}, \ref{tab:res_jacop}, \ref{tab:res_cpx}, \ref{tab:res_gecode}, \ref{tab:res_or} and \ref{tab:res_choco} versus time. The time is on the y-axis and is logarithmic.
+\noindent In Figures \ref{fig:int_vs_time}, \ref{fig:bool_vs_time}, \ref{fig:tot_vs_time}, \ref{fig:arr_vs_time}, \ref{fig:const_vs_time} and \ref{fig:reif_vs_time} we plot the values taken from tables \ref{tab:res_g12}, \ref{tab:res_jacop}, \ref{tab:res_cpx}, \ref{tab:res_gecode}, \ref{tab:res_or} and \ref{tab:res_choco} versus time. The time is on the y-axis and is logarithmic.
 
 As can be seen in Figures \ref{fig:int_vs_time}, \ref{fig:bool_vs_time}, \ref{fig:tot_vs_time}, \ref{fig:arr_vs_time}, \ref{fig:const_vs_time} and \ref{fig:reif_vs_time}, we cannot conclude any relation between the time for the solution and the number of either integer, booleans, arrays, constraints or the percentage of reified constraints. This can also be seen if we study the results for Gecode, or-tools and Choco3. Since they get the same values for the FlatZinc files but completely different times, we can conclude that our data does not show any relation between time and those values.
 \\\\

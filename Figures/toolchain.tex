@@ -1,0 +1,23 @@
+\documentclass[border=4pt]{standalone}
+\usetikzlibrary{arrows}
+\begin{document}
+
+\sffamily
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\begin{tikzpicture}[node distance=3cm,
+  thick
+]
+
+\node[](1){MiniZinc};
+\node[draw, right of=1](2){Translator};
+\node[right of=2](3){FlatZinc};
+\node[draw, right of=3](4){Solver};
+\node[ right of=4](5){Result};
+
+\draw[arrow](1) -- (2);
+\draw[arrow](2) -- (3);
+\draw[arrow](3) -- (4);
+\draw[arrow](4) -- (5);
+
+\end{tikzpicture}
+\end{document}

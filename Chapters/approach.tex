@@ -70,8 +70,17 @@ Our case will be a combination of the flexible job shop problem and the job shop
 There are many solvers for CP problems, but they all use different languages and as a modeler it might be of interest to test how well your model performs on different solvers. To eliminate the need to rewrite models to fit the language of the different solver in order to perform a comparison, MiniZinc was introduced. MiniZinc is a modeling language similar to \emph{Optimized Programming Language} (OPL), but is scaled down and lacks some of OPL's features. MiniZinc's strength lies in that it is coupled with another language called FLatZinc. The difference between MiniZinc and FlatZinc is that MiniZinc is a medium-level language where it is easy for modelers to express themselves and FlatZinc is a low-level language that is easy for interpreters to parse. There is a translator from MiniZinc to FlatZinc provided, the translation is called \emph{flattening}. MiniZinc provides a set of already defined constraints that solvers can use, however, the translator takes in consideration the solver that is going to be used and can apply custom versions of the constraints specified for that particular solver.
 \cite{mz_paper}
 
-Although MiniZinc aims at being a standard language in CP, it does not have support for defining custom search algorithms, as many other languages do. This means we cannot utilize algorithms for random restart, local search, etc. To be clear, the solver is the one performing the search, but in some Constraint Programming languages we can define how that search is to be performed
+Although MiniZinc aims at being a standard language in CP, it does not have support for defining custom search algorithms, as many other languages do. This means we cannot utilize algorithms for random restart, local search, etc. To be clear, the solver is the one performing the search, but in some Constraint Programming languages we can define how that search is to be performed.
 \cite{mz_paper}
+
+To summarise, the process of solving a problem with MiniZinc will follow the toolchain in Figure \ref{fig:toolchain}. The MiniZinc file is first passed through the translator which produces a FlatZinc file. The FlatZinc file is fed to the solver which performs the search and produces a result.
+
+\begin{figure}
+\centering
+\include{Figures/toolchain}
+\caption{The toolchain in MiniZinc}
+\label{fig:toolchain}
+\end{figure}
 
 \section{Solvers}
 This thesis will test the model using 6 different solvers; \emph{G12}, \emph{JaCoP}, \emph{Gecode}, \emph{OR-tools}, \emph{Opturion CPX} and \emph{Choco3}. There where three requirements considered when we chose the solvers:
@@ -81,6 +90,8 @@ This thesis will test the model using 6 different solvers; \emph{G12}, \emph{JaC
 \end{itemize}
 
 The model was initially tested during the implementation phase using G12/FD, but after a while G12/FD was unable to produce results and a switch was made to JaCoP. In other words, the model was developed and tested using JaCoP.
+\\\\
+Which solvers implement which global constraints, or more precisely which global constraints are used in the produced FlatZinc file, are presented in section \ref{sec:res}.
 
 \subsection{G12/FD}
 \emph{G12/FD} is a finite domain solver provided by the G12 team, the creators of MiniZinc. It is implemented in Mercury and is the default solver for the G12 FlatZinc interpreter \cite{nicta_2964} \cite{mz_result_2014}.
@@ -89,10 +100,10 @@ JaCoP stands for Java Constraint Programming solver, and is an open source Java 
 \cite{jacop_overview}
 \cite{jacop_about}.
 \subsection{Gecode}
-Gecode is a free constraint solver under the MIT License implemented in C++. It officially provide a MiniZinc interface, but many external projects provides additional interfaces. One of its strengths is that it can perform parallel searches using multiple cores and this gives the solver great efficiency. This has lead to Gecode winning all the gold medals of the MiniZinc challenge in all 5 consecutive years between 2008 and 2012.
+Gecode is a free constraint solver under the MIT License implemented in C++. It officially provide a MiniZinc interface, but many external projects provides additional interfaces. One of its strengths is that it can perform parallel searches using multiple cores and this gives the solver great efficiency. The parallel search performs its search by having a "worker" on one core start the search. Then other "workers" on other cores can come in an "steal" a part of the search tree to work on and thereby parllelising the search. This has lead to Gecode winning all the gold medals of the MiniZinc challenge in all 5 consecutive years between 2008 and 2012.
 \cite{gecode}
 \subsection{or-tools}
-or-tools is an open source constraint solver under the Apache License 2.0 implemented in C++. or-tools is developed by Google and is part of their Operational Research. In addition to C++ and MiniZinc, or-tools also has interfaces for Python, Java and C\#\\
+or-tools is an open source constraint solver under the Apache License 2.0 implemented in C++. or-tools is developed by Google and is part of their Operational Research. As with Gecode, or-tools also has support for parallel search. However, if this functions the same way as in Gecode is unclear. In addition to C++ and MiniZinc, or-tools also has interfaces for Python, Java and C\#\\
 \cite{or_manual}.
 \subsection{Opturion CPX}
 Opturion CPX is a constraint solver developed by Opturion Pty Ltd, a commercial outcome of the G12 project. The same ones that created G12/FD, MiniZinc and FlatZinc. Opturion CPX is a commercial product and therefore not free. Although, they provide academic licenses which was used for the thesis. Since it originated from G12, the language for implementing models is MiniZinc.

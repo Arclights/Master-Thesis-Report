@@ -11,49 +11,59 @@ In the model each robot arm/manipulator is called a machine. Hence, a two-armed 
 The tools used to generate the data used in this thesis are free to use and are described in appendix \ref{app:tool_manuals}. The complete model file used can be found at \url{https://github.com/Arclights/Thesis-Tools} under \emph{Data}.
  
  \section{Variables}
- The solver takes a description of the robot cell in the form of a MiniZinc data file. The file describes the number of available arms, tools, trays, fixtures etc. These are \emph{model variables} and they will be explained further down among the \emph{static variables}.
+ The solver takes a description of the robot cell in the form of a MiniZinc data file. The file describes the number of available arms, tools, trays, fixtures etc. The variables provided by the data file are called \emph{model variables} and they will be explained further down among the \emph{static variables} together with some additional variables created using the \emph{model variables}.
  
  \subsection{Model Variables}
 \begin{itemize*}
 \item $nbrTasks$
 \item $nbrMachines$
 \item $nbrTools$
-\item $nbrTrays$
-\item $nbrFixtures$
+\item $toolNeeded(t)$
 \item $nbrComponents$
-\item $nbrOutputs$
-\item $nbrConcurrentGroups$
-\item $nbrOrderedGroups$
-\item $tray(t)$
-\item $output(t)$
-\item $fixture(t)$
 \item $componentsUsed(t)$
+\item $componentsCreated(t)$
+\item $taskSubComponents(t)$
+\item $taskCompleteSubComponents(t)$
+\item $subComponents(c)$
+\item $nbrTrays$
+\item $tray(t)$
+\item $nbrFixtures$
+\item $fixture(t)$
+\item $nbrOutputs$
+\item $output(t)$
+\item $nbrConcurrentGroups$
+\item $concurrentTasks(k)$
+\item $nbrOrderedGroups$
+\item $orderedGroup(k)$
+\item $ordered(k,i)$
 \item $mounting$
 \item $taking$
 \item $moving$
 \item $putting$
-\item $concurrentTasks(k)$
-\item $orderedGroup(k)$
-\item $toolNeeded(t)$
 \item $duration(t)$
-\item $taskSubComponents(t)$
-\item $taskCompleteSubComponents(t)$
-\item $timeMatrix3D(t1, \; t2)$
+\item $timeMatrixDepth$
+\item $timeMatrix3D(t1, \; t2, k)$
 \item $tasksOutOfRange(t)$
 \end{itemize*}
- 
- \newpage
- 
+  
  \subsection{Static variables}
  Static variables are variables that have a fixed value, or is a set or list containing fixed values.
  \\\\
-  First we define the number of tasks to be scheduled. Each task is identified.
+  First we define the number of tasks to be scheduled. Each task is identified by a number from 1 to $nbrTasks$.
  \begin{equation}\label{eq:1}
  nbrTasks \in \{1 , \ldots , 2^{32}-1\}
  \end{equation}
  \begin{equation}\label{eq:10}
  tasks = \{1 , \ldots , nbrTasks\}
  \end{equation}
+ 
+ \noindent Here we define the machines available for the assembly. A machine in this model is an arm.
+  \begin{equation}\label{eq:2}
+  nbrMachines \in \{1 , \ldots , 2^{32}-1\}
+  \end{equation}
+  \begin{equation}\label{eq:11}
+  machines = \{1 , \ldots , nbrMachines\}
+  \end{equation}
 
   \noindent As mentioned, this model is based on the technique of using predecessors to determine which task comes directly before another. This creates the need to have source and a sink node for each machine. We call them start tasks and goal tasks. As they are not provided as parameters, the model creates them and give them identifiers with numbers greater than the tasks to be scheduled. Each machine has to have a start task and a goal task. This means that there are as many start and goal tasks as there are machines. They are arranged so that all the start tasks come first and then all the goal tasks. One can easily find the start task for a machine by $nbrTasks + m$, where $m$ is the machine in question. It is also easy to find the matching goal task by $nbrTask + m + nbrMachines$. If one thinks of the tasks, start and goal tasks as an array where the index is the number of the task, then it would look  like in Figure \ref{fig:tasks_array}.
  \begin{equation}\label{eq:19}
@@ -73,14 +83,6 @@ The tools used to generate the data used in this thesis are free to use and are 
 \noindent We group together all tasks in one set in order for a more readable notation further down.
  \begin{equation}\label{eq:21}
  allTasks = tasks \cup startTasks \cup goalTasks
- \end{equation}
-
-  \noindent Here we define the machines available for the assembly. A machine in this model is an arm.
- \begin{equation}\label{eq:2}
- nbrMachines \in \{1 , \ldots , 2^{32}-1\}
- \end{equation}
- \begin{equation}\label{eq:11}
- machines = \{1 , \ldots , nbrMachines\}
  \end{equation}
 
   \noindent These are the tools that can be fitted on an arm. The model assumes that there is a set of $nbrTools$ for each machine. I.e. if $nbrTools = 2$ and $nbrMachines = 2$, there is a set of tool $1$ and tool $2$ for machine $1$, and another set of tools $1$ and $2$ for machine $2$. There cannot be a combination of tools such as, for example, only tool $1$ for machine $1$ and a set of tools $1$ and $2$ for machine $2$.
@@ -244,16 +246,16 @@ The tools used to generate the data used in this thesis are free to use and are 
 
   \noindent $putting(c)$, $mounting(c)$, $taking(c)$ and $moving(c)$ are subsets of respective set above based on the component involved.
  \begin{equation}\label{eq:35}
- putting(c) \subset putting, \; c \in components
+ putting(c) = \{t : t \in putting, \; c \in componentsUsed(t)\}, \; c \in components
  \end{equation}
  \begin{equation}\label{eq:36}
- mounting(c) \subset mounting, \; c \in components
+ mounting(c) = \{t : t \in mounting, \; c \in componentsUsed(t)\}, \; c \in components
  \end{equation}
  \begin{equation}\label{eq:37}
- taking(c) \subset taking, \; c \in components
+ taking(c = \{t : t \in taking, \; c \in componentsUsed(t)\}, \; c \in components
  \end{equation}
  \begin{equation}\label{eq:38}
- moving(c) \subset moving, \; c \in components
+ moving(c) = \{t : t \in moving, \; c \in componentsUsed(t)\}, \; c \in components
  \end{equation}
 
   \noindent $duration(t)$ is simply the duration of task $t$.
@@ -318,7 +320,7 @@ The tools used to generate the data used in this thesis are free to use and are 
   \noindent In order to create an upper limit for variables dealing with time, we create a rough upper limit of the complete assembly. It simply takes the longest duration for a task and the longest duration for a move between tasks and assert it for all the tasks.
  \begin{equation}
  \begin{aligned}\label{eq:maxE}
- maxE = &(max(\{duration(t) : t \in tasks\}) \; +  \\ 
+ maxE = \; &(max(\{duration(t) : t \in tasks\}) \; +  \\ 
  &\begin{aligned}
  max(\{&timeMatrix3D(t_1,t_2,k) : \\
  &\forall t_1 \in tasks \cup startTasks,  \\ 
@@ -626,7 +628,7 @@ The tools used to generate the data used in this thesis are free to use and are 
  \newpage
  
  \section{Filter}
-  In \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} \cite{VilimBartak2002Sequence} Vilím shows that filtering the domains of variables when, as in our case, using sequence dependent setup times can have a great effect on the runtime. Here we present a set of filters in order to minimize the domains of the variables.
+  In \cite{VilimBartak2002Batch} \cite{Vilim2002Precedence} \cite{VilimBartak2002Sequence} Vilím shows that filtering the domains of variables when, as in our case, using sequence dependent setup times can have a great effect on the runtime. Here we present a set of filters by using constraints in order to prune the domains of the variables.
   
 \subsection{Temporal filter}
   The largest domains in the model are the domains for the variables dealing with time, i.e. the temporal variables. Reducing those has the potential to cut much of the processing time.

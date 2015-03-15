@@ -7,7 +7,7 @@ We tested applying filters that reduced the domains of temporal variables and pr
 
 The analysis of the resulting FlatZinc files showed that there was no relation between the resulting FlatZinc file and the runtime of the solver. Moreover, we found no relation between the percentage of reified constraints and the runtime of the solver.
 
-
+\newpage
 \section{Further work}
 
 Since the result from the solver was not evaluated on physical robot it could be a suitable continuation to try out the result on an actual robot. It could show problems not seen in the result itself, such as collisions etc.
@@ -19,3 +19,7 @@ Since MiniZinc does not have support for customized searches, customized searche
 As mentioned, our ambition for this thesis was originally to be able to run Ejenstam's data on our model, but the extended search space prevented us from that. The testing when developing the model, and thereby the tests for the extension to be able to run Ejenstam's data, was performed only on JaCoP. But as we can see from the results, there are solvers that could perform better. Hence, there might be a possibility to solve Ejenstam's data using those solvers. If an incorporation of local search, as mentioned above, can be done, it would probably further the possibility to adapt the model to the data.
 \\\\
 As mentioned before, our model assumes that there are as many sets of all the tools defined as there are machines, so that each machine has its own set of tools. This simulates an ideal world where we have all the resources we want, when in fact we might be limited to a few sets of tools. To be able to do more realistic schedulings that considers the amount of tools available, there would need to be a considerable number of constraints added to the model and it might be worth looking into in future work.
+\\\\
+As mentioned in section \ref{sec:result_model}, the model is only tested on one case study. Therefore it would be interesting to see how well it fared on other use cases. New problem would occur and a clearer picture would be presented on how well the model handles the problems the model is set out to solve.
+\\\\
+Our tests showed how well the different solvers did on this case study. But the results might be specific to this case study, in another case study the solvers might perform differently. Therefore, to get a better understanding on how the different solvers perform on this model more tests should be conducted on more case studies.
